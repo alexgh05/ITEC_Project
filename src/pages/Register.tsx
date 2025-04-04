@@ -57,8 +57,6 @@ const Register = () => {
   const onSubmit = async (data: RegisterFormValues) => {
     try {
       // This would be replaced with actual registration logic
-      console.log('Registration data:', data);
-      
       // Show success toast
       toast({
         title: 'Registration successful',
