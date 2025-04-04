@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { ArrowRight, Music, Pause, Play } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useThemeStore, CultureTheme } from '@/store/useThemeStore';
@@ -21,7 +21,7 @@ const heroSlides: HeroSlide[] = [
     title: "Tokyo Nights Collection",
     subtitle: "Futuristic streetwear with neon aesthetics",
     cta: "Shop Tokyo",
-    link: "/cultures/tokyo",
+    link: "/shop",
     image: "/hero-tokyo.jpg",
     culture: "tokyo"
   },
@@ -30,7 +30,7 @@ const heroSlides: HeroSlide[] = [
     title: "New York Underground",
     subtitle: "Urban hip-hop inspired fashion",
     cta: "Shop New York",
-    link: "/cultures/newyork",
+    link: "/shop",
     image: "/hero-newyork.jpg",
     culture: "newyork"
   },
@@ -39,7 +39,7 @@ const heroSlides: HeroSlide[] = [
     title: "Lagos Energy",
     subtitle: "Vibrant Afrobeats culture with bold patterns",
     cta: "Shop Lagos",
-    link: "/cultures/lagos",
+    link: "/shop",
     image: "/hero-lagos.jpg",
     culture: "lagos"
   },
@@ -48,7 +48,7 @@ const heroSlides: HeroSlide[] = [
     title: "Seoul K-Pop Scene",
     subtitle: "Cute and colorful Korean pop culture",
     cta: "Shop Seoul",
-    link: "/cultures/seoul",
+    link: "/shop",
     image: "/hero-seoul.jpg",
     culture: "seoul"
   },
@@ -57,7 +57,7 @@ const heroSlides: HeroSlide[] = [
     title: "London Electronic",
     subtitle: "Electronic music scene with modern clubwear",
     cta: "Shop London",
-    link: "/cultures/london",
+    link: "/shop",
     image: "/hero-london.jpg",
     culture: "london"
   }
@@ -67,6 +67,7 @@ const HeroSection = () => {
   const [currentSlide, setCurrentSlide] = useState(0);
   const [isPlaying, setIsPlaying] = useState(false);
   const { culture, setCulture, cultureInfo } = useThemeStore();
+  const navigate = useNavigate();
   
   useEffect(() => {
     let interval: NodeJS.Timeout | null = null;
@@ -89,6 +90,13 @@ const HeroSection = () => {
     setCurrentSlide(index);
     // Automatically apply the theme when clicking on slide indicators
     setCulture(heroSlides[index].culture as CultureTheme);
+  };
+
+  const handleShopButtonClick = (slide: HeroSlide) => {
+    // Navigate to shop with culture parameter
+    const cultureName = slide.culture === 'newyork' ? 'New York' : 
+                        slide.culture.charAt(0).toUpperCase() + slide.culture.slice(1);
+    navigate(`/shop?culture=${cultureName}`);
   };
 
   return (
@@ -171,14 +179,12 @@ const HeroSection = () => {
                     transition={{ delay: 0.6, duration: 0.5 }}
                   >
                     <Button 
-                      asChild
                       className={`bg-culture text-culture-foreground hover:bg-culture/90`}
                       size="lg"
+                      onClick={() => handleShopButtonClick(slide)}
                     >
-                      <Link to={slide.link}>
-                        {slide.cta}
-                        <ArrowRight className="ml-2 h-4 w-4" />
-                      </Link>
+                      {slide.cta}
+                      <ArrowRight className="ml-2 h-4 w-4" />
                     </Button>
                   </motion.div>
                 </div>
