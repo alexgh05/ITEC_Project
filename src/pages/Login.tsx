@@ -43,8 +43,6 @@ const Login = () => {
   const onSubmit = async (data: LoginFormValues) => {
     try {
       // This would be replaced with actual authentication logic
-      console.log('Login data:', data);
-      
       // Show success toast
       toast({
         title: 'Login successful',
