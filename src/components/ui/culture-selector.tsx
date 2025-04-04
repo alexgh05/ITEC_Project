@@ -1,7 +1,9 @@
-
 import { motion } from 'framer-motion';
 import { useThemeStore, CultureTheme } from '@/store/useThemeStore';
 import { Music, Sparkles, Headphones, Building2, Palmtree, Heart, Radio } from 'lucide-react';
+import { useState } from 'react';
+import { Button } from '@/components/ui/button';
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 
 interface CultureOption {
   id: CultureTheme;
@@ -13,6 +15,7 @@ interface CultureOption {
 
 const CultureSelector = () => {
   const { culture, setCulture, cultureInfo, audioEnabled, toggleAudio } = useThemeStore();
+  const [hoveredCulture, setHoveredCulture] = useState<CultureTheme | null>(null);
 
   const cultureOptions: CultureOption[] = [
     {
@@ -53,6 +56,7 @@ const CultureSelector = () => {
   ];
 
   const handleCultureSelect = (newCulture: CultureTheme) => {
+    // Immediately apply the theme when clicked
     setCulture(newCulture);
     if (!audioEnabled && newCulture !== 'default') {
       toggleAudio();
@@ -66,25 +70,19 @@ const CultureSelector = () => {
           key={option.id}
           whileHover={{ y: -5, scale: 1.03 }}
           whileTap={{ scale: 0.98 }}
+          onHoverStart={() => setHoveredCulture(option.id)}
+          onHoverEnd={() => setHoveredCulture(null)}
           className={`relative cursor-pointer rounded-lg overflow-hidden group ${
             culture === option.id ? 'ring-2 ring-culture' : ''
           }`}
           onClick={() => handleCultureSelect(option.id)}
         >
           <div className="aspect-square bg-muted relative overflow-hidden">
-            <motion.div 
+            <div 
               className={`absolute inset-0 bg-gradient-to-br from-culture to-culture-accent/50 opacity-80 culture-${option.id}`}
-              animate={{ 
-                opacity: culture === option.id ? [0.8, 0.9, 0.8] : 0.8 
-              }}
-              transition={{ 
-                repeat: Infinity, 
-                duration: 2, 
-                ease: "easeInOut" 
-              }}
             />
             
-            {option.id === 'tokyo' && (
+            {option.id === 'tokyo' && hoveredCulture === 'tokyo' && (
               <div className="absolute inset-0 grid grid-cols-8 grid-rows-8 opacity-30">
                 {[...Array(12)].map((_, i) => (
                   <motion.div 
@@ -103,23 +101,7 @@ const CultureSelector = () => {
               </div>
             )}
             
-            {option.id === 'newyork' && (
-              <div className="absolute inset-0 flex flex-col justify-end opacity-30">
-                {[...Array(6)].map((_, i) => (
-                  <motion.div 
-                    key={i}
-                    className="h-8 bg-gray-800 mx-1 rounded-t"
-                    style={{ 
-                      height: `${20 + i * 15}px`, 
-                      width: `${15 + Math.random() * 20}px`,
-                      marginLeft: `${5 + i * 20}px`
-                    }}
-                  />
-                ))}
-              </div>
-            )}
-            
-            {option.id === 'lagos' && (
+            {option.id === 'lagos' && hoveredCulture === 'lagos' && (
               <div className="absolute inset-0 overflow-hidden opacity-30">
                 <motion.div 
                   className="absolute bottom-0 left-0 right-0 h-24 bg-blue-400"
@@ -146,7 +128,7 @@ const CultureSelector = () => {
               </div>
             )}
             
-            {option.id === 'seoul' && (
+            {option.id === 'seoul' && hoveredCulture === 'seoul' && (
               <div className="absolute inset-0 opacity-30">
                 {[...Array(8)].map((_, i) => (
                   <motion.div 
@@ -176,7 +158,7 @@ const CultureSelector = () => {
               </div>
             )}
             
-            {option.id === 'london' && (
+            {option.id === 'london' && hoveredCulture === 'london' && (
               <div className="absolute inset-0 opacity-30">
                 {/* LED grid pattern */}
                 <div className="absolute inset-0 grid grid-cols-6 grid-rows-6 gap-1">
@@ -226,59 +208,36 @@ const CultureSelector = () => {
               </div>
             )}
             
-            <motion.div 
+            <div 
               className="absolute top-3 left-3 p-2 rounded-full bg-black/20 backdrop-blur-sm"
-              initial={{ opacity: 0, scale: 0 }}
-              animate={{ 
-                opacity: 1, 
-                scale: 1,
-                rotate: culture === option.id ? [0, 5, 0, -5, 0] : 0
-              }}
-              transition={{
-                rotate: {
-                  repeat: Infinity,
-                  duration: 2,
-                  ease: "easeInOut"
-                },
-                opacity: { duration: 0.3 }
-              }}
             >
               {option.icon}
-            </motion.div>
+            </div>
             
             <div className="absolute inset-0 p-6 flex flex-col justify-end">
               <h3 className="text-xl font-bold text-white flex items-center">
                 {option.name}
                 {culture === option.id && (
-                  <motion.div 
-                    className="ml-2"
-                    initial={{ opacity: 0, scale: 0 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                  >
+                  <span className="ml-2 inline-flex">
                     <Sparkles className="h-4 w-4 text-white/80" />
-                  </motion.div>
+                  </span>
                 )}
               </h3>
-              <p className="text-sm text-white/80 mt-1">{option.description}</p>
+              <p className="text-white/80">{option.description}</p>
               <p className="text-xs text-white/70 mt-2 font-medium">
                 {cultureInfo[option.id].musicGenre}
               </p>
               
               {culture === option.id && (
-                <motion.div 
+                <div 
                   className="absolute bottom-0 left-0 right-0 h-1 bg-white"
-                  layoutId="cultureIndicator"
-                  transition={{ type: "spring", bounce: 0.2 }}
                 />
               )}
             </div>
           </div>
           
           {culture === option.id && (
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
+            <div
               className="absolute top-3 right-3 w-4 h-4 bg-culture rounded-full"
             />
           )}

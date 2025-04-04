@@ -1,4 +1,3 @@
-
 import { useRef, useEffect } from 'react';
 import { useThemeStore } from '@/store/useThemeStore';
 import { drawTokyoBackground } from './tokyo-background';
@@ -12,6 +11,7 @@ export const CanvasBackground: React.FC = () => {
   const { culture } = useThemeStore();
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const animationRef = useRef<number | null>(null);
+  const previousCultureRef = useRef<string>(culture);
   
   useEffect(() => {
     if (!canvasRef.current) return;
@@ -29,37 +29,47 @@ export const CanvasBackground: React.FC = () => {
     window.addEventListener('resize', resizeCanvas);
     resizeCanvas();
     
-    // Different animation patterns based on culture
-    const drawBackground = () => {
-      if (!ctx || !canvas) return;
+    // Only redraw background if culture has been explicitly changed by user
+    if (previousCultureRef.current !== culture) {
+      previousCultureRef.current = culture;
       
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      // Different animation patterns based on culture
+      const drawBackground = () => {
+        if (!ctx || !canvas) return;
+        
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        
+        switch(culture) {
+          case 'tokyo':
+            drawTokyoBackground(ctx, canvas);
+            break;
+          case 'newyork':
+            drawNewYorkBackground(ctx, canvas);
+            break;
+          case 'lagos':
+            drawLagosBackground(ctx, canvas);
+            break;
+          case 'seoul':
+            drawSeoulBackground(ctx, canvas);
+            break;
+          case 'london':
+            drawLondonBackground(ctx, canvas);
+            break;
+          default:
+            drawDefaultBackground(ctx, canvas);
+            break;
+        }
+        
+        animationRef.current = requestAnimationFrame(drawBackground);
+      };
       
-      switch(culture) {
-        case 'tokyo':
-          drawTokyoBackground(ctx, canvas);
-          break;
-        case 'newyork':
-          drawNewYorkBackground(ctx, canvas);
-          break;
-        case 'lagos':
-          drawLagosBackground(ctx, canvas);
-          break;
-        case 'seoul':
-          drawSeoulBackground(ctx, canvas);
-          break;
-        case 'london':
-          drawLondonBackground(ctx, canvas);
-          break;
-        default:
-          drawDefaultBackground(ctx, canvas);
-          break;
+      // Cancel any existing animation before starting a new one
+      if (animationRef.current) {
+        cancelAnimationFrame(animationRef.current);
       }
       
-      animationRef.current = requestAnimationFrame(drawBackground);
-    };
-    
-    drawBackground();
+      drawBackground();
+    }
     
     return () => {
       window.removeEventListener('resize', resizeCanvas);
