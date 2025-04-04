@@ -1,0 +1,51 @@
+<svg width="500" height="600" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background -->
+  <rect width="100%" height="100%" fill="#111" />
+  
+  <!-- Hoodie Base -->
+  <path d="M150,150 L350,150 L370,500 L130,500 Z" fill="#222" />
+  
+  <!-- Back Design - Neon Tokyo Skyline -->
+  <g transform="translate(150, 200) scale(0.5)">
+    <!-- Skyline base -->
+    <rect x="0" y="100" width="400" height="2" stroke="#00eeff" stroke-width="3" />
+    
+    <!-- Buildings -->
+    <g stroke="#00eeff" stroke-width="3" fill="none">
+      <!-- Tokyo Tower -->
+      <path d="M80,100 L100,20 L120,100" />
+      <line x1="90" y1="60" x2="110" y2="60" />
+      
+      <!-- Skyscrapers -->
+      <rect x="140" y="40" width="30" height="60" />
+      <rect x="180" y="30" width="40" height="70" />
+      <rect x="230" y="50" width="25" height="50" />
+      <path d="M270,100 L270,30 L300,30 L300,100" />
+      <path d="M320,100 L320,40 L350,20 L380,40 L380,100" />
+    </g>
+    
+    <!-- Reflection in water effect -->
+    <g stroke="#00eeff" stroke-width="1" opacity="0.3">
+      <path d="M80,102 L100,182 L120,102" />
+      <rect x="140" y="102" width="30" height="40" />
+      <rect x="180" y="102" width="40" height="40" />
+      <rect x="230" y="102" width="25" height="30" />
+      <path d="M270,102 L270,152 L300,152 L300,102" />
+      <path d="M320,102 L320,142 L350,162 L380,142 L380,102" />
+    </g>
+  </g>
+  
+  <!-- TOKYO Text -->
+  <text x="250" y="400" font-family="sans-serif" font-size="36" fill="#ff00aa" text-anchor="middle" font-weight="bold">TOKYO</text>
+  
+  <!-- Neon Glow -->
+  <circle cx="250" cy="320" r="150" fill="url(#neonGlow)" opacity="0.2" />
+  
+  <!-- Definitions -->
+  <defs>
+    <radialGradient id="neonGlow" cx="50%" cy="50%" r="50%" fx="50%" fy="50%">
+      <stop offset="0%" style="stop-color:#ff00aa;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#111;stop-opacity:0" />
+    </radialGradient>
+  </defs>
+</svg> 

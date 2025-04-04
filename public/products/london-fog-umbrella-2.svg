@@ -1,0 +1,121 @@
+<svg width="500" height="600" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background -->
+  <rect width="100%" height="100%" fill="#f5f5f5" />
+  
+  <!-- Umbrella - Open View -->
+  
+  <!-- Handle -->
+  <path d="M250,560 L250,500 C250,500 260,490 260,480 C260,470 250,470 250,470 C250,470 240,470 240,480 C240,490 250,500 250,500 Z" 
+        fill="#513722" stroke="#3a2910" stroke-width="1" />
+  
+  <!-- Shaft -->
+  <rect x="247" y="180" width="6" height="320" fill="#c0c0c0" />
+  <path d="M247,500 L253,500 L253,180 L247,180 Z" fill="#a0a0a0" />
+  
+  <!-- Runner and Stretchers (Metal Parts) -->
+  <rect x="245" y="340" width="10" height="6" rx="1" fill="#a0a0a0" stroke="#808080" stroke-width="1" />
+  <path d="M250,340 L290,250" stroke="#909090" stroke-width="2" fill="none" />
+  <path d="M250,340 L210,250" stroke="#909090" stroke-width="2" fill="none" />
+  <path d="M250,340 L330,300" stroke="#909090" stroke-width="2" fill="none" />
+  <path d="M250,340 L170,300" stroke="#909090" stroke-width="2" fill="none" />
+  <path d="M250,340 L350,350" stroke="#909090" stroke-width="2" fill="none" />
+  <path d="M250,340 L150,350" stroke="#909090" stroke-width="2" fill="none" />
+  <path d="M250,340 L310,390" stroke="#909090" stroke-width="2" fill="none" />
+  <path d="M250,340 L190,390" stroke="#909090" stroke-width="2" fill="none" />
+  
+  <!-- Ferrule (Metal Cap at Top) -->
+  <path d="M246,180 L254,180 L254,190 L246,190 Z" fill="#a0a0a0" stroke="#808080" stroke-width="1" />
+  <ellipse cx="250" cy="180" rx="5" ry="3" fill="#808080" />
+  
+  <!-- Umbrella Canopy (Open) -->
+  <!-- Main Canopy Shape -->
+  <path d="M350,350 
+           C340,320 330,300 330,300 
+           C320,270 290,250 290,250 
+           C270,220 250,190 250,190 
+           C230,220 210,250 210,250 
+           C190,270 170,300 170,300 
+           C160,320 150,350 150,350 Z" 
+        fill="#4c586f" stroke="#3a465f" stroke-width="1" />
+  
+  <!-- Canopy Segments -->
+  <path d="M250,190 L290,250 L330,300 L350,350 L310,390 L250,340 Z" fill="#3a465f" opacity="0.9" />
+  <path d="M250,190 L210,250 L170,300 L150,350 L190,390 L250,340 Z" fill="#3a465f" opacity="0.9" />
+  
+  <!-- Seam Lines -->
+  <path d="M250,190 L250,340" stroke="#5a6a7f" stroke-width="1" />
+  <path d="M250,190 L290,250" stroke="#5a6a7f" stroke-width="1" />
+  <path d="M250,190 L210,250" stroke="#5a6a7f" stroke-width="1" />
+  <path d="M250,190 L330,300" stroke="#5a6a7f" stroke-width="1" />
+  <path d="M250,190 L170,300" stroke="#5a6a7f" stroke-width="1" />
+  <path d="M250,190 L350,350" stroke="#5a6a7f" stroke-width="1" />
+  <path d="M250,190 L150,350" stroke="#5a6a7f" stroke-width="1" />
+  <path d="M250,190 L310,390" stroke="#5a6a7f" stroke-width="1" />
+  <path d="M250,190 L190,390" stroke="#5a6a7f" stroke-width="1" />
+  
+  <!-- London Fog Pattern Elements -->
+  <!-- Left Side -->
+  <g opacity="0.5" transform="translate(200, 270) scale(0.8)">
+    <!-- Big Ben Silhouette -->
+    <path d="M-10,-40 L10,-40 L10,-30 L15,-30 L15,-10 L20,-10 L20,0 L-20,0 L-20,-10 L-15,-10 L-15,-30 L-10,-30 Z" 
+          fill="#ffffff" opacity="0.6" />
+    <line x1="0" y1="-40" x2="0" y2="-30" stroke="#ffffff" stroke-width="2" opacity="0.6" />
+    <rect x="-5" y="-30" width="10" height="5" fill="#ffffff" opacity="0.6" />
+    
+    <!-- Tower Bridge -->
+    <path d="M-60,-5 L-50,-20 L-40,-5 L-30,-20 L-20,-5 L-25,-5 L-25,0 L-55,0 L-55,-5 Z" 
+          fill="#ffffff" opacity="0.6" />
+    <path d="M20,-5 L30,-20 L40,-5 L50,-20 L60,-5 L55,-5 L55,0 L25,0 L25,-5 Z" 
+          fill="#ffffff" opacity="0.6" />
+    <path d="M-25,-5 L25,-5" stroke="#ffffff" stroke-width="2" opacity="0.6" />
+    
+    <!-- Rain Drops -->
+    <g opacity="0.7">
+      <path d="M-70,10 Q-68,15 -65,10" stroke="#ffffff" stroke-width="1" fill="none" />
+      <path d="M-50,15 Q-48,20 -45,15" stroke="#ffffff" stroke-width="1" fill="none" />
+      <path d="M-30,10 Q-28,15 -25,10" stroke="#ffffff" stroke-width="1" fill="none" />
+      <path d="M-10,15 Q-8,20 -5,15" stroke="#ffffff" stroke-width="1" fill="none" />
+      <path d="M10,10 Q12,15 15,10" stroke="#ffffff" stroke-width="1" fill="none" />
+      <path d="M30,15 Q32,20 35,15" stroke="#ffffff" stroke-width="1" fill="none" />
+      <path d="M50,10 Q52,15 55,10" stroke="#ffffff" stroke-width="1" fill="none" />
+      <path d="M70,15 Q72,20 75,15" stroke="#ffffff" stroke-width="1" fill="none" />
+      
+      <path d="M-60,30 Q-58,35 -55,30" stroke="#ffffff" stroke-width="1" fill="none" />
+      <path d="M-40,35 Q-38,40 -35,35" stroke="#ffffff" stroke-width="1" fill="none" />
+      <path d="M-20,30 Q-18,35 -15,30" stroke="#ffffff" stroke-width="1" fill="none" />
+      <path d="M0,35 Q2,40 5,35" stroke="#ffffff" stroke-width="1" fill="none" />
+      <path d="M20,30 Q22,35 25,30" stroke="#ffffff" stroke-width="1" fill="none" />
+      <path d="M40,35 Q42,40 45,35" stroke="#ffffff" stroke-width="1" fill="none" />
+      <path d="M60,30 Q62,35 65,30" stroke="#ffffff" stroke-width="1" fill="none" />
+    </g>
+    
+    <!-- Foggy Swirls -->
+    <g opacity="0.5">
+      <path d="M-70,50 C-60,45 -50,55 -40,50 C-30,45 -20,55 -10,50" 
+            stroke="#ffffff" stroke-width="2" fill="none" />
+      <path d="M0,60 C10,55 20,65 30,60 C40,55 50,65 60,60" 
+            stroke="#ffffff" stroke-width="2" fill="none" />
+      <path d="M-50,70 C-40,65 -30,75 -20,70 C-10,65 0,75 10,70" 
+            stroke="#ffffff" stroke-width="2" fill="none" />
+      <path d="M30,80 C40,75 50,85 60,80 C70,75 80,85 90,80" 
+            stroke="#ffffff" stroke-width="2" fill="none" />
+    </g>
+    
+    <!-- London Eye -->
+    <circle cx="60" cy="-25" r="15" fill="none" stroke="#ffffff" stroke-width="1" opacity="0.6" />
+    <circle cx="60" cy="-25" r="12" fill="none" stroke="#ffffff" stroke-width="1" opacity="0.6" stroke-dasharray="3,3" />
+    <circle cx="60" cy="-25" r="8" fill="none" stroke="#ffffff" stroke-width="1" opacity="0.6" stroke-dasharray="2,2" />
+    <line x1="45" y1="-25" x2="75" y2="-25" stroke="#ffffff" stroke-width="1" opacity="0.6" />
+    <line x1="60" y1="-40" x2="60" y2="-10" stroke="#ffffff" stroke-width="1" opacity="0.6" />
+  </g>
+  
+  <!-- Label -->
+  <g transform="translate(250, 280)">
+    <rect x="-50" y="-10" width="100" height="20" rx="5" ry="5" fill="#ffffff" opacity="0.7" />
+    <text x="0" y="5" font-family="Arial, sans-serif" font-size="12" font-weight="bold" text-anchor="middle" fill="#3a465f">LONDON FOG</text>
+  </g>
+  
+  <!-- Button Closure -->
+  <circle cx="250" cy="340" r="6" fill="#513722" stroke="#3a2910" stroke-width="1" />
+  <circle cx="250" cy="340" r="2" fill="#3a2910" />
+</svg> 

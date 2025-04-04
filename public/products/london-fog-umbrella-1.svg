@@ -1,0 +1,80 @@
+<svg width="500" height="600" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background -->
+  <rect width="100%" height="100%" fill="#f5f5f5" />
+  
+  <!-- Umbrella - Closed View -->
+  
+  <!-- Handle -->
+  <path d="M250,560 L250,500 C250,500 260,490 260,480 C260,470 250,470 250,470 C250,470 240,470 240,480 C240,490 250,500 250,500 Z" 
+        fill="#513722" stroke="#3a2910" stroke-width="1" />
+  
+  <!-- Lower Shaft -->
+  <rect x="247" y="190" width="6" height="310" fill="#c0c0c0" />
+  <path d="M247,500 L253,500 L253,190 L247,190 Z" fill="#a0a0a0" />
+  
+  <!-- Ferrule (Metal Cap) -->
+  <path d="M243,160 L257,160 L257,190 L243,190 Z" fill="#a0a0a0" stroke="#808080" stroke-width="1" />
+  
+  <!-- Umbrella Tip -->
+  <ellipse cx="250" cy="160" rx="7" ry="5" fill="#808080" />
+  
+  <!-- Closed Umbrella Fabric -->
+  <path d="M250,160 C300,170 280,180 280,190 L250,500 L220,190 C220,180 200,170 250,160 Z" fill="#4c586f" />
+  <path d="M250,160 C290,165 275,175 275,185 L250,500 L225,185 C225,175 210,165 250,160 Z" fill="#3a465f" />
+  
+  <!-- Fabric Seams -->
+  <path d="M250,160 L250,500" stroke="#5a6a7f" stroke-width="1" stroke-dasharray="5,5" />
+  <path d="M265,170 L255,480" stroke="#5a6a7f" stroke-width="1" stroke-dasharray="5,5" />
+  <path d="M235,170 L245,480" stroke="#5a6a7f" stroke-width="1" stroke-dasharray="5,5" />
+  
+  <!-- Strap -->
+  <path d="M240,350 C240,345 260,345 260,350 L260,370 C260,375 240,375 240,370 Z" fill="#3a465f" stroke="#2a3a4f" stroke-width="1" />
+  <rect x="247" y="355" width="6" height="5" fill="#c0c0c0" />
+  
+  <!-- London Fog Pattern Elements -->
+  <g opacity="0.2">
+    <!-- Big Ben Silhouette -->
+    <path d="M248,170 L252,170 L252,175 L254,175 L254,180 L246,180 L246,175 L248,175 Z" fill="#ffffff" />
+    
+    <!-- Tower Bridge Silhouette -->
+    <path d="M240,185 L235,190 L235,195 L265,195 L265,190 L260,185 L255,185 L255,188 L245,188 L245,185 Z" fill="#ffffff" />
+    
+    <!-- London Eye -->
+    <circle cx="235" cy="205" r="10" fill="none" stroke="#ffffff" stroke-width="1" />
+    <circle cx="235" cy="205" r="8" fill="none" stroke="#ffffff" stroke-width="1" stroke-dasharray="2,2" />
+    <circle cx="235" cy="205" r="6" fill="none" stroke="#ffffff" stroke-width="1" stroke-dasharray="1,1" />
+    
+    <!-- Rain Drops -->
+    <g>
+      <path d="M230,220 L233,225" stroke="#ffffff" stroke-width="1" />
+      <path d="M240,230 L243,235" stroke="#ffffff" stroke-width="1" />
+      <path d="M250,215 L253,220" stroke="#ffffff" stroke-width="1" />
+      <path d="M260,225 L263,230" stroke="#ffffff" stroke-width="1" />
+      <path d="M270,210 L273,215" stroke="#ffffff" stroke-width="1" />
+      
+      <path d="M235,250 L238,255" stroke="#ffffff" stroke-width="1" />
+      <path d="M245,240 L248,245" stroke="#ffffff" stroke-width="1" />
+      <path d="M255,260 L258,265" stroke="#ffffff" stroke-width="1" />
+      <path d="M265,245 L268,250" stroke="#ffffff" stroke-width="1" />
+      
+      <path d="M230,280 L233,285" stroke="#ffffff" stroke-width="1" />
+      <path d="M245,275 L248,280" stroke="#ffffff" stroke-width="1" />
+      <path d="M260,290 L263,295" stroke="#ffffff" stroke-width="1" />
+      
+      <path d="M235,320 L238,325" stroke="#ffffff" stroke-width="1" />
+      <path d="M255,310 L258,315" stroke="#ffffff" stroke-width="1" />
+    </g>
+    
+    <!-- Foggy Swirls -->
+    <path d="M230,340 C235,335 240,345 245,340" stroke="#ffffff" stroke-width="1" fill="none" />
+    <path d="M255,340 C260,335 265,345 270,340" stroke="#ffffff" stroke-width="1" fill="none" />
+    <path d="M230,360 C240,355 250,365 260,360 C270,355 280,365 290,360" stroke="#ffffff" stroke-width="1" fill="none" />
+    <path d="M230,380 C235,375 240,385 245,380 C250,375 255,385 260,380" stroke="#ffffff" stroke-width="1" fill="none" />
+  </g>
+  
+  <!-- Label -->
+  <g transform="translate(250, 420)">
+    <rect x="-40" y="-10" width="80" height="20" rx="5" ry="5" fill="#ffffff" opacity="0.7" />
+    <text x="0" y="5" font-family="Arial, sans-serif" font-size="10" font-weight="bold" text-anchor="middle" fill="#3a465f">LONDON FOG</text>
+  </g>
+</svg> 

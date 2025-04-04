@@ -1,0 +1,97 @@
+<svg width="500" height="500" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background -->
+  <rect width="100%" height="100%" fill="#e9a200" opacity="0.1" />
+  
+  <!-- Vibrant Pattern Background -->
+  <g opacity="0.15">
+    <rect x="50" y="50" width="100" height="100" fill="#e67700" />
+    <rect x="350" y="50" width="100" height="100" fill="#f59f00" />
+    <rect x="50" y="350" width="100" height="100" fill="#f59f00" />
+    <rect x="350" y="350" width="100" height="100" fill="#e67700" />
+    <path d="M150,0 L200,100 L250,0" fill="#e67700" opacity="0.5" />
+    <path d="M250,0 L300,100 L350,0" fill="#f59f00" opacity="0.5" />
+    <path d="M150,500 L200,400 L250,500" fill="#f59f00" opacity="0.5" />
+    <path d="M250,500 L300,400 L350,500" fill="#e67700" opacity="0.5" />
+  </g>
+  
+  <!-- Headphones - Side View -->
+  <g transform="translate(100, 70)">
+    <!-- Headband -->
+    <path d="M100,50 C180,0 250,0 300,90" stroke="#333" stroke-width="12" fill="none" />
+    
+    <!-- Ear Cup - Side View -->
+    <g transform="translate(0, 0)">
+      <ellipse cx="300" cy="120" rx="30" ry="60" fill="#1a1a1a" />
+      <ellipse cx="300" cy="120" rx="20" ry="45" fill="#e9a200" />
+      <path d="M290,120 C290,100 310,100 310,120 C310,140 290,140 290,120 Z" fill="#e67700" />
+      
+      <!-- Ear Cushion -->
+      <path d="M300,60 C310,60 320,70 330,80 C335,90 335,150 330,160 C320,170 310,180 300,180 C290,180 280,170 270,160 C265,150 265,90 270,80 C280,70 290,60 300,60 Z" 
+            fill="#333" stroke="#1a1a1a" stroke-width="2" />
+    </g>
+    
+    <!-- Adjustment Slider -->
+    <rect x="105" y="55" width="8" height="40" rx="4" fill="#444" />
+    <rect x="100" y="90" width="18" height="10" rx="2" fill="#333" />
+    
+    <!-- Support Arm -->
+    <path d="M100,95 C110,120 150,180 230,180 C270,180 290,160 300,120" stroke="#333" stroke-width="5" fill="none" />
+    
+    <!-- Brand Logo -->
+    <g transform="translate(295, 120) rotate(-5)">
+      <circle cx="0" cy="0" r="12" fill="#e9a200" />
+      <text x="0" y="3" font-family="sans-serif" font-size="8" font-weight="bold" text-anchor="middle">LB</text>
+    </g>
+    
+    <!-- Cable -->
+    <path d="M300,180 C310,200 305,220 290,270 C270,330 260,370 220,380" stroke="#333" stroke-width="3" fill="none" />
+    
+    <!-- Jack -->
+    <rect x="200" y="375" width="20" height="8" rx="4" fill="#666" />
+    <rect x="193" y="375" width="7" height="8" rx="2" fill="#999" />
+  </g>
+  
+  <!-- African Pattern Accent Border -->
+  <g transform="translate(30, 30)">
+    <rect x="0" y="0" width="440" height="440" fill="none" stroke="#e67700" stroke-width="2" />
+    
+    <!-- Corner Patterns -->
+    <g fill="#e9a200" opacity="0.6">
+      <circle cx="0" cy="0" r="15" />
+      <circle cx="440" cy="0" r="15" />
+      <circle cx="0" cy="440" r="15" />
+      <circle cx="440" cy="440" r="15" />
+    </g>
+    
+    <!-- Edge Patterns -->
+    <g stroke="#f59f00" stroke-width="2" fill="none">
+      <path d="M40,0 L60,15 L80,0" />
+      <path d="M120,0 L140,15 L160,0" />
+      <path d="M200,0 L220,15 L240,0" />
+      <path d="M280,0 L300,15 L320,0" />
+      <path d="M360,0 L380,15 L400,0" />
+      
+      <path d="M0,40 L15,60 L0,80" />
+      <path d="M0,120 L15,140 L0,160" />
+      <path d="M0,200 L15,220 L0,240" />
+      <path d="M0,280 L15,300 L0,320" />
+      <path d="M0,360 L15,380 L0,400" />
+      
+      <path d="M40,440 L60,425 L80,440" />
+      <path d="M120,440 L140,425 L160,440" />
+      <path d="M200,440 L220,425 L240,440" />
+      <path d="M280,440 L300,425 L320,440" />
+      <path d="M360,440 L380,425 L400,440" />
+      
+      <path d="M440,40 L425,60 L440,80" />
+      <path d="M440,120 L425,140 L440,160" />
+      <path d="M440,200 L425,220 L440,240" />
+      <path d="M440,280 L425,300 L440,320" />
+      <path d="M440,360 L425,380 L440,400" />
+    </g>
+  </g>
+  
+  <!-- Product Name -->
+  <text x="250" y="450" font-family="sans-serif" font-size="24" fill="#333" text-anchor="middle" font-weight="bold">LAGOS BEATS</text>
+  <text x="250" y="475" font-family="sans-serif" font-size="14" fill="#666" text-anchor="middle">Premium Sound Technology</text>
+</svg> 

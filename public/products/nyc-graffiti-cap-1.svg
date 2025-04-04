@@ -1,0 +1,105 @@
+<svg width="500" height="400" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background -->
+  <rect width="100%" height="100%" fill="#f8f8f8" />
+  
+  <!-- Cap Base - Front View -->
+  <path d="M150,200 C150,130 250,100 350,200 C350,280 250,320 150,200 Z" fill="#282828" />
+  
+  <!-- Cap Brim -->
+  <path d="M150,200 C180,230 320,230 350,200 L370,210 C370,220 130,220 130,210 Z" fill="#202020" />
+  <path d="M130,210 C130,220 370,220 370,210 L350,200 C320,230 180,230 150,200 Z" fill="#181818" />
+  
+  <!-- Cap Panel Seams -->
+  <path d="M250,100 L250,200" stroke="#383838" stroke-width="2" fill="none" />
+  <path d="M180,130 L250,100 L320,130" stroke="#383838" stroke-width="2" fill="none" />
+  <path d="M180,130 L150,200" stroke="#383838" stroke-width="2" fill="none" />
+  <path d="M320,130 L350,200" stroke="#383838" stroke-width="2" fill="none" />
+  
+  <!-- Cap Button Top -->
+  <circle cx="250" cy="100" r="8" fill="#383838" />
+  
+  <!-- Graffiti Style NYC Design -->
+  <g transform="translate(250, 155) scale(0.7)">
+    <!-- Vibrant Background Elements -->
+    <ellipse cx="0" cy="10" rx="100" ry="65" fill="url(#gradientBg)" opacity="0.8" />
+    
+    <!-- Define Gradients -->
+    <defs>
+      <linearGradient id="gradientBg" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" stop-color="#ff3333" />
+        <stop offset="100%" stop-color="#3333ff" />
+      </linearGradient>
+      
+      <filter id="neonGlow" x="-30%" y="-30%" width="160%" height="160%">
+        <feGaussianBlur stdDeviation="5" result="blur" />
+        <feComposite in="SourceGraphic" in2="blur" operator="over" />
+      </filter>
+    </defs>
+    
+    <!-- NYC Graffiti Style Text -->
+    <!-- N -->
+    <path d="M-60,-20 L-60,40 L-50,40 L-30,-10 L-30,40 L-20,40 L-20,-20 L-35,-20 L-50,20 L-50,-20 Z" 
+          fill="#ffffff" stroke="#000000" stroke-width="2" />
+    
+    <!-- Y -->
+    <path d="M-15,-20 L-5,5 L5,-20 L20,-20 L0,15 L0,40 L-10,40 L-10,15 L-30,-20 Z" 
+          fill="#ffffff" stroke="#000000" stroke-width="2" />
+    
+    <!-- C -->
+    <path d="M60,-20 C75,-20 80,-5 80,10 L70,10 C70,-5 65,-10 55,-10 C45,-10 40,0 40,10 C40,20 45,30 55,30 C65,30 70,25 70,10 L80,10 C80,25 75,40 60,40 C45,40 30,30 30,10 C30,-10 45,-20 60,-20 Z" 
+          fill="#ffffff" stroke="#000000" stroke-width="2" />
+    
+    <!-- Graffiti Drips -->
+    <path d="M-60,-20 L-62,-35 M-40,-20 L-38,-30 M-20,-20 L-22,-40 M0,-20 L-2,-35 M20,-20 L22,-30 M35,-10 L33,-25 M80,0 L82,-20" 
+          stroke="#ffffff" stroke-width="3" stroke-linecap="round" />
+    
+    <!-- Graffiti Stars/Sparkles -->
+    <g fill="#ffcc00" filter="url(#neonGlow)">
+      <path d="M-75,0 L-72,-3 L-70,0 L-72,3 Z" />
+      <path d="M75,30 L78,27 L80,30 L78,33 Z" />
+      <path d="M-40,35 L-37,32 L-35,35 L-37,38 Z" />
+      <path d="M20,25 L23,22 L25,25 L23,28 Z" />
+      <path d="M-20,-10 L-17,-13 L-15,-10 L-17,-7 Z" />
+      <path d="M45,-15 L48,-18 L50,-15 L48,-12 Z" />
+    </g>
+    
+    <!-- Graffiti Splatters -->
+    <g fill="#ff3333" opacity="0.7">
+      <circle cx="-55" cy="30" r="4" />
+      <circle cx="-51" cy="28" r="2" />
+      <circle cx="-57" cy="26" r="3" />
+      
+      <circle cx="65" cy="-15" r="4" />
+      <circle cx="69" cy="-13" r="2" />
+      <circle cx="63" cy="-11" r="3" />
+      
+      <circle cx="15" cy="10" r="3" />
+      <circle cx="12" cy="13" r="2" />
+      <circle cx="18" cy="8" r="1" />
+    </g>
+    
+    <g fill="#3333ff" opacity="0.7">
+      <circle cx="-15" cy="-15" r="4" />
+      <circle cx="-11" cy="-13" r="2" />
+      <circle cx="-17" cy="-11" r="3" />
+      
+      <circle cx="35" cy="30" r="4" />
+      <circle cx="39" cy="28" r="2" />
+      <circle cx="33" cy="26" r="3" />
+    </g>
+  </g>
+  
+  <!-- Brand Tag -->
+  <g transform="translate(250, 250)">
+    <rect x="-40" y="-10" width="80" height="20" rx="5" ry="5" fill="#fcfcfc" opacity="0.7" />
+    <text x="0" y="5" font-family="Arial, sans-serif" font-size="10" font-weight="bold" text-anchor="middle" fill="#282828">CULTURE DROP</text>
+  </g>
+  
+  <!-- Eyelets/Ventilation -->
+  <g fill="none" stroke="#444444" stroke-width="1.5">
+    <circle cx="190" cy="150" r="3" />
+    <circle cx="210" cy="135" r="3" />
+    <circle cx="290" cy="135" r="3" />
+    <circle cx="310" cy="150" r="3" />
+  </g>
+</svg> 

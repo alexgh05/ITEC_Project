@@ -1,0 +1,98 @@
+<svg width="500" height="600" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background -->
+  <rect width="100%" height="100%" fill="#f6f6f6" />
+  
+  <!-- T-shirt Base - Back -->
+  <path d="M150,150 L350,150 L390,200 L370,250 L350,220 L350,500 L150,500 L150,220 L130,250 L110,200 Z" fill="#66cc99" />
+  
+  <!-- Neck - Back -->
+  <path d="M210,150 L290,150 L280,170 L220,170 Z" fill="#55bb88" />
+  
+  <!-- Sleeves -->
+  <path d="M150,150 L110,200 L130,250 L150,220 Z" fill="#66cc99" />
+  <path d="M350,150 L390,200 L370,250 L350,220 Z" fill="#66cc99" />
+  
+  <!-- Sleeve Hems -->
+  <path d="M110,200 L130,250 L120,255 L100,205 Z" fill="#55bb88" stroke="#55bb88" stroke-width="1" />
+  <path d="M390,200 L370,250 L380,255 L400,205 Z" fill="#55bb88" stroke="#55bb88" stroke-width="1" />
+  
+  <!-- Bottom Hem -->
+  <rect x="150" y="480" width="200" height="20" fill="#55bb88" />
+  
+  <!-- Large Back Design - Rio Carnival Skyline -->
+  <g transform="translate(250, 320)">
+    <!-- Background Sunset Effect -->
+    <defs>
+      <radialGradient id="sunsetGradient" cx="0.5" cy="0.5" r="0.8" fx="0.5" fy="0.5">
+        <stop offset="0%" stop-color="#ff9900" />
+        <stop offset="70%" stop-color="#ff3366" />
+        <stop offset="100%" stop-color="#9933cc" />
+      </radialGradient>
+    </defs>
+    
+    <circle cx="0" cy="0" r="120" fill="url(#sunsetGradient)" opacity="0.5" />
+    
+    <!-- Rio Skyline Silhouette -->
+    <g transform="translate(0, 40) scale(1.2, 1)">
+      <!-- Cristo Redentor -->
+      <path d="M0,-60 L-3,-30 L-15,-30 L-15,-25 L10,-25 L10,-30 L-2,-30 Z" fill="#000000" opacity="0.8" />
+      
+      <!-- Sugar Loaf Mountain -->
+      <path d="M-80,-20 C-70,-40 -60,-45 -50,-20 C-45,-22 -35,-35 -30,-20 L-80,-20 Z" fill="#000000" opacity="0.8" />
+      
+      <!-- Buildings -->
+      <path d="M-100,0 L-95,-15 L-90,0 L-85,-25 L-80,0 L-75,-10 L-70,0 L-65,-15 L-60,0 L-55,-20 
+                L-50,0 L-45,-30 L-40,0 L-35,-15 L-30,0 L-25,-10 L-20,0 L-15,-25 L-10,0 L-5,-15 
+                L0,0 L5,-20 L10,0 L15,-10 L20,0 L25,-15 L30,0 L35,-25 L40,0 L45,-20 L50,0 
+                L55,-15 L60,0 L65,-30 L70,0 L75,-25 L80,0 L85,-15 L90,0 L95,-10 L100,0 Z" 
+            fill="#000000" opacity="0.8" />
+    </g>
+    
+    <!-- Carnival Elements Above Skyline -->
+    <g transform="translate(0, -50)">
+      <!-- Dancer Silhouettes -->
+      <g transform="translate(-70, 0)">
+        <path d="M0,0 C5,-10 0,-20 -5,-15 C-10,-30 0,-40 5,-30 C10,-40 15,-40 10,-25 C20,-30 20,-20 15,-15 C20,-10 15,0 10,-5 C15,5 10,10 5,5 C0,15 -5,10 -3,5 C-10,8 -10,0 -5,0 Z" 
+              fill="#ff3366" opacity="0.7" />
+      </g>
+      
+      <g transform="translate(0, -10)">
+        <path d="M0,0 C5,-15 10,-10 15,-25 C20,-15 25,-20 20,-10 C30,-15 25,-5 20,0 C25,5 15,10 10,5 C15,15 5,15 0,10 C-5,20 -15,15 -10,5 C-20,10 -15,0 -10,-5 C-15,-10 -10,-15 -5,-10 Z"
+              fill="#ffcc00" opacity="0.7" />
+      </g>
+      
+      <g transform="translate(70, 0)">
+        <path d="M0,0 C-5,-10 0,-20 5,-15 C10,-30 0,-40 -5,-30 C-10,-40 -15,-40 -10,-25 C-20,-30 -20,-20 -15,-15 C-20,-10 -15,0 -10,-5 C-15,5 -10,10 -5,5 C0,15 5,10 3,5 C10,8 10,0 5,0 Z" 
+              fill="#3399ff" opacity="0.7" />
+      </g>
+      
+      <!-- Feather Decorative Elements -->
+      <g transform="translate(-50, -30)">
+        <path d="M0,0 C5,-10 10,-5 5,5 C10,0 15,-5 10,10 C15,5 20,0 20,10" stroke="#ff66cc" stroke-width="3" fill="none" />
+      </g>
+      
+      <g transform="translate(50, -30)">
+        <path d="M0,0 C-5,-10 -10,-5 -5,5 C-10,0 -15,-5 -10,10 C-15,5 -20,0 -20,10" stroke="#33ccff" stroke-width="3" fill="none" />
+      </g>
+    </g>
+    
+    <!-- Text Banner -->
+    <g transform="translate(0, 80)">
+      <path d="M-100,0 C-80,-20 -40,-25 0,-25 C40,-25 80,-20 100,0 L100,20 C80,5 40,0 0,0 C-40,0 -80,5 -100,20 Z" 
+            fill="#ffffff" opacity="0.9" />
+      <text x="0" y="5" font-family="sans-serif" font-size="18" font-weight="bold" text-anchor="middle" fill="#ff3366">RIO FESTIVAL</text>
+    </g>
+  </g>
+  
+  <!-- Small Brand Logo at Top -->
+  <g transform="translate(250, 180)">
+    <circle cx="0" cy="0" r="12" fill="#ffffff" />
+    <text x="0" y="4" font-family="sans-serif" font-size="8" font-weight="bold" text-anchor="middle" fill="#55bb88">RIO</text>
+  </g>
+  
+  <!-- Tag at Bottom -->
+  <g transform="translate(170, 460)">
+    <rect x="0" y="0" width="160" height="15" fill="#ffffff" opacity="0.8" />
+    <text x="80" y="12" font-family="sans-serif" font-size="10" font-weight="bold" text-anchor="middle" fill="#444444">CARNIVAL COLLECTION</text>
+  </g>
+</svg> 
