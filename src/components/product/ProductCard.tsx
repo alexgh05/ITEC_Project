@@ -22,6 +22,7 @@ export interface Product {
   description: string;
   isFeatured?: boolean;
   sizes?: string[];
+  selectedSize?: string;
 }
 
 interface ProductCardProps {
@@ -33,10 +34,16 @@ const ProductCard = ({ product }: ProductCardProps) => {
   const { addItem } = useCartStore();
   const { toggleItem, isInWishlist } = useWishlistStore();
   const [selectedSize, setSelectedSize] = useState<string | null>(null);
+  const [popoverOpen, setPopoverOpen] = useState(false);
   const isFavorite = isInWishlist(product.id);
   
   // Default sizes if the product doesn't specify any
   const sizes = product.sizes || ['S', 'M', 'L', 'XL'];
+
+  const handleSizeSelect = (size: string) => {
+    setSelectedSize(size);
+    setPopoverOpen(false); // Close the popover immediately after selection
+  };
 
   const handleAddToCart = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -51,6 +58,7 @@ const ProductCard = ({ product }: ProductCardProps) => {
     });
     toast.success(`${product.name} (${selectedSize}) added to cart!`);
     setSelectedSize(null); // Reset the size after adding to cart
+    setPopoverOpen(false); // Close popover after adding to cart
   };
 
   const handleToggleWishlist = (e: React.MouseEvent) => {
@@ -123,7 +131,7 @@ const ProductCard = ({ product }: ProductCardProps) => {
         </div>
 
         <div className="mt-4 space-y-2">
-          <Popover>
+          <Popover open={popoverOpen} onOpenChange={setPopoverOpen}>
             <PopoverTrigger asChild>
               <Button 
                 variant="outline" 
@@ -141,7 +149,7 @@ const ProductCard = ({ product }: ProductCardProps) => {
                     key={size}
                     variant={selectedSize === size ? "default" : "outline"}
                     size="sm"
-                    onClick={() => setSelectedSize(size)}
+                    onClick={() => handleSizeSelect(size)}
                   >
                     {size}
                   </Button>

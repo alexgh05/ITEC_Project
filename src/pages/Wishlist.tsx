@@ -1,15 +1,23 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useWishlistStore } from '@/store/useWishlistStore';
 import { useCartStore } from '@/store/useCartStore';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
-import { Heart, ShoppingCart, ArrowLeft } from 'lucide-react';
-import { Link } from 'react-router-dom';
-import { motion } from 'framer-motion';
+import { Heart, ShoppingCart, ArrowLeft, Eye, GripVertical, ChevronDown } from 'lucide-react';
+import { Link, useNavigate } from 'react-router-dom';
+import { motion, Reorder, useDragControls } from 'framer-motion';
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 
 const Wishlist = () => {
-  const { items, removeItem, clearWishlist } = useWishlistStore();
+  const { items, removeItem, clearWishlist, setItems } = useWishlistStore();
   const { addItem } = useCartStore();
+  const navigate = useNavigate();
+  const [reorderEnabled, setReorderEnabled] = useState(false);
+  const [reorderItems, setReorderItems] = useState(items);
 
   useEffect(() => {
     // Set page title
@@ -17,16 +25,32 @@ const Wishlist = () => {
     
     // Scroll to top when component mounts
     window.scrollTo(0, 0);
-  }, []);
+    
+    // Sync reorderItems with items when items change
+    setReorderItems(items);
+  }, [items]);
 
-  const handleAddToCart = (product: any) => {
-    addItem(product);
-    toast.success(`${product.name} added to cart!`);
+  const handleAddToCart = (product: any, selectedSize: string) => {
+    addItem({
+      ...product,
+      selectedSize,
+    });
+    toast.success(`${product.name} (${selectedSize}) added to cart!`);
   };
 
   const handleRemoveFromWishlist = (product: any) => {
     removeItem(product.id);
     toast.success(`${product.name} removed from wishlist!`);
+  };
+  
+  const handleViewProduct = (product: any) => {
+    navigate(`/shop/product/${product.id}`);
+  };
+  
+  const saveReorderedItems = () => {
+    setItems(reorderItems);
+    setReorderEnabled(false);
+    toast.success('Wishlist order saved!');
   };
 
   return (
@@ -62,62 +86,286 @@ const Wishlist = () => {
                 <h2 className="text-xl font-medium">
                   {items.length} {items.length === 1 ? 'Item' : 'Items'}
                 </h2>
-                <Button variant="outline" onClick={clearWishlist}>
-                  Clear Wishlist
-                </Button>
+                <div className="flex gap-3">
+                  {reorderEnabled ? (
+                    <Button variant="default" onClick={saveReorderedItems}>
+                      Save Order
+                    </Button>
+                  ) : (
+                    <Button variant="outline" onClick={() => setReorderEnabled(true)}>
+                      Reorder Items
+                    </Button>
+                  )}
+                  <Button variant="outline" onClick={clearWishlist}>
+                    Clear Wishlist
+                  </Button>
+                </div>
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                {items.map(product => (
-                  <motion.div
-                    key={product.id}
-                    className="relative bg-card rounded-lg overflow-hidden shadow-sm border"
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, scale: 0.9 }}
-                    transition={{ duration: 0.3 }}
-                  >
-                    <div className="relative aspect-square bg-secondary">
-                      <img 
-                        src={product.images[0]} 
-                        alt={product.name} 
-                        className="w-full h-full object-cover object-center"
-                      />
-                      <Button 
-                        size="icon" 
-                        variant="destructive" 
-                        className="absolute top-2 right-2"
-                        onClick={() => handleRemoveFromWishlist(product)}
-                      >
-                        <Heart size={18} className="fill-white" />
-                      </Button>
-                    </div>
-                    
-                    <div className="p-4">
-                      <div className="flex justify-between items-start mb-2">
-                        <div>
-                          <h3 className="font-medium line-clamp-1">{product.name}</h3>
-                          <p className="text-sm text-muted-foreground">{product.culture}</p>
-                        </div>
-                        <p className="font-semibold">${product.price.toFixed(2)}</p>
-                      </div>
-                      
-                      <Button 
-                        className="w-full mt-2 flex items-center gap-2"
-                        onClick={() => handleAddToCart(product)}
-                      >
-                        <ShoppingCart size={16} />
-                        Add to Cart
-                      </Button>
-                    </div>
-                  </motion.div>
-                ))}
-              </div>
+              {reorderEnabled ? (
+                <Reorder.Group 
+                  axis="y" 
+                  values={reorderItems} 
+                  onReorder={setReorderItems}
+                  className="space-y-4"
+                >
+                  {reorderItems.map(product => (
+                    <WishlistItemDraggable
+                      key={product.id}
+                      product={product}
+                      handleRemoveFromWishlist={handleRemoveFromWishlist}
+                      handleAddToCart={handleAddToCart}
+                      handleViewProduct={handleViewProduct}
+                    />
+                  ))}
+                </Reorder.Group>
+              ) : (
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                  {items.map(product => (
+                    <WishlistItem
+                      key={product.id}
+                      product={product}
+                      handleRemoveFromWishlist={handleRemoveFromWishlist}
+                      handleAddToCart={handleAddToCart}
+                      handleViewProduct={handleViewProduct}
+                    />
+                  ))}
+                </div>
+              )}
             </div>
           )}
         </div>
       </section>
     </>
+  );
+};
+
+const WishlistItem = ({ product, handleRemoveFromWishlist, handleAddToCart, handleViewProduct }) => {
+  const [selectedSize, setSelectedSize] = useState<string | null>(null);
+  const [popoverOpen, setPopoverOpen] = useState(false);
+  // Default sizes if the product doesn't specify any
+  const sizes = product.sizes || ['S', 'M', 'L', 'XL'];
+
+  const handleSizeSelect = (size: string) => {
+    setSelectedSize(size);
+    setPopoverOpen(false); // Close the popover immediately after selection
+  };
+
+  return (
+    <motion.div
+      className="relative bg-card rounded-lg overflow-hidden shadow-sm border group hover:shadow-md transition-all cursor-pointer"
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, scale: 0.9 }}
+      transition={{ duration: 0.3 }}
+      whileHover={{ y: -5 }}
+    >
+      <div 
+        className="relative aspect-square bg-secondary overflow-hidden"
+        onClick={() => handleViewProduct(product)}
+      >
+        <img 
+          src={product.images[0]} 
+          alt={product.name} 
+          className="w-full h-full object-cover object-center transition-transform group-hover:scale-105 duration-300"
+        />
+        <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+          <Button 
+            variant="secondary" 
+            size="sm" 
+            className="scale-90 group-hover:scale-100 transition-all"
+            onClick={(e) => {
+              e.stopPropagation();
+              handleViewProduct(product);
+            }}
+          >
+            <Eye size={16} className="mr-2" />
+            Quick View
+          </Button>
+        </div>
+        <Button 
+          size="icon" 
+          variant="destructive" 
+          className="absolute top-2 right-2 scale-90 group-hover:scale-100 transition-transform"
+          onClick={(e) => {
+            e.stopPropagation();
+            handleRemoveFromWishlist(product);
+          }}
+        >
+          <Heart size={18} className="fill-white" />
+        </Button>
+      </div>
+      
+      <div className="p-4">
+        <div 
+          className="flex justify-between items-start mb-2 cursor-pointer"
+          onClick={() => handleViewProduct(product)}
+        >
+          <div>
+            <h3 className="font-medium line-clamp-1 group-hover:text-culture transition-colors">{product.name}</h3>
+            <p className="text-sm text-muted-foreground">{product.culture}</p>
+          </div>
+          <p className="font-semibold">${product.price.toFixed(2)}</p>
+        </div>
+        
+        <div className="mt-2 space-y-2" onClick={(e) => e.stopPropagation()}>
+          <Popover open={popoverOpen} onOpenChange={setPopoverOpen}>
+            <PopoverTrigger asChild>
+              <Button 
+                variant="outline" 
+                size="sm" 
+                className="w-full justify-between"
+              >
+                {selectedSize ? `Size: ${selectedSize}` : "Select Size"}
+                <ChevronDown size={16} />
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-full p-2">
+              <div className="grid grid-cols-4 gap-2">
+                {sizes.map(size => (
+                  <Button 
+                    key={size}
+                    variant={selectedSize === size ? "default" : "outline"}
+                    size="sm"
+                    onClick={() => handleSizeSelect(size)}
+                  >
+                    {size}
+                  </Button>
+                ))}
+              </div>
+            </PopoverContent>
+          </Popover>
+          
+          <Button 
+            className="w-full flex items-center gap-2 transition-transform active:scale-95"
+            onClick={(e) => {
+              e.stopPropagation();
+              if (!selectedSize) {
+                toast.error("Please select a size first");
+                return;
+              }
+              handleAddToCart(product, selectedSize);
+            }}
+            disabled={!selectedSize}
+          >
+            <ShoppingCart size={16} />
+            Add to Cart
+          </Button>
+        </div>
+      </div>
+    </motion.div>
+  );
+};
+
+const WishlistItemDraggable = ({ product, handleRemoveFromWishlist, handleAddToCart, handleViewProduct }) => {
+  const dragControls = useDragControls();
+  const [selectedSize, setSelectedSize] = useState<string | null>(null);
+  const [popoverOpen, setPopoverOpen] = useState(false);
+  // Default sizes if the product doesn't specify any
+  const sizes = product.sizes || ['S', 'M', 'L', 'XL'];
+  
+  const handleSizeSelect = (size: string) => {
+    setSelectedSize(size);
+    setPopoverOpen(false); // Close the popover immediately after selection
+  };
+  
+  return (
+    <Reorder.Item
+      value={product}
+      dragControls={dragControls}
+      className="relative bg-card rounded-lg overflow-hidden shadow-sm border cursor-grab active:cursor-grabbing mb-4"
+    >
+      <div className="flex flex-col md:flex-row md:items-center gap-4 p-4">
+        <div className="md:flex-shrink-0 flex items-center gap-3">
+          <div 
+            className="touch-none"
+            onPointerDown={(e) => dragControls.start(e)}
+          >
+            <GripVertical className="h-6 w-6 text-muted-foreground" />
+          </div>
+          
+          <div className="h-16 w-16 rounded-md overflow-hidden bg-secondary">
+            <img 
+              src={product.images[0]} 
+              alt={product.name} 
+              className="w-full h-full object-cover object-center"
+            />
+          </div>
+        </div>
+        
+        <div className="flex-1 min-w-0">
+          <h3 
+            className="font-medium hover:text-culture transition-colors cursor-pointer"
+            onClick={() => handleViewProduct(product)}
+          >
+            {product.name}
+          </h3>
+          <p className="text-sm text-muted-foreground">{product.culture}</p>
+          <p className="text-sm font-semibold mt-1">${product.price.toFixed(2)}</p>
+        </div>
+        
+        <div className="flex flex-col md:flex-row gap-2 mt-2 md:mt-0 w-full md:w-auto md:min-w-[240px]">
+          <Popover open={popoverOpen} onOpenChange={setPopoverOpen}>
+            <PopoverTrigger asChild>
+              <Button 
+                variant="outline" 
+                size="sm" 
+                className="justify-between"
+              >
+                {selectedSize ? `Size: ${selectedSize}` : "Select Size"}
+                <ChevronDown size={16} />
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-full p-2">
+              <div className="grid grid-cols-4 gap-2">
+                {sizes.map(size => (
+                  <Button 
+                    key={size}
+                    variant={selectedSize === size ? "default" : "outline"}
+                    size="sm"
+                    onClick={() => handleSizeSelect(size)}
+                  >
+                    {size}
+                  </Button>
+                ))}
+              </div>
+            </PopoverContent>
+          </Popover>
+          
+          <div className="flex gap-2">
+            <Button 
+              size="sm" 
+              variant="ghost"
+              onClick={() => handleViewProduct(product)}
+            >
+              <Eye size={16} />
+            </Button>
+            <Button 
+              size="sm" 
+              variant="default"
+              onClick={() => {
+                if (!selectedSize) {
+                  toast.error("Please select a size first");
+                  return;
+                }
+                handleAddToCart(product, selectedSize);
+              }}
+              disabled={!selectedSize}
+            >
+              <ShoppingCart size={16} />
+            </Button>
+            <Button 
+              size="sm" 
+              variant="ghost" 
+              className="text-destructive hover:text-destructive"
+              onClick={() => handleRemoveFromWishlist(product)}
+            >
+              <Heart size={16} className="fill-current" />
+            </Button>
+          </div>
+        </div>
+      </div>
+    </Reorder.Item>
   );
 };
 
