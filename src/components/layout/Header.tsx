@@ -1,16 +1,24 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { AnimatePresence, motion } from 'framer-motion';
-import { Menu, X, Moon, Sun, LogIn } from 'lucide-react';
+import { Menu, X, Moon, Sun, LogIn, User, LogOut } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useThemeStore } from '@/store/useThemeStore';
 import { cn } from '@/lib/utils';
 import CartDropdown from './CartDropdown';
+import { useAuth } from '@/providers/AuthProvider';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 
 const Header = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const { darkMode, toggleDarkMode } = useThemeStore();
+  const { user, isAuthenticated, logout } = useAuth();
   
   const navLinks = [
     { name: 'Home', path: '/' },
@@ -28,6 +36,12 @@ const Header = () => {
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
+
+  const handleLogout = () => {
+    logout();
+    // Optionally, you could redirect to the home page
+    // window.location.href = '/';
+  };
 
   return (
     <header 
@@ -65,15 +79,40 @@ const Header = () => {
 
         <div className="flex items-center space-x-4">
           <div className="hidden md:flex items-center space-x-2">
-            <Button variant="ghost" size="sm" asChild>
-              <Link to="/login" className="flex items-center gap-1">
-                <LogIn className="h-4 w-4" />
-                Login
-              </Link>
-            </Button>
-            <Button size="sm" asChild>
-              <Link to="/register">Register</Link>
-            </Button>
+            {isAuthenticated ? (
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" size="sm" className="flex items-center gap-1">
+                    <User className="h-4 w-4" />
+                    {user?.name || 'Profile'}
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                  <DropdownMenuItem asChild>
+                    <Link to="/profile">My Profile</Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem asChild>
+                    <Link to="/orders">My Orders</Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={handleLogout} className="text-destructive">
+                    <LogOut className="h-4 w-4 mr-2" />
+                    Logout
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            ) : (
+              <>
+                <Button variant="ghost" size="sm" asChild>
+                  <Link to="/login" className="flex items-center gap-1">
+                    <LogIn className="h-4 w-4" />
+                    Login
+                  </Link>
+                </Button>
+                <Button size="sm" asChild>
+                  <Link to="/register">Register</Link>
+                </Button>
+              </>
+            )}
           </div>
           
           <Button 
@@ -134,21 +173,53 @@ const Header = () => {
                 ))}
                 {/* Authentication Links for Mobile */}
                 <div className="border-t my-2 pt-4">
-                  <Link
-                    to="/login"
-                    className="flex items-center gap-2 text-lg font-medium py-2"
-                    onClick={() => setMobileMenuOpen(false)}
-                  >
-                    <LogIn className="h-5 w-5" />
-                    Login
-                  </Link>
-                  <Link
-                    to="/register"
-                    className="text-lg font-medium py-2"
-                    onClick={() => setMobileMenuOpen(false)}
-                  >
-                    Register
-                  </Link>
+                  {isAuthenticated ? (
+                    <>
+                      <Link
+                        to="/profile"
+                        className="flex items-center gap-2 text-lg font-medium py-2"
+                        onClick={() => setMobileMenuOpen(false)}
+                      >
+                        <User className="h-5 w-5" />
+                        My Profile
+                      </Link>
+                      <Link
+                        to="/orders"
+                        className="text-lg font-medium py-2"
+                        onClick={() => setMobileMenuOpen(false)}
+                      >
+                        My Orders
+                      </Link>
+                      <button
+                        className="flex items-center gap-2 text-lg font-medium py-2 text-destructive w-full text-left"
+                        onClick={() => {
+                          handleLogout();
+                          setMobileMenuOpen(false);
+                        }}
+                      >
+                        <LogOut className="h-5 w-5" />
+                        Logout
+                      </button>
+                    </>
+                  ) : (
+                    <>
+                      <Link
+                        to="/login"
+                        className="flex items-center gap-2 text-lg font-medium py-2"
+                        onClick={() => setMobileMenuOpen(false)}
+                      >
+                        <LogIn className="h-5 w-5" />
+                        Login
+                      </Link>
+                      <Link
+                        to="/register"
+                        className="text-lg font-medium py-2"
+                        onClick={() => setMobileMenuOpen(false)}
+                      >
+                        Register
+                      </Link>
+                    </>
+                  )}
                 </div>
               </nav>
             </div>

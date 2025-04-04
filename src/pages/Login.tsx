@@ -17,6 +17,7 @@ import {
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { useToast } from '@/components/ui/use-toast';
+import { useAuth } from '@/providers/AuthProvider';
 
 // Form validation schema
 const loginSchema = z.object({
@@ -30,6 +31,7 @@ const Login = () => {
   const [showPassword, setShowPassword] = useState(false);
   const { toast } = useToast();
   const navigate = useNavigate();
+  const { login, error: authError, loading } = useAuth();
 
   const form = useForm<LoginFormValues>({
     resolver: zodResolver(loginSchema),
@@ -42,20 +44,24 @@ const Login = () => {
   // Handle form submission
   const onSubmit = async (data: LoginFormValues) => {
     try {
-      // This would be replaced with actual authentication logic
+      // Use the login function from AuthProvider
+      await login(data.email, data.password);
+      
       // Show success toast
       toast({
         title: 'Login successful',
         description: 'Redirecting to your account...',
       });
       
-      // Redirect to home page (would go to dashboard in a real app)
+      // Redirect to home page
       setTimeout(() => navigate('/'), 1500);
     } catch (error) {
       console.error('Login error:', error);
+      // The error state is already handled by the AuthProvider
+      // But we can show a toast for better UX
       toast({
         title: 'Login failed',
-        description: 'Please check your credentials and try again.',
+        description: authError || 'Please check your credentials and try again.',
         variant: 'destructive',
       });
     }
@@ -132,8 +138,8 @@ const Login = () => {
                 </Link>
               </div>
 
-              <Button type="submit" className="w-full">
-                Sign In
+              <Button type="submit" className="w-full" disabled={loading}>
+                {loading ? 'Signing in...' : 'Sign In'}
               </Button>
 
               <div className="text-center mt-6">

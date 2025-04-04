@@ -19,6 +19,7 @@ import {
 import { Input } from '@/components/ui/input';
 import { Checkbox } from '@/components/ui/checkbox';
 import { useToast } from '@/components/ui/use-toast';
+import { useAuth } from '@/providers/AuthProvider';
 
 // Form validation schema
 const registerSchema = z.object({
@@ -41,6 +42,7 @@ const Register = () => {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const { toast } = useToast();
   const navigate = useNavigate();
+  const { register, error: authError, loading } = useAuth();
 
   const form = useForm<RegisterFormValues>({
     resolver: zodResolver(registerSchema),
@@ -56,20 +58,22 @@ const Register = () => {
   // Handle form submission
   const onSubmit = async (data: RegisterFormValues) => {
     try {
-      // This would be replaced with actual registration logic
+      // Use the register function from AuthProvider
+      await register(data.fullName, data.email, data.password);
+      
       // Show success toast
       toast({
         title: 'Registration successful',
-        description: 'Your account has been created. Redirecting to login...',
+        description: 'Your account has been created!',
       });
       
-      // Redirect to login page
-      setTimeout(() => navigate('/login'), 1500);
+      // Redirect to home page
+      setTimeout(() => navigate('/'), 1500);
     } catch (error) {
       console.error('Registration error:', error);
       toast({
         title: 'Registration failed',
-        description: 'There was a problem creating your account. Please try again.',
+        description: authError || 'There was a problem creating your account. Please try again.',
         variant: 'destructive',
       });
     }
@@ -213,8 +217,8 @@ const Register = () => {
                 )}
               />
 
-              <Button type="submit" className="w-full">
-                Create Account
+              <Button type="submit" className="w-full" disabled={loading}>
+                {loading ? 'Creating Account...' : 'Create Account'}
               </Button>
 
               <div className="text-center mt-6">
