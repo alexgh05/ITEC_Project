@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { AnimatePresence, motion } from 'framer-motion';
-import { Menu, X, Moon, Sun } from 'lucide-react';
+import { Menu, X, Moon, Sun, LogIn } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useThemeStore } from '@/store/useThemeStore';
 import { cn } from '@/lib/utils';
@@ -64,6 +64,18 @@ const Header = () => {
         </nav>
 
         <div className="flex items-center space-x-4">
+          <div className="hidden md:flex items-center space-x-2">
+            <Button variant="ghost" size="sm" asChild>
+              <Link to="/login" className="flex items-center gap-1">
+                <LogIn className="h-4 w-4" />
+                Login
+              </Link>
+            </Button>
+            <Button size="sm" asChild>
+              <Link to="/register">Register</Link>
+            </Button>
+          </div>
+          
           <Button 
             variant="ghost" 
             size="icon" 
@@ -120,6 +132,24 @@ const Header = () => {
                     {link.name}
                   </Link>
                 ))}
+                {/* Authentication Links for Mobile */}
+                <div className="border-t my-2 pt-4">
+                  <Link
+                    to="/login"
+                    className="flex items-center gap-2 text-lg font-medium py-2"
+                    onClick={() => setMobileMenuOpen(false)}
+                  >
+                    <LogIn className="h-5 w-5" />
+                    Login
+                  </Link>
+                  <Link
+                    to="/register"
+                    className="text-lg font-medium py-2"
+                    onClick={() => setMobileMenuOpen(false)}
+                  >
+                    Register
+                  </Link>
+                </div>
               </nav>
             </div>
           </motion.div>
