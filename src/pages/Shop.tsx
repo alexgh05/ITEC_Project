@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
+import { useSearchParams } from 'react-router-dom';
 import ProductGrid from '@/components/product/ProductGrid';
 import { Filter, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -120,6 +121,7 @@ const ShopPage = () => {
   const [showFilters, setShowFilters] = useState(false);
   const [filteredProducts, setFilteredProducts] = useState(allProducts);
   const { setCulture } = useThemeStore();
+  const [searchParams] = useSearchParams();
   
   // Apply filters
   useEffect(() => {
@@ -137,6 +139,14 @@ const ShopPage = () => {
     
     setFilteredProducts(filtered);
   }, [selectedCategory, selectedCulture]);
+
+  // Handle URL parameters for filtering
+  useEffect(() => {
+    const cultureParam = searchParams.get('culture');
+    if (cultureParam && cultures.includes(cultureParam)) {
+      handleCultureChange(cultureParam);
+    }
+  }, [searchParams]);
 
   // Handle culture change and update theme
   const handleCultureChange = (culture: string) => {

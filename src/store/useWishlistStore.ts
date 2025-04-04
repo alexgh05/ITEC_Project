@@ -9,6 +9,7 @@ interface WishlistState {
   toggleItem: (product: Product) => void;
   clearWishlist: () => void;
   isInWishlist: (productId: string) => boolean;
+  setItems: (items: Product[]) => void;
 }
 
 export const useWishlistStore = create<WishlistState>()(
@@ -41,7 +42,9 @@ export const useWishlistStore = create<WishlistState>()(
       
       isInWishlist: (productId: string) => {
         return get().items.some(item => item.id === productId);
-      }
+      },
+      
+      setItems: (items: Product[]) => set({ items })
     }),
     {
       name: 'culture-drop-wishlist'
