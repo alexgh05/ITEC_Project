@@ -19,4 +19,4 @@ const InteractiveBackground = () => {
   );
 };
 
-export default InteractiveBackground;
+export default InteractiveBackground; 

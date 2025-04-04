@@ -1,4 +1,3 @@
-
 import { useEffect } from 'react';
 import { motion } from 'framer-motion';
 import HeroSection from '@/components/hero/HeroSection';
@@ -7,6 +6,7 @@ import CultureSelector from '@/components/ui/culture-selector';
 import { ArrowRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Link } from 'react-router-dom';
+import { useThemeStore } from '@/store/useThemeStore';
 
 // Mock featured products - this would come from an API in a real app
 const featuredProducts = [
@@ -50,6 +50,8 @@ const featuredProducts = [
 ];
 
 const HomePage = () => {
+  const { darkMode, toggleDarkMode } = useThemeStore();
+  
   useEffect(() => {
     // Scroll to top when component mounts
     window.scrollTo(0, 0);
@@ -97,8 +99,19 @@ const HomePage = () => {
             viewport={{ once: true, margin: "-100px" }}
             className="text-center mb-12"
           >
-            <h2 className="text-3xl font-bold">Explore Cultures</h2>
-            <p className="text-muted-foreground mt-2">Discover products inspired by urban cultures around the world</p>
+            <h2 className="text-3xl font-bold">Your Style, Your Choice</h2>
+            <p className="text-muted-foreground mt-2">Select a culture theme to customize your shopping experience</p>
+            <div className="mt-4 flex justify-center items-center gap-4">
+              <Button 
+                variant="outline" 
+                size="sm" 
+                onClick={toggleDarkMode}
+                className="text-sm"
+              >
+                {darkMode ? "Light Mode" : "Dark Mode"}
+              </Button>
+              <p className="text-sm text-muted-foreground">Choose your theme below</p>
+            </div>
           </motion.div>
           
           <CultureSelector />
