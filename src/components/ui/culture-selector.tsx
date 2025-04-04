@@ -101,22 +101,6 @@ const CultureSelector = () => {
               </div>
             )}
             
-            {option.id === 'newyork' && hoveredCulture === 'newyork' && (
-              <div className="absolute inset-0 flex flex-col justify-end opacity-30">
-                {[...Array(6)].map((_, i) => (
-                  <motion.div 
-                    key={i}
-                    className="h-8 bg-gray-800 mx-1 rounded-t"
-                    style={{ 
-                      height: `${20 + i * 15}px`, 
-                      width: `${15 + Math.random() * 20}px`,
-                      marginLeft: `${5 + i * 20}px`
-                    }}
-                  />
-                ))}
-              </div>
-            )}
-            
             {option.id === 'lagos' && hoveredCulture === 'lagos' && (
               <div className="absolute inset-0 overflow-hidden opacity-30">
                 <motion.div 
