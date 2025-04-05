@@ -43,6 +43,15 @@ const ProductCard = ({ product }: ProductCardProps) => {
   // Default sizes if the product doesn't specify any
   const sizes = product.sizes || ['S', 'M', 'L', 'XL'];
 
+  // Ensure we have at least two images (front and back view)
+  const frontImage = product.images && product.images.length > 0 
+    ? product.images[0] 
+    : '/placeholder-product.jpg';
+    
+  const backImage = product.images && product.images.length > 1 
+    ? product.images[1] 
+    : '/placeholder-product-back.jpg'; // Use dedicated back placeholder
+
   const handleSizeSelect = (size: string) => {
     setSelectedSize(size);
     setPopoverOpen(false); // Close the popover immediately after selection
@@ -78,39 +87,52 @@ const ProductCard = ({ product }: ProductCardProps) => {
 
   return (
     <motion.div
-      className="product-card hover-scale group"
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
-      whileHover={{ y: -5 }}
+      className="product-card group"
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.3 }}
     >
-      <div className="product-image-container">
-        <Link to={`/shop/product/${product.id}`}>
-          <motion.img
-            src={product.images[0]}
-            alt={product.name}
-            className="w-full h-full object-cover object-center transition-transform duration-700"
-            animate={{ scale: isHovered && product.images.length > 1 ? 1.05 : 1 }}
-          />
+      {/* Flip Card Container */}
+      <div className="flip-card h-[300px] rounded-t-lg overflow-hidden">
+        <div className="flip-card-inner">
+          {/* Front Side */}
+          <div className="flip-card-front">
+            <Link to={`/shop/product/${product.id}`} className="block w-full h-full">
+              <img 
+                src={frontImage} 
+                alt={`${product.name} - Front view`} 
+                className="w-full h-full object-cover object-center"
+              />
+              
+              {product.isFeatured && (
+                <div className="absolute top-2 left-2 bg-culture text-culture-foreground text-xs font-medium py-1 px-2 rounded">
+                  Featured
+                </div>
+              )}
+            </Link>
+          </div>
           
-          {product.images.length > 1 && (
-            <motion.img
-              src={product.images[1]}
-              alt={`${product.name} alternate view`}
-              className="absolute inset-0 w-full h-full object-cover object-center"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: isHovered ? 1 : 0 }}
-              transition={{ duration: 0.3 }}
-            />
-          )}
-        </Link>
-
+          {/* Back Side */}
+          <div className="flip-card-back">
+            <Link to={`/shop/product/${product.id}`} className="block w-full h-full">
+              <img 
+                src={backImage} 
+                alt={`${product.name} - Back view`} 
+                className="w-full h-full object-cover object-center"
+              />
+              
+              <div className="absolute bottom-0 left-0 right-0 bg-black/60 text-white text-xs text-center py-1 font-medium">
+                Back View
+              </div>
+            </Link>
+          </div>
+        </div>
+        
+        {/* Wishlist button (outside the flip card inner to always be accessible) */}
         <Button 
           size="icon" 
           variant="ghost" 
-          className="absolute top-2 right-2 bg-background/70 backdrop-blur-sm opacity-0 group-hover:opacity-100 transition-opacity"
+          className="absolute top-2 right-2 bg-background/70 backdrop-blur-sm opacity-0 group-hover:opacity-100 transition-opacity z-10"
           onClick={handleToggleWishlist}
           aria-label={isFavorite ? "Remove from wishlist" : "Add to wishlist"}
         >
@@ -119,12 +141,6 @@ const ProductCard = ({ product }: ProductCardProps) => {
             className={isFavorite ? "fill-red-500 text-red-500" : ""}
           />
         </Button>
-
-        {product.isFeatured && (
-          <div className="absolute top-2 left-2 bg-culture text-culture-foreground text-xs font-medium py-1 px-2 rounded">
-            Featured
-          </div>
-        )}
       </div>
 
       <div className="p-4">

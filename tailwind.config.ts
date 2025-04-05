@@ -1,5 +1,5 @@
-
 import type { Config } from "tailwindcss";
+import plugin from "tailwindcss/plugin";
 
 export default {
   darkMode: ["class"],
@@ -103,6 +103,10 @@ export default {
           "0%, 100%": { transform: "translateY(0)" },
           "50%": { transform: "translateY(-10px)" },
         },
+        "flip": {
+          "0%": { transform: "rotateY(0deg)" },
+          "100%": { transform: "rotateY(180deg)" },
+        },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
@@ -113,8 +117,28 @@ export default {
         "slide-out": "slide-out 0.4s ease-out",
         pulse: "pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite",
         float: "float 3s ease-in-out infinite",
+        "flip": "flip 0.6s ease-out forwards",
       },
     },
   },
-  plugins: [require("tailwindcss-animate")],
+  plugins: [
+    require("tailwindcss-animate"),
+    plugin(function({ addUtilities }) {
+      addUtilities({
+        '.perspective-1000': {
+          'perspective': '1000px'
+        },
+        '.preserve-3d': {
+          'transform-style': 'preserve-3d'
+        },
+        '.backface-hidden': {
+          'backface-visibility': 'hidden'
+        },
+        '.rotate-y-180': {
+          'transform': 'rotateY(180deg)'
+        },
+      })
+    }),
+  ],
 } satisfies Config;
+

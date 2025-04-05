@@ -317,35 +317,131 @@ const Admin = () => {
     user.role.toLowerCase().includes(userSearchQuery.toLowerCase())
   );
   
-  // Handle form submission for adding a product
+  // File input refs
+  const addFrontImageInputRef = useRef(null);
+  const addBackImageInputRef = useRef(null);
+  const editImageInputRef = useRef(null);
+  const [imageUploading, setImageUploading] = useState(false);
+  const [frontImageUploading, setFrontImageUploading] = useState(false);
+  const [backImageUploading, setBackImageUploading] = useState(false);
+  
+  // Handle image upload for a product
+  const handleImageUpload = async (file, productId, imageIndex = 0, setUploadingState = setImageUploading) => {
+    if (!file) return null;
+    
+    try {
+      setUploadingState(true);
+      
+      // Log upload attempt for debugging
+      console.log('Attempting to upload image for product:', productId, 'at index:', imageIndex);
+      console.log('File details:', { name: file.name, type: file.type, size: file.size });
+      
+      // Call the API with image index parameter
+      const result = await uploadProductImage(file, productId, token, imageIndex);
+      console.log('Upload response:', result);
+      
+      // Update the product in the state with the new image
+      if (result.success && result.product) {
+        setProducts(products.map(p => 
+          p._id === result.product._id ? result.product : p
+        ));
+        
+        // If this is the currently selected product, update it
+        if (selectedProduct && selectedProduct._id === productId) {
+          setSelectedProduct(result.product);
+        }
+        
+        toast({
+          title: 'Success',
+          description: 'Image uploaded successfully',
+        });
+        
+        return result;
+      } else if (result.success && result.imageUrl) {
+        // If we got imageUrl but no product (should not happen)
+        toast({
+          title: 'Success',
+          description: 'Image uploaded but product was not updated',
+        });
+        
+        return result;
+      } else {
+        // Something unexpected happened
+        toast({
+          title: 'Warning',
+          description: 'Unexpected response from server',
+          variant: 'destructive'
+        });
+        
+        return null;
+      }
+    } catch (error) {
+      console.error('Error uploading image:', error);
+      toast({
+        title: 'Error',
+        description: error.message || 'Failed to upload image',
+        variant: 'destructive'
+      });
+      
+      return null;
+    } finally {
+      setUploadingState(false);
+    }
+  };
+  
+  // Handle adding a product
   const handleAddProduct = async (event) => {
     event.preventDefault();
     const formData = new FormData(event.target);
     
+    // Check if both image inputs have files
+    const frontImageInput = addFrontImageInputRef.current;
+    const backImageInput = addBackImageInputRef.current;
+    
+    if (!frontImageInput?.files?.[0] || !backImageInput?.files?.[0]) {
+      toast({
+        title: 'Error',
+        description: 'Both front and back images are required',
+        variant: 'destructive'
+      });
+      return;
+    }
+    
     const productData = {
-      name: formData.get('name'),
-      price: parseFloat(formData.get('price')),
-      countInStock: parseInt(formData.get('countInStock')),
-      category: formData.get('category'),
-      description: formData.get('description'),
-      culture: formData.get('culture') || 'Tokyo', // Default culture
-      images: ['/product-placeholder.jpg'], // Placeholder image
+      name: formData.get('name')?.toString() || '',
+      price: parseFloat(formData.get('price')?.toString() || '0'),
+      countInStock: parseInt(formData.get('countInStock')?.toString() || '0'),
+      category: formData.get('category')?.toString() || '',
+      description: formData.get('description')?.toString() || '',
+      culture: formData.get('culture')?.toString() || 'Tokyo', // Default culture
+      images: [], // Start with empty images array, we'll add them after upload
     };
     
     try {
+      // Create product first
       const newProduct = await createProduct(productData, token);
-      setProducts([...products, newProduct]);
       
-      // If an image was selected, upload it for the new product
-      const imageInput = addImageInputRef.current;
-      if (imageInput && imageInput.files && imageInput.files[0]) {
-        await handleImageUpload(imageInput.files[0], newProduct._id);
+      // Upload front and back images sequentially
+      console.log('Uploading front image...');
+      const frontResult = await handleImageUpload(frontImageInput.files[0], newProduct._id, 0, setFrontImageUploading);
+      
+      console.log('Uploading back image...');
+      const backResult = await handleImageUpload(backImageInput.files[0], newProduct._id, 1, setBackImageUploading);
+      
+      // Get the updated product with both images
+      if (frontResult?.product && backResult?.product) {
+        // Use the product from the last upload as it should contain both images
+        setProducts([...products, backResult.product]);
+      } else {
+        // Fallback to refreshing products from server
+        const updatedProducts = await getProducts();
+        setProducts(updatedProducts);
       }
       
       setIsAddDialogOpen(false);
       toast({
         title: 'Success',
-        description: 'Product added successfully',
+        description: 'Product added successfully with front and back images',
       });
       
       // Update product count in stats
@@ -360,7 +456,7 @@ const Admin = () => {
       console.error('Error adding product:', error);
       toast({
         title: 'Error',
-        description: 'Failed to add product',
+        description: 'Failed to add product: ' + (error.message || 'Unknown error'),
         variant: 'destructive'
       });
     }
@@ -372,11 +468,11 @@ const Admin = () => {
     const formData = new FormData(event.target);
     
     const productData = {
-      name: formData.get('name'),
-      price: parseFloat(formData.get('price')),
-      countInStock: parseInt(formData.get('countInStock')),
-      category: formData.get('category'),
-      description: formData.get('description'),
+      name: formData.get('name')?.toString() || '',
+      price: parseFloat(formData.get('price')?.toString() || '0'),
+      countInStock: parseInt(formData.get('countInStock')?.toString() || '0'),
+      category: formData.get('category')?.toString() || '',
+      description: formData.get('description')?.toString() || '',
       // Keep existing values for other fields
       culture: selectedProduct.culture,
       images: selectedProduct.images
@@ -400,66 +496,6 @@ const Admin = () => {
       });
     }
   };
-  
-  // Handle image upload for a product
-  const handleImageUpload = async (file, productId) => {
-    if (!file) return;
-    
-    try {
-      setImageUploading(true);
-      
-      // Log upload attempt for debugging
-      console.log('Attempting to upload image for product:', productId);
-      console.log('File details:', { name: file.name, type: file.type, size: file.size });
-      
-      const result = await uploadProductImage(file, productId, token);
-      console.log('Upload response:', result);
-      
-      // Update the product in the state with the new image
-      if (result.success && result.product) {
-        setProducts(products.map(p => 
-          p._id === result.product._id ? result.product : p
-        ));
-        
-        // If this is the currently selected product, update it
-        if (selectedProduct && selectedProduct._id === productId) {
-          setSelectedProduct(result.product);
-        }
-        
-        toast({
-          title: 'Success',
-          description: 'Image uploaded successfully',
-        });
-      } else if (result.success && result.imageUrl) {
-        // If we got imageUrl but no product (should not happen)
-        toast({
-          title: 'Success',
-          description: 'Image uploaded but product was not updated',
-        });
-      } else {
-        // Something unexpected happened
-        toast({
-          title: 'Warning',
-          description: 'Unexpected response from server',
-          variant: 'destructive'
-        });
-      }
-    } catch (error) {
-      console.error('Error uploading image:', error);
-      toast({
-        title: 'Error',
-        description: error.message || 'Failed to upload image',
-        variant: 'destructive'
-      });
-    } finally {
-      setImageUploading(false);
-    }
-  };
-  
-  // File input refs
-  const addImageInputRef = useRef(null);
-  const editImageInputRef = useRef(null);
-  const [imageUploading, setImageUploading] = useState(false);
   
   // Handle deleting a product
   const handleDeleteProduct = async (productId) => {
@@ -657,33 +693,70 @@ const Admin = () => {
                         <Label htmlFor="description">Description</Label>
                         <Textarea id="description" name="description" rows={4} required />
                       </div>
+                      
+                      {/* Front Image Upload */}
                       <div className="space-y-2">
-                        <Label htmlFor="image" className="block">Product Image</Label>
-                        <div className="border-2 border-dashed rounded-md p-6 text-center cursor-pointer hover:bg-muted/50 transition-colors">
+                        <Label htmlFor="frontImage" className="block">Front View Image (Required)</Label>
+                        <div className="border-2 border-dashed rounded-md p-4 text-center cursor-pointer hover:bg-muted/50 transition-colors">
                           <input 
                             type="file" 
-                            id="image" 
-                            ref={addImageInputRef}
+                            id="frontImage" 
+                            ref={addFrontImageInputRef}
                             className="hidden" 
                             accept="image/*"
+                            required
                           />
                           <Button 
                             type="button" 
                             variant="ghost" 
                             className="w-full h-full flex flex-col items-center"
-                            onClick={() => addImageInputRef.current?.click()}
-                            disabled={imageUploading}
+                            onClick={() => addFrontImageInputRef.current?.click()}
+                            disabled={frontImageUploading}
                           >
-                            {imageUploading ? (
+                            {frontImageUploading ? (
                               <div className="h-6 w-6 border-2 border-current border-t-transparent rounded-full animate-spin mb-2"></div>
                             ) : (
-                              <FileImage className="h-8 w-8 mb-2 text-muted-foreground" />
+                              <FileImage className="h-6 w-6 mb-2 text-muted-foreground" />
                             )}
                             <p className="text-sm text-muted-foreground">
-                              {imageUploading ? 'Uploading...' : 'Click to upload product image'}
+                              {frontImageUploading ? 'Uploading...' : 'Click to upload front view image'}
                             </p>
                             <p className="text-xs text-muted-foreground mt-1">
-                              Maximum file size: 5MB. Supported formats: JPEG, PNG, WebP
+                              This will be the main product image
+                            </p>
+                          </Button>
+                        </div>
+                      </div>
+                      
+                      {/* Back Image Upload */}
+                      <div className="space-y-2">
+                        <Label htmlFor="backImage" className="block">Back View Image (Required)</Label>
+                        <div className="border-2 border-dashed rounded-md p-4 text-center cursor-pointer hover:bg-muted/50 transition-colors">
+                          <input 
+                            type="file" 
+                            id="backImage" 
+                            ref={addBackImageInputRef}
+                            className="hidden" 
+                            accept="image/*"
+                            required
+                          />
+                          <Button 
+                            type="button" 
+                            variant="ghost" 
+                            className="w-full h-full flex flex-col items-center"
+                            onClick={() => addBackImageInputRef.current?.click()}
+                            disabled={backImageUploading}
+                          >
+                            {backImageUploading ? (
+                              <div className="h-6 w-6 border-2 border-current border-t-transparent rounded-full animate-spin mb-2"></div>
+                            ) : (
+                              <FileImage className="h-6 w-6 mb-2 text-muted-foreground" />
+                            )}
+                            <p className="text-sm text-muted-foreground">
+                              {backImageUploading ? 'Uploading...' : 'Click to upload back view image'}
+                            </p>
+                            <p className="text-xs text-muted-foreground mt-1">
+                              This will show when customers hover over the product
                             </p>
                           </Button>
                         </div>
