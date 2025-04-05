@@ -1,22 +1,40 @@
 import { motion } from 'framer-motion';
 import { useThemeStore, CultureTheme } from '@/store/useThemeStore';
+import { useLanguageStore } from '@/store/useLanguageStore';
 import { Music, Sparkles, Headphones, Building2, Palmtree, Heart, Radio } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { useAudio } from '@/providers/ThemeProvider';
+import { getDynamicTranslation } from '@/lib/translations';
 
 interface CultureOption {
   id: CultureTheme;
-  name: string;
-  description: string;
+  name: {
+    en: string;
+    ro: string;
+    es: string;
+    de: string;
+  };
+  description: {
+    en: string;
+    ro: string;
+    es: string;
+    de: string;
+  };
   image: string;
   icon: JSX.Element;
-  musicText?: string;
+  musicText?: {
+    en: string;
+    ro: string;
+    es: string;
+    de: string;
+  };
 }
 
 const CultureSelector = () => {
   const { culture, setCulture, cultureInfo, audioEnabled } = useThemeStore();
+  const { language } = useLanguageStore();
   const { isPlaying, toggleAudio, audioRef } = useAudio();
   const [hoveredCulture, setHoveredCulture] = useState<CultureTheme | null>(null);
   const [autoRotate, setAutoRotate] = useState(false);
@@ -28,46 +46,111 @@ const CultureSelector = () => {
   const cultureOptions: CultureOption[] = [
     {
       id: 'tokyo',
-      name: 'Tokyo',
-      description: 'Futuristic streetwear with neon aesthetics',
+      name: {
+        en: 'Tokyo',
+        ro: 'Tokyo',
+        es: 'Tokio',
+        de: 'Tokio'
+      },
+      description: {
+        en: 'Futuristic streetwear with neon aesthetics',
+        ro: 'Îmbrăcăminte stradală futuristă cu estetică neon',
+        es: 'Ropa urbana futurista con estética neón',
+        de: 'Futuristische Streetwear mit Neon-Ästhetik'
+      },
       image: '/culture-tokyo.jpg',
       icon: <Headphones className="h-4 w-4 text-white" />
     },
     {
       id: 'newyork',
-      name: 'New York',
-      description: 'Urban hip-hop inspired fashion',
+      name: {
+        en: 'New York',
+        ro: 'New York',
+        es: 'Nueva York',
+        de: 'New York'
+      },
+      description: {
+        en: 'Urban hip-hop inspired fashion',
+        ro: 'Modă inspirată din hip-hop urban',
+        es: 'Moda inspirada en el hip-hop urbano',
+        de: 'Von urbanem Hip-Hop inspirierte Mode'
+      },
       image: '/culture-newyork.jpg',
       icon: <Building2 className="h-4 w-4 text-white" />
     },
     {
       id: 'lagos',
-      name: 'Lagos',
-      description: 'Vibrant Afrobeats culture with bold patterns',
+      name: {
+        en: 'Lagos',
+        ro: 'Lagos',
+        es: 'Lagos',
+        de: 'Lagos'
+      },
+      description: {
+        en: 'Vibrant Afrobeats culture with bold patterns',
+        ro: 'Cultură vibrantă Afrobeats cu modele îndrăznețe',
+        es: 'Cultura vibrante de Afrobeats con patrones audaces',
+        de: 'Pulsierende Afrobeats-Kultur mit kühnen Mustern'
+      },
       image: '/culture-lagos.jpg',
       icon: <Palmtree className="h-4 w-4 text-white" />
     },
     {
       id: 'seoul',
-      name: 'Seoul',
-      description: 'K-pop influenced modern street style',
+      name: {
+        en: 'Seoul',
+        ro: 'Seoul',
+        es: 'Seúl',
+        de: 'Seoul'
+      },
+      description: {
+        en: 'K-pop influenced modern street style',
+        ro: 'Stil stradal modern influențat de K-pop',
+        es: 'Estilo urbano moderno influenciado por el K-pop',
+        de: 'Von K-Pop beeinflusster moderner Streetstyle'
+      },
       image: '/culture-seoul.jpg',
       icon: <Heart className="h-4 w-4 text-white" />
     },
     {
       id: 'london',
-      name: 'London',
-      description: 'Drill music scene with modern streetwear',
+      name: {
+        en: 'London',
+        ro: 'Londra',
+        es: 'Londres',
+        de: 'London'
+      },
+      description: {
+        en: 'Drill music scene with modern streetwear',
+        ro: 'Scena muzicii Drill cu îmbrăcăminte stradală modernă',
+        es: 'Escena musical Drill con ropa urbana moderna',
+        de: 'Drill-Musikszene mit moderner Streetwear'
+      },
       image: '/culture-london.jpg',
       icon: <Radio className="h-4 w-4 text-white" />
     },
     {
       id: 'berlin',
-      name: 'Berlin',
-      description: 'Techno music scene with futuristic clubwear',
+      name: {
+        en: 'Berlin',
+        ro: 'Berlin',
+        es: 'Berlín',
+        de: 'Berlin'
+      },
+      description: {
+        en: 'Techno music scene with futuristic clubwear',
+        ro: 'Scena muzicii techno cu îmbrăcăminte de club futuristă',
+        es: 'Escena musical techno con ropa de club futurista',
+        de: 'Techno-Musikszene mit futuristischer Clubkleidung'
+      },
       image: 'none',
       icon: <Music className="h-4 w-4 text-white" />,
-      musicText: 'Electronic and Techno'
+      musicText: {
+        en: 'Electronic and Techno',
+        ro: 'Electronic și Techno',
+        es: 'Electrónica y Techno',
+        de: 'Elektronik und Techno'
+      }
     }
   ];
 
@@ -199,6 +282,32 @@ const CultureSelector = () => {
     }
   };
 
+  // Helper function to get the localized music genre
+  const getMusicGenre = (optionId: CultureTheme) => {
+    const option = cultureOptions.find(opt => opt.id === optionId);
+    
+    if (option && option.musicText) {
+      return getDynamicTranslation(option.musicText, language, option.musicText.en);
+    }
+    
+    if (optionId === 'london') {
+      return getDynamicTranslation({
+        en: 'UK Drill & Rap',
+        ro: 'UK Drill & Rap',
+        es: 'UK Drill & Rap',
+        de: 'UK Drill & Rap'
+      }, language, 'UK Drill & Rap');
+    }
+    
+    // Try to get from cultureInfo
+    if (cultureInfo && cultureInfo[optionId] && cultureInfo[optionId].musicGenre) {
+      return cultureInfo[optionId].musicGenre;
+    }
+    
+    // Fallback
+    return 'Music';
+  };
+
   return (
     <div 
       className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4"
@@ -248,24 +357,24 @@ const CultureSelector = () => {
               <div className="w-6 h-6 flex items-center justify-center rounded-full bg-culture/80 mr-2">
                 {option.icon}
               </div>
-              <h3 className="text-white font-medium">{option.name}</h3>
+              <h3 className="text-white font-medium">
+                {typeof option.name === 'object' ? 
+                  getDynamicTranslation(option.name, language, option.name.en) : 
+                  option.name}
+              </h3>
             </div>
             
             <p className="text-white/80 text-sm">
-              {option.description}
+              {typeof option.description === 'object' ? 
+                getDynamicTranslation(option.description, language, option.description.en) : 
+                option.description}
             </p>
             
             {/* Music genre label */}
             <div className="mt-2 text-xs flex items-center text-white/70">
               <Music className="h-3 w-3 mr-1" />
               <span className="font-bold text-white">
-                {option.id === 'berlin' ? 
-                  'Electronic and Techno' :
-                  option.id === 'london' ? 
-                    'UK Drill & Rap' : 
-                    (cultureInfo && cultureInfo[option.id] ? 
-                      cultureInfo[option.id].musicGenre : 'Music')
-                }
+                {getMusicGenre(option.id)}
               </span>
             </div>
           </div>

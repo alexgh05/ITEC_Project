@@ -1,10 +1,10 @@
 import { ReactNode, useEffect } from 'react';
-import { Navigate, useLocation } from 'react-router-dom';
+import { Navigate, useLocation, Outlet } from 'react-router-dom';
 import { useAuthStore } from '@/store/useAuthStore';
 import { toast } from 'sonner';
 
 interface ProtectedRouteProps {
-  children: ReactNode;
+  children?: ReactNode;
 }
 
 const ProtectedRoute = ({ children }: ProtectedRouteProps) => {
@@ -22,7 +22,8 @@ const ProtectedRoute = ({ children }: ProtectedRouteProps) => {
     return <Navigate to="/login" state={{ from: location.pathname }} replace />;
   }
 
-  return <>{children}</>;
+  // Support both direct children and outlet
+  return children ? <>{children}</> : <Outlet />;
 };
 
 export default ProtectedRoute; 
