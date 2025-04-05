@@ -23,7 +23,8 @@ type TranslationKey =
   | 'size'
   | 'total'
   | 'viewCart'
-  | 'checkout';
+  | 'checkout'
+  | 'outfitGenerator';
 
 type TranslationsType = {
   [key in TranslationKey]: {
@@ -52,6 +53,12 @@ export const translations: TranslationsType = {
     ro: 'Culturi',
     es: 'Culturas',
     de: 'Kulturen'
+  },
+  outfitGenerator: {
+    en: 'AI Outfit Generator',
+    ro: 'Generator de Ținute AI',
+    es: 'Generador de Outfits AI',
+    de: 'KI-Outfit-Generator'
   },
   wishlist: {
     en: 'Wishlist',

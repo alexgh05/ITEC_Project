@@ -31,6 +31,7 @@
     --culture-foreground: 0 0% 98%;
     --culture-muted: 240 5% 64.9%;
     --culture-accent: 12 76% 61%;
+    --culture-rgb: 26, 26, 30;
 
     --font-display: "Archivo", sans-serif;
     --font-accent: "Inter", sans-serif;
@@ -59,6 +60,7 @@
 
     /* Dark mode culture theme adjustments */
     --culture-muted: 240 6% 70%;
+    --culture-rgb: 200, 200, 220;
   }
 
   /* Tokyo culture theme */
@@ -67,6 +69,7 @@
     --culture-foreground: 0 0% 100%;
     --culture-muted: 330 30% 80%;
     --culture-accent: 230 80% 60%;
+    --culture-rgb: 242, 77, 171;
   }
 
   /* New York culture theme - darker to match hip hop aesthetic */
@@ -75,6 +78,7 @@
     --culture-foreground: 0 0% 100%;
     --culture-muted: 220 30% 70%;
     --culture-accent: 20 90% 45%;
+    --culture-rgb: 30, 64, 140;
   }
 
   /* Lagos culture theme - brighter and sunnier */
@@ -83,6 +87,7 @@
     --culture-foreground: 0 0% 10%;
     --culture-muted: 40 50% 80%;
     --culture-accent: 160 70% 50%;
+    --culture-rgb: 255, 191, 71;
   }
 
   /* Seoul culture theme - more pink K-pop aesthetic */
@@ -91,6 +96,7 @@
     --culture-foreground: 0 0% 100%;
     --culture-muted: 330 40% 80%;
     --culture-accent: 280 80% 70%;
+    --culture-rgb: 255, 102, 187;
   }
   
   /* London culture theme - electronic music blues */
@@ -99,6 +105,7 @@
     --culture-foreground: 0 0% 100%;
     --culture-muted: 210 40% 80%;
     --culture-accent: 280 70% 60%;
+    --culture-rgb: 51, 171, 230;
   }
 
   /* Berlin culture theme - techno purple theme */
@@ -140,34 +147,6 @@
   .text-balance {
     text-wrap: balance;
   }
-
-  /* 3D Card Flip Effect */
-  .flip-card {
-    perspective: 1000px;
-    transform-style: preserve-3d;
-  }
-
-  .flip-card-inner {
-    position: relative;
-    width: 100%;
-    height: 100%;
-    transition: transform 0.6s;
-    transform-style: preserve-3d;
-  }
-
-  .flip-card:hover .flip-card-inner {
-    transform: rotateY(180deg);
-  }
-
-  .flip-card-front, .flip-card-back {
-    position: absolute;
-    width: 100%;
-    height: 100%;
-    backface-visibility: hidden;
-    -webkit-backface-visibility: hidden; /* For Safari support */
-  }
-
-  .flip-card-back {
-    transform: rotateY(180deg);
+ main
   }
 }

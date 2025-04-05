@@ -30,6 +30,7 @@ import Admin from "./pages/Admin";
 import Orders from "./pages/Orders";
 import PrivacyPolicy from "./pages/PrivacyPolicy";
 import TermsOfService from "./pages/TermsOfService";
+import FinalOutfitGenerator from "./pages/FinalOutfitGenerator";
 
 const queryClient = new QueryClient();
 
@@ -49,6 +50,7 @@ const App = () => (
                 <Route path="/shop/:category" element={<ShopCategory />} />
                 <Route path="/cultures" element={<Cultures />} />
                 <Route path="/cultures/:cultureId" element={<Culture />} />
+                <Route path="/outfit-generator" element={<FinalOutfitGenerator />} />
                 <Route path="/about" element={<About />} />
                 <Route path="/wishlist" element={<Wishlist />} />
                 <Route path="/cart" element={<Cart />} />

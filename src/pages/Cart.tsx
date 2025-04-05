@@ -1,19 +1,21 @@
 import { useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { ShoppingBag, Trash2, ArrowLeft, Plus, Minus, ArrowRight } from 'lucide-react';
+import { ArrowLeft, ShoppingBag, Trash2, Minus, Plus, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useCartStore } from '@/store/useCartStore';
 import { toast } from 'sonner';
 import { Separator } from '@/components/ui/separator';
 
 const Cart = () => {
-  const { items, getTotalItems, getTotalPrice, removeItem, updateQuantity, clearCart } = useCartStore();
+  const { items, getTotalItems, getTotalPrice, removeItem, updateQuantity, clearCart, getDiscountAmount, getFinalPrice } = useCartStore();
   const navigate = useNavigate();
   const totalItems = getTotalItems();
   const subtotal = getTotalPrice();
+  const discountAmount = getDiscountAmount();
+  const discountedTotal = getFinalPrice();
   const shipping = subtotal > 0 ? 9.99 : 0;
-  const total = subtotal + shipping;
+  const total = discountedTotal + shipping;
 
   useEffect(() => {
     // Set page title
@@ -144,12 +146,22 @@ const Cart = () => {
                           
                           <div className="md:col-span-2 flex justify-between md:justify-center items-center">
                             <span className="md:hidden font-medium">Total:</span>
-                            <div className="flex items-center justify-between w-full md:w-auto">
-                              <span className="font-medium">${(item.price * item.quantity).toFixed(2)}</span>
+                            <div className="flex flex-col items-end md:items-center justify-between w-full md:w-auto">
+                              {item.discountPercentage ? (
+                                <>
+                                  <span className="text-xs text-culture font-medium">Save {item.discountPercentage}%</span>
+                                  <div className="flex items-center gap-2">
+                                    <span className="text-muted-foreground line-through text-xs">${(item.price * item.quantity).toFixed(2)}</span>
+                                    <span className="font-medium">${((item.price * item.quantity) * (1 - item.discountPercentage / 100)).toFixed(2)}</span>
+                                  </div>
+                                </>
+                              ) : (
+                                <span className="font-medium">${(item.price * item.quantity).toFixed(2)}</span>
+                              )}
                               <Button 
                                 variant="ghost" 
                                 size="icon" 
-                                className="h-8 w-8 text-destructive hover:text-destructive hidden md:flex"
+                                className="h-8 w-8 text-destructive hover:text-destructive hidden md:flex mt-1"
                                 onClick={() => handleRemoveItem(item.id, item.name)}
                               >
                                 <Trash2 className="h-4 w-4" />
@@ -167,13 +179,15 @@ const Cart = () => {
                   
                   <div className="bg-muted p-6 flex justify-between">
                     <Button 
-                      variant="outline" 
+                      variant="destructive" 
                       onClick={() => {
                         clearCart();
                         toast.success("Cart cleared");
                       }}
+                      className="flex items-center"
                     >
-                      Clear Cart
+                      <X className="h-4 w-4 mr-2" />
+                      Empty Cart
                     </Button>
                     <Button asChild variant="outline">
                       <Link to="/shop">Continue Shopping</Link>
@@ -191,6 +205,13 @@ const Cart = () => {
                       <span className="text-muted-foreground">Subtotal</span>
                       <span>${subtotal.toFixed(2)}</span>
                     </div>
+                    
+                    {discountAmount > 0 && (
+                      <div className="flex justify-between text-culture">
+                        <span>Discount (Save 15%)</span>
+                        <span>-${discountAmount.toFixed(2)}</span>
+                      </div>
+                    )}
                     
                     <div className="flex justify-between">
                       <span className="text-muted-foreground">Shipping</span>
@@ -210,7 +231,6 @@ const Cart = () => {
                       onClick={handleProceedToCheckout}
                     >
                       Proceed to Checkout
-                      <ArrowRight className="ml-2 h-4 w-4" />
                     </Button>
                   </div>
                 </div>
