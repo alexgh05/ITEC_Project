@@ -48,7 +48,11 @@ const ProductDetailPage = () => {
           if (productData) {
             document.title = `${productData.name} | CultureDrop`;
             // Set the culture theme to match the product
-            setCulture(productData.culture.toLowerCase() as any);
+            if (productData.culture) {
+              // Safely set the culture theme
+              const cultureName = productData.culture.toString().toLowerCase();
+              setCulture(cultureName as any);
+            }
           }
         }
         setLoading(false);
@@ -155,7 +159,7 @@ const ProductDetailPage = () => {
                     className="w-full h-full object-cover object-center"
                   />
                 ) : (
-                  <div className={`w-full h-full bg-gradient-to-br from-culture to-culture-accent/50 culture-${product.culture.toLowerCase()}`} />
+                  <div className={`w-full h-full bg-gradient-to-br from-culture to-culture-accent/50`} />
                 )}
               </motion.div>
             </AnimatePresence>

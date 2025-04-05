@@ -22,6 +22,9 @@ const CultureSelector = () => {
   const [autoRotate, setAutoRotate] = useState(false);
   const [currentAutoIndex, setCurrentAutoIndex] = useState(0);
 
+  // Debug logs
+  console.log('CultureInfo:', cultureInfo);
+
   const cultureOptions: CultureOption[] = [
     {
       id: 'tokyo',
@@ -62,7 +65,7 @@ const CultureSelector = () => {
       id: 'berlin',
       name: 'Berlin',
       description: 'Techno music scene with futuristic clubwear',
-      image: '/culture-berlin.jpg',
+      image: 'none',
       icon: <Music className="h-4 w-4 text-white" />,
       musicText: 'Electronic and Techno'
     }
@@ -72,6 +75,11 @@ const CultureSelector = () => {
   const availableCultureOptions = cultureOptions.filter(option => 
     cultureInfo && Object.keys(cultureInfo).includes(option.id)
   );
+  
+  // More debug logs
+  console.log('Culture Options:', cultureOptions);
+  console.log('Available Culture Options:', availableCultureOptions);
+  console.log('Culture Info Keys:', cultureInfo ? Object.keys(cultureInfo) : 'No culture info');
 
   // Auto-rotate effect - starts the rotation after 10 seconds
   useEffect(() => {
@@ -127,10 +135,16 @@ const CultureSelector = () => {
 
   return (
     <div 
-      className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4"
+      className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4"
       onMouseEnter={handleUserInteraction}
     >
-      {availableCultureOptions.map((option) => (
+      {/* Combine available culture options and Berlin */}
+      {[...availableCultureOptions, 
+        // Only add Berlin manually if it's not already included
+        ...(!availableCultureOptions.some(opt => opt.id === 'berlin') ? 
+          [cultureOptions.find(opt => opt.id === 'berlin')] : 
+          [])
+      ].filter(Boolean).map((option) => (
         <motion.div
           key={option.id}
           className={`
@@ -144,9 +158,12 @@ const CultureSelector = () => {
         >
           {/* Background image */}
           <div 
-            className="absolute inset-0 bg-cover bg-center transition-transform duration-700"
+            className={`absolute inset-0 bg-cover bg-center transition-transform duration-700 ${option.id === 'berlin' ? 'bg-gradient-to-br from-purple-900 via-violet-800 to-indigo-900' : ''}`}
             style={{ 
-              backgroundImage: `url(${option.image})`,
+              backgroundImage: option.id === 'berlin' 
+                ? 'none' 
+                : `url(${option.image}), url('https://images.unsplash.com/photo-1599119357673-2c957228c88b?q=80&w=1740&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D')`,
+              backgroundColor: option.id === 'berlin' ? 'transparent' : 'transparent',
               transform: hoveredCulture === option.id ? 'scale(1.1)' : 'scale(1)'
             }}
           />

@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button';
 import { useThemeStore } from '@/store/useThemeStore';
 import { fetchProducts } from '@/lib/api';
 
-const categories = ['All', 'Fashion', 'Music', 'Accessories', 'Footwear', 'Clothing'];
+const categories = ['All', 'Music', 'Accessories', 'Footwear', 'Fashion'];
 const cultures = ['All', 'Tokyo', 'New York', 'Lagos', 'Seoul', 'London', 'Berlin'];
 
 // Featured category cards
@@ -69,8 +69,16 @@ const ShopPage = () => {
   // Handle URL parameters for filtering
   useEffect(() => {
     const cultureParam = searchParams.get('culture');
-    if (cultureParam && cultures.includes(cultureParam)) {
-      handleCultureChange(cultureParam);
+    if (cultureParam) {
+      // Find matching culture in the cultures array (case-insensitive)
+      const matchingCulture = cultures.find(c => 
+        c.toLowerCase() === cultureParam.toLowerCase() ||
+        (c === 'New York' && cultureParam.toLowerCase() === 'newyork')
+      );
+      
+      if (matchingCulture) {
+        handleCultureChange(matchingCulture);
+      }
     }
   }, [searchParams]);
 
@@ -84,7 +92,7 @@ const ShopPage = () => {
     } else if (culture === 'New York') {
       setCulture('newyork');
     } else {
-      // For Tokyo, Lagos, Seoul, London - lowercase the culture name
+      // For Tokyo, Lagos, Seoul, London, Berlin - lowercase the culture name
       setCulture(culture.toLowerCase() as any);
     }
   };

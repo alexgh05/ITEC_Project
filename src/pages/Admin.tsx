@@ -179,6 +179,35 @@ const Admin = () => {
   const [settingsLoading, setSettingsLoading] = useState(true);
   const [settingsEdited, setSettingsEdited] = useState(false);
   
+  // File input refs
+  const addFrontImageInputRef = useRef(null);
+  const addBackImageInputRef = useRef(null);
+  const editFrontImageInputRef = useRef(null);
+  const editBackImageInputRef = useRef(null);
+  const [imageUploading, setImageUploading] = useState(false);
+  const [frontImageUploading, setFrontImageUploading] = useState(false);
+  const [backImageUploading, setBackImageUploading] = useState(false);
+  const [editFrontImageUploading, setEditFrontImageUploading] = useState(false);
+  const [editBackImageUploading, setEditBackImageUploading] = useState(false);
+  
+  // Image preview states
+  const [frontImagePreview, setFrontImagePreview] = useState(null);
+  const [backImagePreview, setBackImagePreview] = useState(null);
+  const [editFrontImagePreview, setEditFrontImagePreview] = useState(null);
+  const [editBackImagePreview, setEditBackImagePreview] = useState(null);
+  
+  // Handle image file selection for preview
+  const handleImageChange = (e, setPreviewFunc) => {
+    const file = e.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setPreviewFunc(reader.result);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+  
   // Fetch products from API
   useEffect(() => {
     const fetchProducts = async () => {
@@ -317,14 +346,6 @@ const Admin = () => {
     user.role.toLowerCase().includes(userSearchQuery.toLowerCase())
   );
   
-  // File input refs
-  const addFrontImageInputRef = useRef(null);
-  const addBackImageInputRef = useRef(null);
-  const editImageInputRef = useRef(null);
-  const [imageUploading, setImageUploading] = useState(false);
-  const [frontImageUploading, setFrontImageUploading] = useState(false);
-  const [backImageUploading, setBackImageUploading] = useState(false);
-  
   // Handle image upload for a product
   const handleImageUpload = async (file, productId, imageIndex = 0, setUploadingState = setImageUploading) => {
     if (!file) return null;
@@ -389,6 +410,14 @@ const Admin = () => {
     }
   };
   
+  // Function to reset image states
+  const resetImageStates = () => {
+    setFrontImagePreview(null);
+    setBackImagePreview(null);
+    setEditFrontImagePreview(null);
+    setEditBackImagePreview(null);
+  };
+  
   // Handle adding a product
   const handleAddProduct = async (event) => {
     event.preventDefault();
@@ -440,6 +469,9 @@ const Admin = () => {
       }
       
       setIsAddDialogOpen(false);
+      // Reset image previews after successful upload
+      resetImageStates();
+      
       toast({
         title: 'Success',
         description: 'Product added successfully with front and back images',
@@ -484,6 +516,8 @@ const Admin = () => {
       setProducts(products.map(p => p._id === updatedProduct._id ? updatedProduct : p));
       setIsEditDialogOpen(false);
       setSelectedProduct(null);
+      resetImageStates();
+      
       toast({
         title: 'Success',
         description: 'Product updated successfully',
@@ -635,7 +669,13 @@ const Admin = () => {
                   onChange={(e) => setSearchQuery(e.target.value)}
                 />
               </div>
-              <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
+              <Dialog 
+                open={isAddDialogOpen} 
+                onOpenChange={(open) => {
+                  setIsAddDialogOpen(open);
+                  if (!open) resetImageStates();
+                }}
+              >
                 <DialogTrigger asChild>
                   <Button className="flex items-center gap-2">
                     <Plus className="h-4 w-4" />
@@ -683,7 +723,7 @@ const Admin = () => {
                             <option value="books">Books</option>
                             <option value="art">Art</option>
                             <option value="footwear">Footwear</option>
-                            <option value="clothing">Clothing</option>
+                            
                           </select>
                         </div>
                       </div>
@@ -713,26 +753,46 @@ const Admin = () => {
                             className="hidden" 
                             accept="image/*"
                             required
+                            onChange={(e) => handleImageChange(e, setFrontImagePreview)}
                           />
-                          <Button 
-                            type="button" 
-                            variant="ghost" 
-                            className="w-full h-full flex flex-col items-center"
-                            onClick={() => addFrontImageInputRef.current?.click()}
-                            disabled={frontImageUploading}
-                          >
-                            {frontImageUploading ? (
-                              <div className="h-6 w-6 border-2 border-current border-t-transparent rounded-full animate-spin mb-2"></div>
-                            ) : (
-                              <FileImage className="h-6 w-6 mb-2 text-muted-foreground" />
-                            )}
-                            <p className="text-sm text-muted-foreground">
-                              {frontImageUploading ? 'Uploading...' : 'Click to upload front view image'}
-                            </p>
-                            <p className="text-xs text-muted-foreground mt-1">
-                              This will be the main product image
-                            </p>
-                          </Button>
+                          {frontImagePreview ? (
+                            <div className="relative">
+                              <img 
+                                src={frontImagePreview} 
+                                alt="Front view preview" 
+                                className="mx-auto max-h-60 object-contain rounded-md mb-2"
+                              />
+                              <Button 
+                                type="button" 
+                                variant="outline" 
+                                size="sm"
+                                className="mt-2 text-sm"
+                                onClick={() => addFrontImageInputRef.current?.click()}
+                              >
+                                Change Image
+                              </Button>
+                            </div>
+                          ) : (
+                            <Button 
+                              type="button" 
+                              variant="ghost" 
+                              className="w-full h-full flex flex-col items-center"
+                              onClick={() => addFrontImageInputRef.current?.click()}
+                              disabled={frontImageUploading}
+                            >
+                              {frontImageUploading ? (
+                                <div className="h-6 w-6 border-2 border-current border-t-transparent rounded-full animate-spin mb-2"></div>
+                              ) : (
+                                <FileImage className="h-6 w-6 mb-2 text-muted-foreground" />
+                              )}
+                              <p className="text-sm text-muted-foreground">
+                                {frontImageUploading ? 'Uploading...' : 'Click to upload front view image'}
+                              </p>
+                              <p className="text-xs text-muted-foreground mt-1">
+                                This will be the main product image
+                              </p>
+                            </Button>
+                          )}
                         </div>
                       </div>
                       
@@ -747,31 +807,54 @@ const Admin = () => {
                             className="hidden" 
                             accept="image/*"
                             required
+                            onChange={(e) => handleImageChange(e, setBackImagePreview)}
                           />
-                          <Button 
-                            type="button" 
-                            variant="ghost" 
-                            className="w-full h-full flex flex-col items-center"
-                            onClick={() => addBackImageInputRef.current?.click()}
-                            disabled={backImageUploading}
-                          >
-                            {backImageUploading ? (
-                              <div className="h-6 w-6 border-2 border-current border-t-transparent rounded-full animate-spin mb-2"></div>
-                            ) : (
-                              <FileImage className="h-6 w-6 mb-2 text-muted-foreground" />
-                            )}
-                            <p className="text-sm text-muted-foreground">
-                              {backImageUploading ? 'Uploading...' : 'Click to upload back view image'}
-                            </p>
-                            <p className="text-xs text-muted-foreground mt-1">
-                              This will show when customers hover over the product
-                            </p>
-                          </Button>
+                          {backImagePreview ? (
+                            <div className="relative">
+                              <img 
+                                src={backImagePreview} 
+                                alt="Back view preview" 
+                                className="mx-auto max-h-60 object-contain rounded-md mb-2"
+                              />
+                              <Button 
+                                type="button" 
+                                variant="outline" 
+                                size="sm"
+                                className="mt-2 text-sm"
+                                onClick={() => addBackImageInputRef.current?.click()}
+                              >
+                                Change Image
+                              </Button>
+                            </div>
+                          ) : (
+                            <Button 
+                              type="button" 
+                              variant="ghost" 
+                              className="w-full h-full flex flex-col items-center"
+                              onClick={() => addBackImageInputRef.current?.click()}
+                              disabled={backImageUploading}
+                            >
+                              {backImageUploading ? (
+                                <div className="h-6 w-6 border-2 border-current border-t-transparent rounded-full animate-spin mb-2"></div>
+                              ) : (
+                                <FileImage className="h-6 w-6 mb-2 text-muted-foreground" />
+                              )}
+                              <p className="text-sm text-muted-foreground">
+                                {backImageUploading ? 'Uploading...' : 'Click to upload back view image'}
+                              </p>
+                              <p className="text-xs text-muted-foreground mt-1">
+                                This will show when customers hover over the product
+                              </p>
+                            </Button>
+                          )}
                         </div>
                       </div>
                     </div>
                     <DialogFooter className="mt-6 sticky bottom-0 bg-background pb-2 pt-4">
-                      <Button variant="outline" onClick={() => setIsAddDialogOpen(false)}>Cancel</Button>
+                      <Button variant="outline" onClick={() => {
+                        setIsAddDialogOpen(false);
+                        resetImageStates();
+                      }}>Cancel</Button>
                       <Button type="submit" className="bg-primary text-primary-foreground hover:bg-primary/90 font-medium">
                         Save Product
                       </Button>
@@ -1288,7 +1371,7 @@ const Admin = () => {
                         <div className="flex items-center gap-2">
                           <Store className="h-5 w-5 text-primary" />
                           <CardTitle>Store Information</CardTitle>
-              </div>
+                        </div>
                         <CardDescription>
                           Basic information about your store
                         </CardDescription>
@@ -1580,7 +1663,16 @@ const Admin = () => {
           
           {/* Edit Product Dialog */}
           {selectedProduct && (
-            <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
+            <Dialog 
+              open={isEditDialogOpen} 
+              onOpenChange={(open) => {
+                setIsEditDialogOpen(open);
+                if (!open) {
+                  setSelectedProduct(null);
+                  resetImageStates();
+                }
+              }}
+            >
               <DialogContent className="sm:max-w-[625px] max-h-[90vh] overflow-y-auto">
                 <DialogHeader>
                   <DialogTitle>Edit Product</DialogTitle>
@@ -1652,7 +1744,7 @@ const Admin = () => {
                           <option value="books">Books</option>
                           <option value="art">Art</option>
                           <option value="footwear">Footwear</option>
-                          <option value="clothing">Clothing</option>
+                          
                         </select>
                       </div>
                     </div>
@@ -1666,59 +1758,167 @@ const Admin = () => {
                         required
                       />
                     </div>
+                    
+                    {/* Front Image Upload */}
                     <div className="space-y-2">
-                      <Label htmlFor="editImage" className="block">Product Image</Label>
-                      <div className="grid grid-cols-2 gap-4">
-                        <div>
-                          {selectedProduct?.images && selectedProduct.images[0] && (
+                      <Label htmlFor="editFrontImage" className="block">Front View Image</Label>
+                      <div className="border-2 border-dashed rounded-md p-4 text-center cursor-pointer hover:bg-muted/50 transition-colors">
+                        <input 
+                          type="file" 
+                          id="editFrontImage" 
+                          ref={editFrontImageInputRef}
+                          className="hidden" 
+                          accept="image/*"
+                          onChange={(e) => {
+                            handleImageChange(e, setEditFrontImagePreview);
+                            if (e.target.files && e.target.files[0]) {
+                              handleImageUpload(e.target.files[0], selectedProduct._id, 0, setEditFrontImageUploading);
+                            }
+                          }}
+                        />
+                        {editFrontImagePreview ? (
+                          <div className="relative">
+                            <img 
+                              src={editFrontImagePreview} 
+                              alt="Front view preview" 
+                              className="mx-auto max-h-60 object-contain rounded-md mb-2"
+                            />
+                            <Button 
+                              type="button" 
+                              variant="outline" 
+                              size="sm"
+                              className="mt-2 text-sm"
+                              onClick={() => editFrontImageInputRef.current?.click()}
+                              disabled={editFrontImageUploading}
+                            >
+                              {editFrontImageUploading ? 'Uploading...' : 'Change Image'}
+                            </Button>
+                          </div>
+                        ) : selectedProduct?.images && selectedProduct.images[0] ? (
+                          <div className="relative">
                             <img 
                               src={selectedProduct.images[0]} 
                               alt={selectedProduct.name} 
-                              className="h-40 w-full object-cover rounded-md border"
+                              className="mx-auto max-h-60 object-contain rounded-md mb-2"
                             />
-                          )}
-                        </div>
-                        <div className="flex flex-col gap-2">
-                          <input 
-                            type="file" 
-                            id="editImage" 
-                            ref={editImageInputRef}
-                            className="hidden" 
-                            accept="image/*"
-                            onChange={(e) => {
-                              if (e.target.files && e.target.files[0]) {
-                                handleImageUpload(e.target.files[0], selectedProduct._id);
-                              }
-                            }}
-                          />
+                            <Button 
+                              type="button" 
+                              variant="outline" 
+                              size="sm"
+                              className="mt-2 text-sm"
+                              onClick={() => editFrontImageInputRef.current?.click()}
+                              disabled={editFrontImageUploading}
+                            >
+                              {editFrontImageUploading ? 'Uploading...' : 'Change Image'}
+                            </Button>
+                          </div>
+                        ) : (
                           <Button 
                             type="button" 
-                            variant="outline" 
-                            className="h-20 w-full" 
-                            onClick={() => editImageInputRef.current?.click()}
-                            disabled={imageUploading}
+                            variant="ghost" 
+                            className="w-full h-full flex flex-col items-center"
+                            onClick={() => editFrontImageInputRef.current?.click()}
+                            disabled={editFrontImageUploading}
                           >
-                            {imageUploading ? (
-                              <span className="flex items-center gap-2">
-                                <div className="h-4 w-4 border-2 border-current border-t-transparent rounded-full animate-spin"></div>
-                                Uploading...
-                              </span>
+                            {editFrontImageUploading ? (
+                              <div className="h-6 w-6 border-2 border-current border-t-transparent rounded-full animate-spin mb-2"></div>
                             ) : (
-                              <span className="flex flex-col items-center gap-1">
-                                <Upload className="h-4 w-4" />
-                                Upload New Image
-                              </span>
+                              <FileImage className="h-6 w-6 mb-2 text-muted-foreground" />
                             )}
+                            <p className="text-sm text-muted-foreground">
+                              {editFrontImageUploading ? 'Uploading...' : 'Click to upload front view image'}
+                            </p>
+                            <p className="text-xs text-muted-foreground mt-1">
+                              This will be the main product image
+                            </p>
                           </Button>
-                          <p className="text-xs text-muted-foreground">
-                            Maximum file size: 5MB. Supported formats: JPEG, PNG, WebP
-                          </p>
-                        </div>
+                        )}
+                      </div>
+                    </div>
+                    
+                    {/* Back Image Upload */}
+                    <div className="space-y-2">
+                      <Label htmlFor="editBackImage" className="block">Back View Image</Label>
+                      <div className="border-2 border-dashed rounded-md p-4 text-center cursor-pointer hover:bg-muted/50 transition-colors">
+                        <input 
+                          type="file" 
+                          id="editBackImage" 
+                          ref={editBackImageInputRef}
+                          className="hidden" 
+                          accept="image/*"
+                          onChange={(e) => {
+                            handleImageChange(e, setEditBackImagePreview);
+                            if (e.target.files && e.target.files[0]) {
+                              handleImageUpload(e.target.files[0], selectedProduct._id, 1, setEditBackImageUploading);
+                            }
+                          }}
+                        />
+                        {editBackImagePreview ? (
+                          <div className="relative">
+                            <img 
+                              src={editBackImagePreview} 
+                              alt="Back view preview" 
+                              className="mx-auto max-h-60 object-contain rounded-md mb-2"
+                            />
+                            <Button 
+                              type="button" 
+                              variant="outline" 
+                              size="sm"
+                              className="mt-2 text-sm"
+                              onClick={() => editBackImageInputRef.current?.click()}
+                              disabled={editBackImageUploading}
+                            >
+                              {editBackImageUploading ? 'Uploading...' : 'Change Image'}
+                            </Button>
+                          </div>
+                        ) : selectedProduct?.images && selectedProduct.images[1] ? (
+                          <div className="relative">
+                            <img 
+                              src={selectedProduct.images[1]} 
+                              alt={`${selectedProduct.name} back view`} 
+                              className="mx-auto max-h-60 object-contain rounded-md mb-2"
+                            />
+                            <Button 
+                              type="button" 
+                              variant="outline" 
+                              size="sm"
+                              className="mt-2 text-sm"
+                              onClick={() => editBackImageInputRef.current?.click()}
+                              disabled={editBackImageUploading}
+                            >
+                              {editBackImageUploading ? 'Uploading...' : 'Change Image'}
+                            </Button>
+                          </div>
+                        ) : (
+                          <Button 
+                            type="button" 
+                            variant="ghost" 
+                            className="w-full h-full flex flex-col items-center"
+                            onClick={() => editBackImageInputRef.current?.click()}
+                            disabled={editBackImageUploading}
+                          >
+                            {editBackImageUploading ? (
+                              <div className="h-6 w-6 border-2 border-current border-t-transparent rounded-full animate-spin mb-2"></div>
+                            ) : (
+                              <FileImage className="h-6 w-6 mb-2 text-muted-foreground" />
+                            )}
+                            <p className="text-sm text-muted-foreground">
+                              {editBackImageUploading ? 'Uploading...' : 'Click to upload back view image'}
+                            </p>
+                            <p className="text-xs text-muted-foreground mt-1">
+                              This will show when customers hover over the product
+                            </p>
+                          </Button>
+                        )}
                       </div>
                     </div>
                   </div>
                   <DialogFooter className="mt-6 sticky bottom-0 bg-background pb-2 pt-4">
-                    <Button variant="outline" onClick={() => setIsEditDialogOpen(false)}>Cancel</Button>
+                    <Button variant="outline" onClick={() => {
+                      setIsEditDialogOpen(false);
+                      setSelectedProduct(null);
+                      resetImageStates();
+                    }}>Cancel</Button>
                     <Button type="submit" className="bg-primary text-primary-foreground hover:bg-primary/90 font-medium">
                       Update Product
                     </Button>

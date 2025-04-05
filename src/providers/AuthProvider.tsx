@@ -1,6 +1,7 @@
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { loginUser, registerUser, loginWithGoogleApi, registerWithGoogleApi } from '@/lib/api';
 import { useWishlistStore } from '@/store/useWishlistStore';
+import { useCartStore } from '@/store/useCartStore';
 
 interface User {
   _id: string;
@@ -217,6 +218,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     localStorage.removeItem('token');
     sessionStorage.removeItem('user');
     sessionStorage.removeItem('token');
+    
+    // Clear cart when logging out
+    useCartStore.getState().clearCart();
   };
 
   // Update user function
