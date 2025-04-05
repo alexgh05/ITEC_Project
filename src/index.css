@@ -1,4 +1,3 @@
-
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -100,6 +99,14 @@
     --culture-foreground: 0 0% 100%;
     --culture-muted: 210 40% 80%;
     --culture-accent: 280 70% 60%;
+  }
+
+  /* Berlin culture theme - techno purple theme */
+  .culture-berlin {
+    --culture: 280 70% 50%;
+    --culture-foreground: 0 0% 100%;
+    --culture-muted: 280 40% 80%;
+    --culture-accent: 320 70% 60%;
   }
 
   * {

@@ -51,9 +51,16 @@ const CultureSelector = () => {
     {
       id: 'london',
       name: 'London',
-      description: 'Electronic music scene with modern clubwear',
+      description: 'Drill music scene with modern streetwear',
       image: '/culture-london.jpg',
       icon: <Radio className="h-4 w-4 text-white" />
+    },
+    {
+      id: 'berlin',
+      name: 'Berlin',
+      description: 'Techno music scene with futuristic clubwear',
+      image: '/culture-berlin.jpg',
+      icon: <Music className="h-4 w-4 text-white" />
     }
   ];
 

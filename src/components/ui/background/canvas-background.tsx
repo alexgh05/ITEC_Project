@@ -5,6 +5,7 @@ import { drawNewYorkBackground } from './newyork-background';
 import { drawLagosBackground } from './lagos-background';
 import { drawSeoulBackground } from './seoul-background';
 import { drawLondonBackground } from './london-background';
+import { drawBerlinBackground } from './berlin-background';
 import { drawDefaultBackground } from './default-background';
 
 export const CanvasBackground: React.FC = () => {
@@ -54,6 +55,9 @@ export const CanvasBackground: React.FC = () => {
             break;
           case 'london':
             drawLondonBackground(ctx, canvas);
+            break;
+          case 'berlin':
+            drawBerlinBackground(ctx, canvas);
             break;
           default:
             drawDefaultBackground(ctx, canvas);

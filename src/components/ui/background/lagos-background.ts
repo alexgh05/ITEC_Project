@@ -103,6 +103,54 @@ export const drawLagosBackground = (ctx: CanvasRenderingContext2D, canvas: HTMLC
       ctx.fill();
     }
   }
+
+    // Draw static pineapples (no animation)
+    for (let i = 0; i < 6; i++) {
+      const x = canvas.width * (0.05 + i * 0.15); // Fixed positions, no animation
+      const y = canvas.height - beachHeight * 1.1 - (i % 3) * beachHeight * 0.1; // Slight height variation
+      const size = 20 + (i % 4) * 3; // Slight size variation
+      
+      // Draw pineapple body
+      ctx.fillStyle = 'rgba(255, 200, 0, 0.7)';  // Yellow-orange
+      ctx.beginPath();
+      ctx.ellipse(x, y + size * 0.6, size * 0.5, size, 0, 0, Math.PI * 2);
+      ctx.fill();
+      
+      // Diamond pattern on pineapple
+      ctx.strokeStyle = 'rgba(150, 100, 0, 0.4)';
+      ctx.lineWidth = 1;
+      for (let j = 0; j < 10; j++) {
+        const angle = j * Math.PI / 5;
+        for (let k = 0; k < 3; k++) {
+          ctx.beginPath();
+          ctx.arc(
+            x + Math.cos(angle) * (k * size * 0.2), 
+            y + size * 0.6 + Math.sin(angle) * (k * size * 0.15),
+            size * 0.1,
+            0,
+            Math.PI * 2
+          );
+          ctx.stroke();
+        }
+      }
+      
+      // Draw pineapple crown
+      ctx.fillStyle = 'rgba(20, 150, 20, 0.6)';  // Green
+      for (let j = 0; j < 7; j++) {
+        const angle = (j / 7) * Math.PI - Math.PI / 2;
+        ctx.beginPath();
+        ctx.ellipse(
+          x + Math.cos(angle) * size * 0.2,
+          y - size * 0.3 + Math.sin(angle) * size * 0.2,
+          size * 0.15,
+          size * 0.4,
+          angle,
+          0,
+          Math.PI * 2
+        );
+        ctx.fill();
+      }
+    }
   
   // Draw colorful patterns
   for (let i = 0; i < 15; i++) {

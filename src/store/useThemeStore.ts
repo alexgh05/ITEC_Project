@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 
-export type CultureTheme = 'default' | 'tokyo' | 'newyork' | 'lagos' | 'seoul' | 'london';
+export type CultureTheme = 'default' | 'tokyo' | 'newyork' | 'lagos' | 'seoul' | 'london' | 'berlin';
 
 interface CultureInfo {
   name: string;
@@ -78,12 +78,21 @@ export const useThemeStore = create<ThemeState>()(
         },
         london: {
           name: "London",
-          description: "Electronic music scene with modern clubwear",
+          description: "UK Drill music scene with modern streetwear",
           primaryColor: "hsl(200, 80%, 55%)",
-          musicGenre: "Electronic & Drum and Bass",
+          musicGenre: "UK Drill & Rap",
           sampleTrack: "/audio/london-electronic.mp3",
           backgroundPattern: "electronicGrid",
-          themeDescription: "London nightlife with LED patterns, club lights, and electronic vibes",
+          themeDescription: "London nightlife with balaclavas, football jerseys, and drill music",
+        },
+        berlin: {
+          name: "Berlin",
+          description: "Techno music scene with futuristic clubwear",
+          primaryColor: "hsl(280, 70%, 50%)",
+          musicGenre: "Techno & Industrial",
+          sampleTrack: "/audio/berlin-techno.mp3",
+          backgroundPattern: "technoGrid",
+          themeDescription: "Berlin underground techno scene with industrial aesthetics and dark tones",
         },
       },
       setDarkMode: (darkMode) => set({ darkMode }),

@@ -8,7 +8,7 @@ type ThemeProviderProps = {
 };
 
 // Create a context for global audio
-export const AudioContext = createContext<{
+const AudioContextInternal = createContext<{
   audioRef: React.RefObject<HTMLAudioElement | null>;
   isPlaying: boolean;
   isMuted: boolean;
@@ -205,7 +205,7 @@ const ThemeProvider = ({ children }: ThemeProviderProps) => {
     }
     
     // Handle culture theme
-    html.classList.remove('culture-tokyo', 'culture-newyork', 'culture-lagos', 'culture-seoul', 'culture-london');
+    html.classList.remove('culture-tokyo', 'culture-newyork', 'culture-lagos', 'culture-seoul', 'culture-london', 'culture-berlin');
     if (appliedTheme.culture !== 'default') {
       html.classList.add(`culture-${appliedTheme.culture}`);
     }
@@ -219,15 +219,18 @@ const ThemeProvider = ({ children }: ThemeProviderProps) => {
   }, [appliedTheme]);
 
   return (
-    <AudioContext.Provider value={{ audioRef, isPlaying, isMuted, toggleAudio, toggleMute }}>
+    <AudioContextInternal.Provider value={{ audioRef, isPlaying, isMuted, toggleAudio, toggleMute }}>
       <InteractiveBackground />
       {children}
       <AudioControl />
-    </AudioContext.Provider>
+    </AudioContextInternal.Provider>
   );
 };
 
 export default ThemeProvider;
 
+// Export the AudioContext separately as a named export
+export const AudioContext = AudioContextInternal;
+
 // Helper hook to use audio
-export const useAudio = () => useContext(AudioContext);
+export const useAudio = () => useContext(AudioContextInternal);
