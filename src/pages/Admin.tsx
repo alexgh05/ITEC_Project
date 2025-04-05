@@ -30,7 +30,8 @@ import {
   Save,
   Facebook,
   Twitter,
-  Instagram
+  Instagram,
+  Music
 } from 'lucide-react';
 
 import { useAuth } from '@/providers/AuthProvider';
@@ -121,10 +122,6 @@ interface AdminUser {
   _id: string;
   name: string;
   email: string;
-  role: string;
-  createdAt: string;
-  wishlist: string[];
-  cart: any[];
 }
 
 // Define store settings interface
@@ -150,6 +147,31 @@ interface StoreSettings {
     taxRate: number;
   };
 }
+
+// Featured category cards
+const featuredCategories = [
+  {
+    id: 'music',
+    name: 'Music',
+    description: 'Vinyl records, digital releases, and mixtapes',
+    icon: Music,
+    image: 'https://images.unsplash.com/photo-1614613535308-eb5fbd3d2c17?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3'
+  },
+  {
+    id: 'fashion',
+    name: 'Fashion',
+    description: 'Streetwear, limited editions, and cultural apparel',
+    icon: ShoppingBag,
+    image: 'https://images.unsplash.com/photo-1503341733017-1901578f9f1e?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3'
+  },
+  {
+    id: 'accessories',
+    name: 'Accessories',
+    description: 'Complete your look with unique cultural pieces',
+    icon: Package,
+    image: '/uploads/lv-transparent-chain-necklace.jpg' // Updated to use the transparent chain necklace image
+  }
+];
 
 const Admin = () => {
   const { user, token } = useAuth();

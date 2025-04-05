@@ -79,7 +79,7 @@ const Header = () => {
             transition={{ duration: 0.5 }}
             className="text-2xl font-bold text-foreground"
           >
-            CultureDrop
+            HypeHeritage
           </motion.div>
         </Link>
 
@@ -199,7 +199,7 @@ const Header = () => {
           >
             <div className="flex flex-col h-full">
               <div className="flex items-center justify-between p-4 border-b">
-                <div className="text-xl font-bold">CultureDrop</div>
+                <div className="text-xl font-bold">HypeHeritage</div>
                 <Button 
                   variant="ghost" 
                   size="icon" 

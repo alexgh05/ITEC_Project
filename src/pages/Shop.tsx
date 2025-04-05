@@ -31,7 +31,14 @@ const featuredCategories = [
     name: 'Accessories',
     description: 'Complete your look with unique cultural pieces',
     icon: Package,
-    image: 'https://images.unsplash.com/photo-1599459183200-89f6f64c1a3c?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3'
+    image: '/uploads/accessories_background.png'
+  },
+  {
+    id: 'footwear',
+    name: 'Footwear',
+    description: 'Stylish footwear for every culture',
+    icon: ShoppingBag,
+    image: '/uploads/footwear_background.png'
   }
 ];
 
@@ -120,7 +127,7 @@ const ShopPage = () => {
       <section className="py-12 px-4">
         <div className="container mx-auto">
           <h2 className="text-2xl font-bold mb-8 text-center">Shop by Category</h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-6">
             {featuredCategories.map((category) => (
               <motion.div
                 key={category.id}
