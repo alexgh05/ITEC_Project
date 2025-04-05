@@ -115,7 +115,9 @@ const ThemeProvider = ({ children }: ThemeProviderProps) => {
     const audio = audioRef.current;
     if (!audio) return;
     
- main
+    // Add null check for cultureInfo[culture]
+    if (!cultureInfo || !cultureInfo[culture]) return;
+    
     const trackSrc = cultureInfo[culture].sampleTrack;
     if (!trackSrc) return;
     
