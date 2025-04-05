@@ -31,6 +31,11 @@ const productSchema = new mongoose.Schema({
     required: [true, 'Please add a culture'],
     enum: ['Tokyo', 'New York', 'Lagos', 'Seoul', 'London', 'Berlin']
   },
+  gender: {
+    type: String,
+    required: [true, 'Please add a gender'],
+    enum: ['male', 'female', 'unisex']
+  },
   images: {
     type: [String],
     required: true

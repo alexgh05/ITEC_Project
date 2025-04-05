@@ -9,6 +9,7 @@ export const getProducts = async (req, res) => {
   try {
     const category = req.query.category;
     const culture = req.query.culture;
+    const gender = req.query.gender;
     
     let filter = {};
     
@@ -18,6 +19,10 @@ export const getProducts = async (req, res) => {
     
     if (culture && culture !== 'All') {
       filter.culture = culture;
+    }
+    
+    if (gender && gender.toLowerCase() !== 'all') {
+      filter.gender = gender.toLowerCase();
     }
     
     const products = await Product.find(filter);

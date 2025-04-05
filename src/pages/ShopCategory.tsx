@@ -32,6 +32,9 @@ const cultureMap = {
   'Seoul': 'seoul'
 };
 
+// Gender options
+const genders = ['Male', 'Female', 'Unisex'];
+
 // Product types for type safety
 interface Product {
   id: string;
@@ -40,6 +43,7 @@ interface Product {
   rating: number;
   culture: string;
   category: string;
+  gender: string;
   images: string[];
   description: string;
   [key: string]: any;
@@ -56,6 +60,7 @@ const ShopCategory = () => {
   const [minPriceInput, setMinPriceInput] = useState("0");
   const [maxPriceInput, setMaxPriceInput] = useState("200");
   const [selectedCultures, setSelectedCultures] = useState<string[]>([]);
+  const [selectedGenders, setSelectedGenders] = useState<string[]>([]);
   const [filterOpen, setFilterOpen] = useState(false);
   
   // Sort state
@@ -88,7 +93,7 @@ const ShopCategory = () => {
         // Log products for debugging
         console.log("Fetched products:", categoryProducts);
         categoryProducts.forEach(product => {
-          console.log(`Product: ${product.name}, Culture: ${product.culture}`);
+          console.log(`Product: ${product.name}, Culture: ${product.culture}, Gender: ${product.gender}`);
         });
         
         setProducts(categoryProducts);
@@ -132,6 +137,17 @@ const ShopCategory = () => {
       });
     }
     
+    // Apply gender filter if any genders are selected
+    if (selectedGenders.length > 0) {
+      result = result.filter(product => {
+        // For gender filter - convert everything to lowercase for case-insensitive comparison
+        const selectedGenderValues = selectedGenders.map(g => g.toLowerCase());
+        const productGender = product.gender?.toLowerCase();
+        
+        return selectedGenderValues.includes(productGender);
+      });
+    }
+    
     // Apply sorting
     switch (sortOption) {
       case 'price-low-high':
@@ -157,16 +173,17 @@ const ShopCategory = () => {
     // Log filtered results
     console.log("Filter applied:", {
       selectedCultures,
+      selectedGenders,
       priceRange,
       resultCount: result.length
     });
     
-    if (result.length === 0 && selectedCultures.length > 0) {
-      console.log("No results after filtering by culture. Check culture values in products and mapping.");
+    if (result.length === 0 && (selectedCultures.length > 0 || selectedGenders.length > 0)) {
+      console.log("No results after filtering. Check values in products and mapping.");
     }
     
     setFilteredProducts(result);
-  }, [products, priceRange, selectedCultures, sortOption]);
+  }, [products, priceRange, selectedCultures, selectedGenders, sortOption]);
   
   const handleMinPriceChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
@@ -215,11 +232,29 @@ const ShopCategory = () => {
     });
   };
   
+  const toggleGender = (gender: string) => {
+    console.log("Toggling gender:", gender);
+    
+    setSelectedGenders(prev => {
+      // Check if this gender is already selected
+      if (prev.includes(gender)) {
+        // Remove it if it's already selected
+        console.log(`Removing ${gender} from selected genders`);
+        return prev.filter(g => g !== gender);
+      } else {
+        // Add it if it's not selected
+        console.log(`Adding ${gender} to selected genders`);
+        return [...prev, gender];
+      }
+    });
+  };
+  
   const clearFilters = () => {
     setPriceRange([0, 200]);
     setMinPriceInput("0");
     setMaxPriceInput("200");
     setSelectedCultures([]);
+    setSelectedGenders([]);
   };
   
   return (
@@ -322,6 +357,28 @@ const ShopCategory = () => {
                               <Check className="h-3 w-3 inline-block mr-1" />
                             )}
                             {culture}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+
+                    <div className="space-y-3">
+                      <h4 className="font-medium text-sm">Gender</h4>
+                      <div className="grid grid-cols-2 gap-2">
+                        {genders.map((gender) => (
+                          <button
+                            key={gender}
+                            onClick={() => toggleGender(gender)}
+                            className={`py-2 px-4 rounded-md text-sm text-center transition-colors ${
+                              selectedGenders.includes(gender) 
+                                ? 'bg-white text-black font-medium' 
+                                : 'bg-zinc-900 text-white border border-zinc-700 hover:bg-zinc-800'
+                            }`}
+                          >
+                            {selectedGenders.includes(gender) && (
+                              <Check className="h-3 w-3 inline-block mr-1" />
+                            )}
+                            {gender}
                           </button>
                         ))}
                       </div>
