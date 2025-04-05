@@ -247,7 +247,7 @@ export const OutfitGenerator = () => {
   
   return (
     <div className="min-h-screen w-full">
-      <div className="fixed inset-0 bg-black/30 backdrop-blur-[2px] z-0" />
+      <div className={`fixed inset-0 ${darkMode ? 'bg-black/30' : 'bg-white/70'} backdrop-blur-[2px] z-0`} />
       
       {/* Fixed top emergency button */}
       <div className="fixed top-20 right-4 z-[9999] shadow-xl flex flex-col gap-3">

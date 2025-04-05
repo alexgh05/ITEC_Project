@@ -27,7 +27,7 @@ const HomePage = () => {
         setFeaturedProducts(featured);
         setLoading(false);
       } catch (error) {
-        console.error('Error fetching featured products:', error);
+        console.error('Error fetching products:', error);
         setLoading(false);
       }
     };
@@ -40,12 +40,11 @@ const HomePage = () => {
     window.scrollTo(0, 0);
     
     // Set page title
-    document.title = "CultureDrop | Music & Fashion Concept Shop";
+    document.title = "HypeHeritage | Music & Fashion Concept Shop";
   }, []);
 
   const handleSubscribe = (e) => {
     e.preventDefault();
-    // In a real app, you would send this to your backend
     console.log('Subscribed with email:', email);
     setSubscribed(true);
     setEmail('');
@@ -140,7 +139,7 @@ const HomePage = () => {
             >
               <h2 className="text-3xl font-bold mb-4">Where Music Meets Fashion</h2>
               <p className="text-muted-foreground mb-6">
-                CultureDrop is more than just a store. We're a platform that celebrates the intersection of music and fashion across different urban cultures.
+                HypeHeritage is more than just a store. We're a platform that celebrates the intersection of music and fashion across different urban cultures.
               </p>
               <Button asChild variant="outline">
                 <Link to="/about">

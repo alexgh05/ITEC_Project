@@ -1,27 +1,47 @@
-
 import { useState, useEffect } from 'react';
 import { Outlet } from 'react-router-dom';
-import { AnimatePresence } from 'framer-motion';
+import { AnimatePresence, motion } from 'framer-motion';
 import Header from './Header';
 import Footer from './Footer';
 import PageTransition from './PageTransition';
+import LetterGlitch from '@/components/LetterGlitch';
+import { useThemeStore } from '@/store/useThemeStore';
 
 const Layout = () => {
   const [isLoading, setIsLoading] = useState(true);
+  const { darkMode } = useThemeStore();
 
   useEffect(() => {
     // Simulate loading assets
     const timer = setTimeout(() => {
       setIsLoading(false);
-    }, 1000);
+    }, 3000); // Increased to 3 seconds to show the animation longer
     
     return () => clearTimeout(timer);
   }, []);
 
   if (isLoading) {
     return (
-      <div className="h-screen w-full flex items-center justify-center bg-background">
-        <div className="text-2xl font-bold animate-pulse">CultureDrop</div>
+      <div className="h-screen w-full overflow-hidden">
+        <LetterGlitch
+          glitchSpeed={100}
+          centerVignette={false}
+          outerVignette={false}
+          smooth={false}
+        />
+        <motion.div 
+          className="absolute inset-0 flex flex-col items-center justify-center"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.5, duration: 0.5 }}
+        >
+          <h1 className={`text-4xl md:text-6xl font-bold z-10 mb-4 ${darkMode ? 'text-white' : 'text-black'}`}>
+            HypeHeritage
+          </h1>
+          <p className={`text-xl md:text-3xl z-10 mt-4 font-mono tracking-wider ${darkMode ? 'text-white' : 'text-black'}`}>
+            Pl34s3 w41t w3 ar3 5t1ll c0d1ng
+          </p>
+        </motion.div>
       </div>
     );
   }
