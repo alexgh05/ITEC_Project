@@ -1,47 +1,60 @@
-
-import { useRef, useEffect } from 'react';
-import { Volume2, VolumeX } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { Play, Volume2, VolumeX, Loader2 } from 'lucide-react';
 import { Button } from '../button';
 import { useThemeStore } from '@/store/useThemeStore';
+import { useAudio } from '@/providers/ThemeProvider';
 
 export const AudioControl: React.FC = () => {
-  const { culture, cultureInfo, audioEnabled, toggleAudio } = useThemeStore();
-  const audioRef = useRef<HTMLAudioElement | null>(null);
+  const { culture, cultureInfo } = useThemeStore();
+  const { audioRef, isPlaying, isMuted, toggleAudio, toggleMute } = useAudio();
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   
+  // Handle loading and error states
   useEffect(() => {
-    if (audioEnabled && cultureInfo[culture].sampleTrack && audioRef.current) {
-      audioRef.current.src = cultureInfo[culture].sampleTrack || '';
-      audioRef.current.volume = 0.3;
-      audioRef.current.loop = true;
-      audioRef.current.play().catch(err => console.log("Audio autoplay prevented", err));
-    } else if (audioRef.current) {
-      audioRef.current.pause();
-    }
+    const audio = audioRef.current;
+    if (!audio) return;
     
-    return () => {
-      if (audioRef.current) {
-        audioRef.current.pause();
-      }
+    const handlePlay = () => setIsLoading(false);
+    const handlePause = () => setIsLoading(false);
+    const handleLoadStart = () => setIsLoading(true);
+    const handleError = (e: ErrorEvent) => {
+      console.error("Audio playback error:", e);
+      setIsLoading(false);
+      setError("Couldn't play audio. Try again or check browser settings.");
     };
-  }, [culture, audioEnabled, cultureInfo]);
+    
+    // Add event listeners
+    audio.addEventListener('play', handlePlay);
+    audio.addEventListener('playing', handlePlay);
+    audio.addEventListener('pause', handlePause);
+    audio.addEventListener('loadstart', handleLoadStart);
+    audio.addEventListener('error', handleError as EventListener);
+    
+    // Cleanup
+    return () => {
+      audio.removeEventListener('play', handlePlay);
+      audio.removeEventListener('playing', handlePlay);
+      audio.removeEventListener('pause', handlePause);
+      audio.removeEventListener('loadstart', handleLoadStart);
+      audio.removeEventListener('error', handleError as EventListener);
+    };
+  }, [audioRef]);
   
-  return (
-    <>
-      <audio ref={audioRef} />
-      
-      <div className="absolute bottom-4 right-4 pointer-events-auto">
-        <Button
-          variant="outline"
-          size="icon"
-          className="rounded-full bg-background/50 backdrop-blur-sm hover:bg-background/80"
-          onClick={toggleAudio}
-          title={audioEnabled ? "Mute background music" : "Play background music"}
-        >
-          {audioEnabled ? <Volume2 size={18} /> : <VolumeX size={18} />}
-        </Button>
-      </div>
-    </>
-  );
+  // Keep these functions for potential use by other components
+  const handleTogglePlayback = () => {
+    setError(null);
+    setIsLoading(true);
+    toggleAudio();
+  };
+  
+  const handleToggleMute = () => {
+    setError(null);
+    toggleMute();
+  };
+  
+  // Return null to hide the component from the UI
+  return null;
 };
 
 export default AudioControl;

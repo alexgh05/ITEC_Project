@@ -3,24 +3,36 @@ import {
   registerUser,
   loginUser,
   getUserProfile,
+  updateUserProfile,
+  forgotPassword,
+  resetPasswordWithToken,
   addToWishlist,
   removeFromWishlist,
   addToCart,
-  removeFromCart
+  removeFromCart,
+  loginWithGoogle,
+  registerWithGoogle
 } from '../controllers/userController.js';
+import { protect } from '../middleware/authMiddleware.js';
 
 const router = express.Router();
 
-// Routes
+// Public routes
 router.post('/register', registerUser);
 router.post('/login', loginUser);
+router.post('/forgot-password', forgotPassword);
+router.post('/reset-password', resetPasswordWithToken);
 
-// These routes would normally require authentication middleware
-// For simplicity, we're not implementing that here
-router.get('/profile', getUserProfile);
-router.post('/wishlist', addToWishlist);
-router.delete('/wishlist/:productId', removeFromWishlist);
-router.post('/cart', addToCart);
-router.delete('/cart/:productId', removeFromCart);
+// Google OAuth routes
+router.post('/google/login', loginWithGoogle);
+router.post('/google/register', registerWithGoogle);
+
+// Protected routes - require authentication
+router.get('/profile', protect, getUserProfile);
+router.put('/profile', protect, updateUserProfile);
+router.post('/wishlist', protect, addToWishlist);
+router.delete('/wishlist/:productId', protect, removeFromWishlist);
+router.post('/cart', protect, addToCart);
+router.delete('/cart/:productId', protect, removeFromCart);
 
 export default router; 

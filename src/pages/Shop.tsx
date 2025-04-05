@@ -1,143 +1,69 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { useSearchParams } from 'react-router-dom';
+import { useSearchParams, Link } from 'react-router-dom';
 import ProductGrid from '@/components/product/ProductGrid';
-import { Filter, X } from 'lucide-react';
+import { Filter, X, Music, ShoppingBag, Package } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useThemeStore } from '@/store/useThemeStore';
+import { fetchProducts } from '@/lib/api';
 
-// Mock product data - would come from an API in a real app
-const allProducts = [
-  {
-    id: 'p1',
-    name: 'Tokyo Neon Hoodie',
-    price: 89.99,
-    category: 'fashion',
-    culture: 'Tokyo',
-    images: ['/product-1a.jpg', '/product-1b.jpg'],
-    description: 'Inspired by the neon-lit streets of Shibuya',
-    isFeatured: true
-  },
-  {
-    id: 'p2',
-    name: 'NYC Underground Vinyl',
-    price: 29.99,
-    category: 'music',
-    culture: 'New York',
-    images: ['/product-2a.jpg', '/product-2b.jpg'],
-    description: 'Limited edition hip-hop vinyl straight from Brooklyn'
-  },
-  {
-    id: 'p3',
-    name: 'Lagos Beats Headphones',
-    price: 129.99,
-    category: 'accessories',
-    culture: 'Lagos',
-    images: ['/product-3a.jpg', '/product-3b.jpg'],
-    description: 'Experience Afrobeats like never before'
-  },
-  {
-    id: 'p4',
-    name: 'Seoul Streetwear Jacket',
-    price: 149.99,
-    category: 'fashion',
-    culture: 'Seoul',
-    images: ['/product-4a.jpg', '/product-4b.jpg'],
-    description: 'K-pop inspired fashion statement piece'
-  },
-  {
-    id: 'p5',
-    name: 'Tokyo Techno Vinyl',
-    price: 34.99,
-    category: 'music',
-    culture: 'Tokyo',
-    images: ['/product-5a.jpg', '/product-5b.jpg'],
-    description: 'Cutting-edge electronic music from Tokyo\'s underground scene'
-  },
-  {
-    id: 'p6',
-    name: 'New York Cap',
-    price: 39.99,
-    category: 'accessories',
-    culture: 'New York',
-    images: ['/product-6a.jpg', '/product-6b.jpg'],
-    description: 'Classic New York streetwear cap'
-  },
-  {
-    id: 'p7',
-    name: 'Lagos Pattern Tee',
-    price: 49.99,
-    category: 'fashion',
-    culture: 'Lagos',
-    images: ['/product-7a.jpg', '/product-7b.jpg'],
-    description: 'Vibrant t-shirt with traditional Nigerian patterns'
-  },
-  {
-    id: 'p8',
-    name: 'Seoul K-Pop Album',
-    price: 24.99,
-    category: 'music',
-    culture: 'Seoul',
-    images: ['/product-8a.jpg', '/product-8b.jpg'],
-    description: 'Limited edition K-Pop album with exclusive photobook'
-  },
-  {
-    id: 'p9',
-    name: 'London Club Jacket',
-    price: 129.99,
-    category: 'fashion',
-    culture: 'London',
-    images: ['/product-9a.jpg', '/product-9b.jpg'],
-    description: 'Stylish jacket inspired by London\'s electronic music scene',
-    isFeatured: true
-  },
-  {
-    id: 'p10',
-    name: 'London Underground Beanie',
-    price: 29.99,
-    category: 'accessories',
-    culture: 'London',
-    images: ['/product-10a.jpg', '/product-10b.jpg'],
-    description: 'Keep warm with this London Underground inspired beanie'
-  },
-  {
-    id: 'p11',
-    name: 'London Beats Vinyl',
-    price: 39.99,
-    category: 'music',
-    culture: 'London',
-    images: ['/product-11a.jpg', '/product-11b.jpg'],
-    description: 'Limited edition drum and bass vinyl from London\'s top producers'
-  },
-  // More products would be added here
-];
-
-const categories = ['All', 'Fashion', 'Music', 'Accessories'];
+const categories = ['All', 'Fashion', 'Music', 'Accessories', 'Books', 'Art', 'Footwear', 'Clothing'];
 const cultures = ['All', 'Tokyo', 'New York', 'Lagos', 'Seoul', 'London'];
+
+// Featured category cards
+const featuredCategories = [
+  {
+    id: 'music',
+    name: 'Music',
+    description: 'Vinyl records, digital releases, and mixtapes',
+    icon: Music,
+    image: 'https://images.unsplash.com/photo-1614613535308-eb5fbd3d2c17?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3'
+  },
+  {
+    id: 'fashion',
+    name: 'Fashion',
+    description: 'Streetwear, limited editions, and cultural apparel',
+    icon: ShoppingBag,
+    image: 'https://images.unsplash.com/photo-1503341733017-1901578f9f1e?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3'
+  },
+  {
+    id: 'accessories',
+    name: 'Accessories',
+    description: 'Complete your look with unique cultural pieces',
+    icon: Package,
+    image: 'https://images.unsplash.com/photo-1599459183200-89f6f64c1a3c?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3'
+  }
+];
 
 const ShopPage = () => {
   const [selectedCategory, setSelectedCategory] = useState('All');
   const [selectedCulture, setSelectedCulture] = useState('All');
   const [showFilters, setShowFilters] = useState(false);
-  const [filteredProducts, setFilteredProducts] = useState(allProducts);
+  const [products, setProducts] = useState([]);
+  const [filteredProducts, setFilteredProducts] = useState([]);
+  const [loading, setLoading] = useState(true);
   const { setCulture } = useThemeStore();
   const [searchParams] = useSearchParams();
   
-  // Apply filters
+  // Fetch products from API
   useEffect(() => {
-    let filtered = allProducts;
+    const getProductsData = async () => {
+      try {
+        setLoading(true);
+        const data = await fetchProducts(
+          selectedCategory !== 'All' ? selectedCategory.toLowerCase() : undefined,
+          selectedCulture !== 'All' ? selectedCulture : undefined
+        );
+        setProducts(data);
+        setFilteredProducts(data);
+        setLoading(false);
+      } catch (error) {
+        console.error('Error fetching products:', error);
+        setLoading(false);
+      }
+    };
     
-    if (selectedCategory !== 'All') {
-      filtered = filtered.filter(product => 
-        product.category.toLowerCase() === selectedCategory.toLowerCase()
-      );
-    }
-    
-    if (selectedCulture !== 'All') {
-      filtered = filtered.filter(product => product.culture === selectedCulture);
-    }
-    
-    setFilteredProducts(filtered);
+    getProductsData();
   }, [selectedCategory, selectedCulture]);
 
   // Handle URL parameters for filtering
@@ -182,12 +108,47 @@ const ShopPage = () => {
         </div>
       </section>
 
+      {/* Featured Categories */}
+      <section className="py-12 px-4">
+        <div className="container mx-auto">
+          <h2 className="text-2xl font-bold mb-8 text-center">Shop by Category</h2>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {featuredCategories.map((category) => (
+              <motion.div
+                key={category.id}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5 }}
+                viewport={{ once: true }}
+                className="group relative h-64 overflow-hidden rounded-lg shadow-md"
+              >
+                <div 
+                  className="absolute inset-0 bg-cover bg-center transition-transform duration-500 group-hover:scale-110"
+                  style={{ backgroundImage: `url(${category.image})` }}
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-black/20" />
+                <div className="absolute inset-0 flex flex-col justify-end p-6">
+                  <category.icon className="text-white mb-2 h-6 w-6" />
+                  <h3 className="text-xl font-bold text-white mb-1">{category.name}</h3>
+                  <p className="text-white/80 text-sm mb-4">{category.description}</p>
+                  <Button asChild variant="outline" className="bg-background/10 backdrop-blur-sm border-white/20 text-white hover:bg-white hover:text-black transition-colors">
+                    <Link to={`/shop/${category.id.toLowerCase()}`}>
+                      Browse {category.name}
+                    </Link>
+                  </Button>
+                </div>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
+
       <section className="py-8 px-4">
         <div className="container mx-auto">
           <div className="flex flex-wrap justify-between items-center mb-8">
             <div className="mb-4 lg:mb-0">
               <h2 className="text-xl font-medium">
-                {filteredProducts.length} Products
+                {loading ? 'Loading products...' : `${filteredProducts.length} Products`}
               </h2>
             </div>
             
@@ -199,101 +160,77 @@ const ShopPage = () => {
               >
                 {showFilters ? (
                   <>
-                    <X className="h-4 w-4 mr-2" /> Hide Filters
+                    <X className="mr-2 h-4 w-4" />
+                    Hide Filters
                   </>
                 ) : (
                   <>
-                    <Filter className="h-4 w-4 mr-2" /> Show Filters
+                    <Filter className="mr-2 h-4 w-4" />
+                    Show Filters
                   </>
                 )}
               </Button>
-              
-              <div className="flex space-x-2">
-                <select 
-                  className="px-4 py-2 rounded-md border border-input bg-background"
-                  value={selectedCulture}
-                  onChange={(e) => handleCultureChange(e.target.value)}
-                >
-                  {cultures.map(culture => (
-                    <option key={culture} value={culture}>{culture}</option>
-                  ))}
-                </select>
-                
-                <select
-                  className="px-4 py-2 rounded-md border border-input bg-background"
-                  value={selectedCategory}
-                  onChange={(e) => setSelectedCategory(e.target.value)}
-                >
-                  {categories.map(category => (
-                    <option key={category} value={category}>{category}</option>
-                  ))}
-                </select>
-              </div>
             </div>
           </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
-            {/* Filters sidebar - hidden on mobile unless toggled */}
-            <motion.div
-              className={`lg:block ${showFilters ? 'block' : 'hidden'}`}
-              initial={{ opacity: 0, height: 0 }}
-              animate={{ 
-                opacity: showFilters ? 1 : 0,
-                height: showFilters ? 'auto' : 0
-              }}
-              transition={{ duration: 0.3 }}
-            >
-              <div className="bg-card p-6 rounded-lg shadow-sm">
-                <h3 className="font-medium mb-4">Categories</h3>
-                <div className="space-y-2">
-                  {categories.map(category => (
-                    <div key={category} className="flex items-center">
-                      <input
-                        type="radio"
-                        id={`category-${category}`}
-                        name="category"
-                        checked={selectedCategory === category}
-                        onChange={() => setSelectedCategory(category)}
-                        className="mr-2"
-                      />
-                      <label htmlFor={`category-${category}`}>{category}</label>
-                    </div>
-                  ))}
+          <div className="flex flex-col lg:flex-row gap-8">
+            <div className={`lg:w-1/4 lg:block ${showFilters ? 'block' : 'hidden'}`}>
+              <div className="bg-card border rounded-lg shadow-sm p-6">
+                <h3 className="text-lg font-medium mb-4">Filters</h3>
+                
+                <div className="mb-6">
+                  <h4 className="font-medium mb-2">Category</h4>
+                  <div className="space-y-2">
+                    {categories.map(category => (
+                      <label key={category} className="flex items-center">
+                        <input
+                          type="radio"
+                          name="category"
+                          checked={selectedCategory === category}
+                          onChange={() => setSelectedCategory(category)}
+                          className="mr-2"
+                        />
+                        {category}
+                      </label>
+                    ))}
+                  </div>
                 </div>
                 
-                <h3 className="font-medium mb-4 mt-8">Cultures</h3>
-                <div className="space-y-2">
-                  {cultures.map(culture => (
-                    <div key={culture} className="flex items-center">
-                      <input
-                        type="radio"
-                        id={`culture-${culture}`}
-                        name="culture"
-                        checked={selectedCulture === culture}
-                        onChange={() => handleCultureChange(culture)}
-                        className="mr-2"
-                      />
-                      <label htmlFor={`culture-${culture}`}>{culture}</label>
-                    </div>
-                  ))}
+                <div>
+                  <h4 className="font-medium mb-2">Culture</h4>
+                  <div className="space-y-2">
+                    {cultures.map(culture => (
+                      <label key={culture} className="flex items-center">
+                        <input
+                          type="radio"
+                          name="culture"
+                          checked={selectedCulture === culture}
+                          onChange={() => handleCultureChange(culture)}
+                          className="mr-2"
+                        />
+                        {culture}
+                      </label>
+                    ))}
+                  </div>
                 </div>
-
-                <Button 
-                  variant="outline" 
-                  className="w-full mt-8"
-                  onClick={() => {
-                    setSelectedCategory('All');
-                    handleCultureChange('All');
-                  }}
-                >
-                  Reset Filters
-                </Button>
               </div>
-            </motion.div>
-
-            {/* Product grid */}
-            <div className="lg:col-span-3">
-              <ProductGrid products={filteredProducts} />
+            </div>
+            
+            <div className="lg:w-3/4">
+              {loading ? (
+                <div className="flex justify-center items-center h-[400px]">
+                  <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+                </div>
+              ) : filteredProducts.length > 0 ? (
+                <ProductGrid products={filteredProducts} />
+              ) : (
+                <div className="text-center py-12 border rounded-lg">
+                  <h3 className="text-xl mb-2">No products found</h3>
+                  <p className="text-muted-foreground">
+                    Try changing your filters to see more products
+                  </p>
+                </div>
+              )}
             </div>
           </div>
         </div>

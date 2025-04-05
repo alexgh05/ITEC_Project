@@ -1,4 +1,3 @@
-import { AudioControl } from './background/audio-control';
 import { CanvasBackground } from './background/canvas-background';
 import { CultureInfoCard } from './background/culture-info-card';
 import { useThemeStore } from '@/store/useThemeStore';
@@ -11,7 +10,6 @@ const InteractiveBackground = () => {
       <CanvasBackground />
       {culture !== 'default' && (
         <>
-          <AudioControl />
           <CultureInfoCard />
         </>
       )}

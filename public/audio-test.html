@@ -1,0 +1,468 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Audio Test Page</title>
+  <style>
+    body {
+      font-family: system-ui, -apple-system, sans-serif;
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 20px;
+      line-height: 1.6;
+      background-color: #f5f5f5;
+    }
+    h1, h2 {
+      text-align: center;
+    }
+    h1 {
+      margin-bottom: 1rem;
+    }
+    h2 {
+      margin-bottom: 2rem;
+      font-size: 1.2rem;
+      color: #555;
+    }
+    .audio-container {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+      margin-bottom: 2rem;
+    }
+    .audio-item {
+      display: flex;
+      align-items: center;
+      border: 1px solid #ddd;
+      padding: 1rem;
+      border-radius: 8px;
+      background-color: white;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    }
+    .audio-title {
+      flex: 1;
+      font-weight: 500;
+    }
+    .audio-controls {
+      display: flex;
+      gap: 0.5rem;
+    }
+    button {
+      background: #4a4feb;
+      color: white;
+      border: none;
+      padding: 8px 16px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-weight: 500;
+    }
+    button:hover {
+      background: #3838c9;
+    }
+    .app-button {
+      position: fixed;
+      bottom: 1rem;
+      right: 1rem;
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(255, 255, 255, 0.8);
+      backdrop-filter: blur(10px);
+      border: 1px solid #ddd;
+      cursor: pointer;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+      z-index: 1000;
+    }
+    .app-button:hover {
+      background: rgba(255, 255, 255, 0.9);
+    }
+    .app-button svg {
+      width: 24px;
+      height: 24px;
+    }
+    .loading {
+      animation: spin 1s linear infinite;
+    }
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+    #log {
+      background: #333;
+      color: #fff;
+      padding: 10px;
+      border-radius: 4px;
+      font-family: monospace;
+      height: 150px;
+      overflow-y: auto;
+      margin-bottom: 2rem;
+    }
+    .simple-test {
+      margin-top: 2rem;
+      padding: 1rem;
+      background-color: #e9e9e9;
+      border-radius: 8px;
+    }
+    .simple-test button {
+      margin-right: 10px;
+    }
+  </style>
+</head>
+<body>
+  <h1>Audio Test Page</h1>
+  <h2>Testing the audio functionality for culture themes</h2>
+  
+  <div class="simple-test">
+    <h3>Simple Audio Test (Direct Controls)</h3>
+    <p>Test if basic audio functionality works in your browser:</p>
+    <audio id="simpleAudio" src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" preload="auto"></audio>
+    <div>
+      <button onclick="document.getElementById('simpleAudio').play()">Play</button>
+      <button onclick="document.getElementById('simpleAudio').pause()">Pause</button>
+      <button onclick="document.getElementById('simpleAudio').load()">Reload</button>
+      <span id="simpleStatus">Status: Ready</span>
+    </div>
+  </div>
+
+  <h3>Debug Log:</h3>
+  <div id="log"></div>
+  
+  <div class="audio-container">
+    <div class="audio-item">
+      <div class="audio-title">Tokyo (J-Pop & Future Bass)</div>
+      <div class="audio-controls">
+        <audio src="/audio/tokyo-ambient.mp3" controls></audio>
+      </div>
+    </div>
+    
+    <div class="audio-item">
+      <div class="audio-title">New York (Hip-Hop & Jazz)</div>
+      <div class="audio-controls">
+        <audio src="/audio/newyork-hiphop.mp3" controls></audio>
+      </div>
+    </div>
+    
+    <div class="audio-item">
+      <div class="audio-title">Lagos (Afrobeats & Highlife)</div>
+      <div class="audio-controls">
+        <audio src="/audio/lagos-beats.mp3" controls></audio>
+      </div>
+    </div>
+    
+    <div class="audio-item">
+      <div class="audio-title">Seoul (K-Pop & Electronic)</div>
+      <div class="audio-controls">
+        <audio src="/audio/seoul-kpop.mp3" controls></audio>
+      </div>
+    </div>
+    
+    <div class="audio-item">
+      <div class="audio-title">London (Electronic & Drum and Bass)</div>
+      <div class="audio-controls">
+        <audio src="/audio/london-electronic.mp3" controls></audio>
+      </div>
+    </div>
+  </div>
+  
+  <div>
+    <p>This page allows you to test the audio files that are used in the app's background music system.</p>
+    <p>Each audio track represents a different cultural theme's background music and is played when you select that culture in the app.</p>
+    <p><a href="/">Return to the app</a></p>
+  </div>
+
+  <!-- App-like audio button -->
+  <button id="appAudioButton" class="app-button" title="Play music">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" id="buttonIcon">
+      <polygon points="5 3 19 12 5 21 5 3" id="playIcon"></polygon>
+    </svg>
+  </button>
+
+  <script>
+    // Debug log function
+    function log(message) {
+      const logContainer = document.getElementById('log');
+      const time = new Date().toLocaleTimeString();
+      logContainer.innerHTML += `<div>[${time}] ${message}</div>`;
+      logContainer.scrollTop = logContainer.scrollHeight;
+    }
+
+    // Simple audio event listeners
+    const simpleAudio = document.getElementById('simpleAudio');
+    const simpleStatus = document.getElementById('simpleStatus');
+    
+    simpleAudio.addEventListener('play', () => {
+      simpleStatus.textContent = 'Status: Playing';
+      log('Simple audio: Play event triggered');
+    });
+    
+    simpleAudio.addEventListener('pause', () => {
+      simpleStatus.textContent = 'Status: Paused';
+      log('Simple audio: Pause event triggered');
+    });
+    
+    simpleAudio.addEventListener('error', (e) => {
+      simpleStatus.textContent = 'Status: Error';
+      log('Simple audio: Error event triggered: ' + e.message);
+    });
+
+    document.addEventListener('DOMContentLoaded', function() {
+      log('Page loaded');
+      const button = document.getElementById('appAudioButton');
+      const buttonIcon = document.getElementById('buttonIcon');
+      let currentAudio = null;
+      let currentTrack = 'tokyo';
+      let isPlaying = false;
+      let isLoading = false;
+
+      const tracks = {
+        'tokyo': '/audio/tokyo-ambient.mp3',
+        'newyork': '/audio/newyork-hiphop.mp3',
+        'lagos': '/audio/lagos-beats.mp3',
+        'seoul': '/audio/seoul-kpop.mp3',
+        'london': '/audio/london-electronic.mp3'
+      };
+
+      function createAudio(src) {
+        log(`Creating audio element for: ${src}`);
+        const audio = new Audio();
+        
+        // Add timestamp to prevent caching
+        const timestamp = new Date().getTime();
+        const trackUrl = `${src}?t=${timestamp}`;
+        audio.src = trackUrl;
+        
+        log(`Set audio src to: ${trackUrl}`);
+        audio.volume = 0.3;
+        audio.loop = true;
+        
+        // Configure immediate play on mobile
+        audio.playsinline = true;
+        
+        audio.addEventListener('loadstart', () => {
+          log('Audio loadstart event');
+          isLoading = true;
+          updateButtonIcon();
+        });
+        
+        audio.addEventListener('canplay', () => {
+          log('Audio canplay event');
+          isLoading = false;
+          updateButtonIcon();
+        });
+        
+        audio.addEventListener('playing', () => {
+          log('Audio playing event');
+          isPlaying = true;
+          updateButtonIcon();
+        });
+        
+        audio.addEventListener('play', () => {
+          log('Audio play event');
+          isPlaying = true;
+          updateButtonIcon();
+        });
+        
+        audio.addEventListener('pause', () => {
+          log('Audio pause event');
+          isPlaying = false;
+          updateButtonIcon();
+        });
+        
+        audio.addEventListener('error', (e) => {
+          const errorMessage = e.target.error ? e.target.error.message : 'unknown error';
+          log(`Audio error: ${errorMessage}`);
+          console.error('Audio error:', e);
+          isLoading = false;
+          isPlaying = false;
+          updateButtonIcon();
+        });
+        
+        return audio;
+      }
+
+      function updateButtonIcon() {
+        if (isLoading) {
+          log('Updating button: Loading state');
+          buttonIcon.innerHTML = '<circle cx="12" cy="12" r="10" class="loading"></circle>';
+          button.disabled = true;
+        } else if (isPlaying) {
+          log('Updating button: Playing state');
+          buttonIcon.innerHTML = `
+            <line x1="6" y1="4" x2="6" y2="20"></line>
+            <line x1="18" y1="4" x2="18" y2="20"></line>
+          `;
+          button.disabled = false;
+        } else {
+          log('Updating button: Paused state');
+          buttonIcon.innerHTML = '<polygon points="5 3 19 12 5 21 5 3"></polygon>';
+          button.disabled = false;
+        }
+      }
+
+      button.addEventListener('click', function() {
+        log('Button clicked');
+        
+        if (!currentAudio) {
+          log('Creating new audio instance');
+          currentAudio = createAudio(tracks[currentTrack]);
+          // Preload audio
+          currentAudio.load();
+        }
+        
+        if (isPlaying) {
+          log('Pausing playback');
+          currentAudio.pause();
+          isPlaying = false;
+          updateButtonIcon();
+        } else {
+          log('Starting playback');
+          isLoading = true;
+          updateButtonIcon();
+          
+          try {
+            // Force reload
+            currentAudio.load();
+            
+            // Clear any previous error
+            currentAudio.onerror = null;
+            
+            log('Calling play()');
+            const playPromise = currentAudio.play();
+            
+            if (playPromise !== undefined) {
+              playPromise
+                .then(() => {
+                  log('Play promise resolved successfully');
+                  isPlaying = true;
+                })
+                .catch(err => {
+                  log(`Play promise rejected: ${err.message}`);
+                  console.error('Audio playback error:', err);
+                  isPlaying = false;
+                })
+                .finally(() => {
+                  log('Play promise completed');
+                  isLoading = false;
+                  updateButtonIcon();
+                });
+            } else {
+              log('Browser did not return a play promise');
+              isPlaying = true;
+              isLoading = false;
+              updateButtonIcon();
+            }
+          } catch (error) {
+            log(`Exception during play: ${error.message}`);
+            console.error('Error playing audio:', error);
+            isPlaying = false;
+            isLoading = false;
+            updateButtonIcon();
+          }
+        }
+      });
+      
+      // Add track selector
+      const trackSelector = document.createElement('div');
+      trackSelector.style.position = 'fixed';
+      trackSelector.style.bottom = '1rem';
+      trackSelector.style.left = '1rem';
+      trackSelector.style.padding = '8px';
+      trackSelector.style.background = 'rgba(255, 255, 255, 0.8)';
+      trackSelector.style.backdropFilter = 'blur(10px)';
+      trackSelector.style.borderRadius = '8px';
+      trackSelector.style.boxShadow = '0 2px 10px rgba(0,0,0,0.1)';
+      
+      const select = document.createElement('select');
+      select.style.padding = '8px';
+      select.style.borderRadius = '4px';
+      select.style.border = '1px solid #ddd';
+      
+      Object.keys(tracks).forEach(track => {
+        const option = document.createElement('option');
+        option.value = track;
+        option.text = track.charAt(0).toUpperCase() + track.slice(1);
+        select.appendChild(option);
+      });
+      
+      select.addEventListener('change', function() {
+        const selectedTrack = this.value;
+        log(`Track changed to: ${selectedTrack}`);
+        
+        if (currentAudio && isPlaying) {
+          log('Stopping current audio');
+          currentAudio.pause();
+          isPlaying = false;
+        }
+        
+        currentTrack = selectedTrack;
+        log(`Creating new audio for track: ${tracks[currentTrack]}`);
+        currentAudio = createAudio(tracks[currentTrack]);
+        
+        if (isPlaying) {
+          log('Restarting playback with new track');
+          isLoading = true;
+          updateButtonIcon();
+          
+          try {
+            const playPromise = currentAudio.play();
+            if (playPromise !== undefined) {
+              playPromise
+                .then(() => {
+                  log('New track play promise resolved');
+                  isPlaying = true;
+                })
+                .catch(err => {
+                  log(`New track play promise rejected: ${err.message}`);
+                  console.error('Audio playback error:', err);
+                  isPlaying = false;
+                })
+                .finally(() => {
+                  isLoading = false;
+                  updateButtonIcon();
+                });
+            } else {
+              isPlaying = true;
+              isLoading = false;
+              updateButtonIcon();
+            }
+          } catch (error) {
+            log(`Exception during track change: ${error.message}`);
+            console.error('Error playing audio after track change:', error);
+            isPlaying = false;
+            isLoading = false;
+            updateButtonIcon();
+          }
+        } else {
+          updateButtonIcon();
+        }
+      });
+      
+      const label = document.createElement('label');
+      label.textContent = 'Theme: ';
+      label.style.fontWeight = '500';
+      label.style.marginRight = '8px';
+      
+      trackSelector.appendChild(label);
+      trackSelector.appendChild(select);
+      document.body.appendChild(trackSelector);
+      
+      // Check that files exist
+      Object.entries(tracks).forEach(([name, url]) => {
+        fetch(url)
+          .then(response => {
+            if (!response.ok) {
+              throw new Error(`HTTP error! Status: ${response.status}`);
+            }
+            log(`✅ Verified file exists: ${name} (${url})`);
+          })
+          .catch(error => {
+            log(`❌ File check failed for ${name}: ${error.message}`);
+          });
+      });
+    });
+  </script>
+</body>
+</html> 

@@ -1,10 +1,10 @@
-
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
 import CultureSelector from '@/components/ui/culture-selector';
 import { Button } from '@/components/ui/button';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { ShoppingBag, Music, Hash } from 'lucide-react';
+import { useThemeStore } from '@/store/useThemeStore';
 
 const cultureInfo = [
   {
@@ -38,13 +38,39 @@ const cultureInfo = [
 ];
 
 const CulturesPage = () => {
+  const location = useLocation();
+  const { setCulture } = useThemeStore();
+  const cultureRefs = useRef<Record<string, HTMLElement | null>>({});
+  
+  // Extract culture from URL path if present
+  const currentPath = location.pathname;
+  const selectedCulture = currentPath.includes('/cultures/') 
+    ? currentPath.split('/cultures/')[1] 
+    : null;
+
   useEffect(() => {
     // Set page title
-    document.title = "Cultures | CultureDrop";
+    document.title = selectedCulture 
+      ? `${selectedCulture.charAt(0).toUpperCase() + selectedCulture.slice(1)} Culture | CultureDrop`
+      : "Cultures | CultureDrop";
     
     // Scroll to top when component mounts
     window.scrollTo(0, 0);
-  }, []);
+    
+    // If a specific culture is selected in the URL
+    if (selectedCulture && cultureInfo.some(c => c.id === selectedCulture)) {
+      // Slight delay to ensure the page has rendered
+      setTimeout(() => {
+        // Scroll to the selected culture section
+        if (cultureRefs.current[selectedCulture]) {
+          cultureRefs.current[selectedCulture]?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          
+          // Update the active culture theme
+          setCulture(selectedCulture);
+        }
+      }, 300);
+    }
+  }, [selectedCulture, setCulture]);
 
   return (
     <>
@@ -70,6 +96,8 @@ const CulturesPage = () => {
       {cultureInfo.map((culture, index) => (
         <motion.section
           key={culture.id}
+          ref={el => cultureRefs.current[culture.id] = el}
+          id={`culture-${culture.id}`}
           initial={{ opacity: 0 }}
           whileInView={{ opacity: 1 }}
           transition={{ duration: 0.5 }}

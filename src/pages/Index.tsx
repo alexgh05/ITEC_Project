@@ -1,56 +1,39 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import HeroSection from '@/components/hero/HeroSection';
 import ProductGrid from '@/components/product/ProductGrid';
 import CultureSelector from '@/components/ui/culture-selector';
-import { ArrowRight } from 'lucide-react';
+import { ArrowRight, Check } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Link } from 'react-router-dom';
 import { useThemeStore } from '@/store/useThemeStore';
-
-// Mock featured products - this would come from an API in a real app
-const featuredProducts = [
-  {
-    id: 'p1',
-    name: 'Tokyo Neon Hoodie',
-    price: 89.99,
-    category: 'fashion',
-    culture: 'Tokyo',
-    images: ['/product-1a.jpg', '/product-1b.jpg'],
-    description: 'Inspired by the neon-lit streets of Shibuya',
-    isFeatured: true
-  },
-  {
-    id: 'p2',
-    name: 'NYC Underground Vinyl',
-    price: 29.99,
-    category: 'music',
-    culture: 'New York',
-    images: ['/product-2a.jpg', '/product-2b.jpg'],
-    description: 'Limited edition hip-hop vinyl straight from Brooklyn'
-  },
-  {
-    id: 'p3',
-    name: 'Lagos Beats Headphones',
-    price: 129.99,
-    category: 'accessories',
-    culture: 'Lagos',
-    images: ['/product-3a.jpg', '/product-3b.jpg'],
-    description: 'Experience Afrobeats like never before'
-  },
-  {
-    id: 'p4',
-    name: 'Seoul Streetwear Jacket',
-    price: 149.99,
-    category: 'fashion',
-    culture: 'Seoul',
-    images: ['/product-4a.jpg', '/product-4b.jpg'],
-    description: 'K-pop inspired fashion statement piece'
-  }
-];
+import { fetchProducts } from '@/lib/api';
 
 const HomePage = () => {
   const { darkMode, toggleDarkMode } = useThemeStore();
+  const [featuredProducts, setFeaturedProducts] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [email, setEmail] = useState('');
+  const [subscribed, setSubscribed] = useState(false);
+  
+  // Fetch featured products from API
+  useEffect(() => {
+    const getFeaturedProducts = async () => {
+      try {
+        setLoading(true);
+        const products = await fetchProducts();
+        // Filter featured products or take the first 4 products
+        const featured = products.filter(product => product.isFeatured) || products.slice(0, 4);
+        setFeaturedProducts(featured);
+        setLoading(false);
+      } catch (error) {
+        console.error('Error fetching featured products:', error);
+        setLoading(false);
+      }
+    };
+    
+    getFeaturedProducts();
+  }, []);
   
   useEffect(() => {
     // Scroll to top when component mounts
@@ -59,6 +42,19 @@ const HomePage = () => {
     // Set page title
     document.title = "CultureDrop | Music & Fashion Concept Shop";
   }, []);
+
+  const handleSubscribe = (e) => {
+    e.preventDefault();
+    // In a real app, you would send this to your backend
+    console.log('Subscribed with email:', email);
+    setSubscribed(true);
+    setEmail('');
+    
+    // Reset the success message after 5 seconds
+    setTimeout(() => {
+      setSubscribed(false);
+    }, 5000);
+  };
 
   return (
     <>
@@ -77,7 +73,13 @@ const HomePage = () => {
             <p className="text-muted-foreground mt-2">Curated items from our latest collections</p>
           </motion.div>
           
-          <ProductGrid products={featuredProducts} />
+          {loading ? (
+            <div className="flex justify-center items-center h-[400px]">
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+            </div>
+          ) : (
+            <ProductGrid products={featuredProducts} />
+          )}
           
           <div className="mt-12 text-center">
             <Button asChild variant="outline" size="lg">
@@ -169,15 +171,24 @@ const HomePage = () => {
             Stay updated with the latest drops, exclusive offers, and cultural insights.
           </p>
           
-          <form className="max-w-md mx-auto flex gap-2">
-            <input
-              type="email"
-              placeholder="Your email address"
-              className="flex-1 px-4 py-2 rounded-md border border-input bg-background"
-              required
-            />
-            <Button type="submit">Subscribe</Button>
-          </form>
+          {subscribed ? (
+            <div className="max-w-md mx-auto p-4 bg-green-50 dark:bg-green-900/20 rounded-md text-green-600 dark:text-green-400 flex items-center justify-center gap-2">
+              <Check className="h-5 w-5" />
+              <span>Thanks for subscribing! We'll keep you updated.</span>
+            </div>
+          ) : (
+            <form onSubmit={handleSubscribe} className="max-w-md mx-auto flex gap-2">
+              <input
+                type="email"
+                placeholder="Your email address"
+                className="flex-1 px-4 py-2 rounded-md border border-input bg-background"
+                required
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+              />
+              <Button type="submit">Subscribe</Button>
+            </form>
+          )}
         </div>
       </section>
     </>

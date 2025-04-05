@@ -22,6 +22,8 @@ interface ThemeState {
   setCulture: (culture: CultureTheme) => void;
   toggleDarkMode: () => void;
   toggleAudio: () => void;
+  enableAudio: () => void;
+  disableAudio: () => void;
 }
 
 export const useThemeStore = create<ThemeState>()(
@@ -85,9 +87,23 @@ export const useThemeStore = create<ThemeState>()(
         },
       },
       setDarkMode: (darkMode) => set({ darkMode }),
-      setCulture: (culture) => set({ culture }),
+      setCulture: (culture) => set((state) => {
+        // If changing from default to a culture with music, enable audio
+        const shouldEnableAudio = 
+          state.culture === 'default' && 
+          culture !== 'default' && 
+          !state.audioEnabled;
+          
+        return { 
+          culture,
+          // Enable audio if appropriate
+          audioEnabled: shouldEnableAudio ? true : state.audioEnabled
+        };
+      }),
       toggleDarkMode: () => set((state) => ({ darkMode: !state.darkMode })),
       toggleAudio: () => set((state) => ({ audioEnabled: !state.audioEnabled })),
+      enableAudio: () => set({ audioEnabled: true }),
+      disableAudio: () => set({ audioEnabled: false }),
     }),
     {
       name: 'culture-drop-theme',

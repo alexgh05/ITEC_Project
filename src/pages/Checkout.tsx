@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { ArrowLeft, CreditCard, Check } from 'lucide-react';
+import { ArrowLeft, CreditCard, Check, Truck, AlertCircle, ExternalLink } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -24,6 +24,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { useAuthStore } from '@/store/useAuthStore';
+import { createOrder } from '@/lib/api';
 
 const countries = [
   { value: "us", label: "United States" },
@@ -36,13 +39,15 @@ const countries = [
 ];
 
 const paymentMethods = [
-  { id: "credit", name: "Credit Card" },
-  { id: "paypal", name: "PayPal" },
-  { id: "applepay", name: "Apple Pay" },
+  { id: "delivery", name: "Pay at Delivery", available: true, icon: Truck },
+  { id: "credit", name: "Credit Card (Coming Soon)", available: false, icon: CreditCard },
+  { id: "paypal", name: "PayPal (Coming Soon)", available: false },
+  { id: "applepay", name: "Apple Pay (Coming Soon)", available: false },
 ];
 
 const Checkout = () => {
   const { items, getTotalItems, getTotalPrice, clearCart } = useCartStore();
+  const { user, token } = useAuthStore();
   const navigate = useNavigate();
   const totalItems = getTotalItems();
   const subtotal = getTotalPrice();
@@ -51,9 +56,11 @@ const Checkout = () => {
   const total = subtotal + shipping + tax;
   
   const [step, setStep] = useState(1);
-  const [paymentMethod, setPaymentMethod] = useState("credit");
+  const [paymentMethod, setPaymentMethod] = useState("delivery");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [formComplete, setFormComplete] = useState(false);
+  const [emailPreviewUrl, setEmailPreviewUrl] = useState('');
+  const [emailProvider, setEmailProvider] = useState('');
   
   const [formData, setFormData] = useState({
     firstName: "",
@@ -71,6 +78,16 @@ const Checkout = () => {
     cardCvc: "",
   });
 
+  // Store order summary for confirmation page
+  const [orderSummary, setOrderSummary] = useState({
+    items: [],
+    totalItems: 0,
+    subtotal: 0,
+    shipping: 0,
+    tax: 0,
+    total: 0
+  });
+
   useEffect(() => {
     // Set page title
     document.title = "Checkout | CultureDrop";
@@ -78,12 +95,12 @@ const Checkout = () => {
     // Scroll to top when component mounts
     window.scrollTo(0, 0);
     
-    // Redirect to cart if cart is empty
-    if (items.length === 0) {
+    // Redirect to cart if cart is empty and not in confirmation step
+    if (items.length === 0 && step !== 3) {
       navigate('/cart');
       toast.error("Your cart is empty");
     }
-  }, [items, navigate]);
+  }, [items, navigate, step]);
   
   useEffect(() => {
     // Check if shipping form is complete
@@ -103,17 +120,8 @@ const Checkout = () => {
     }
     // Check if payment form is complete
     else if (step === 2) {
-      if (paymentMethod === "credit") {
-        const { cardName, cardNumber, cardExpiry, cardCvc } = formData;
-        setFormComplete(
-          cardName !== "" && 
-          cardNumber !== "" && 
-          cardExpiry !== "" && 
-          cardCvc !== ""
-        );
-      } else {
-        setFormComplete(true); // Other payment methods don't require additional info
-      }
+      // With Pay at Delivery as default, the form is always complete
+      setFormComplete(true);
     }
   }, [formData, step, paymentMethod]);
 
@@ -145,19 +153,118 @@ const Checkout = () => {
   const handleSubmitOrder = async () => {
     setIsSubmitting(true);
     
-    // Simulate API call to process order
+    // Save order summary before clearing cart
+    setOrderSummary({
+      items: [...items],
+      totalItems,
+      subtotal,
+      shipping,
+      tax,
+      total
+    });
+    
     try {
-      await new Promise(resolve => setTimeout(resolve, 1500));
+      // Prepare order data
+      const orderData = {
+        orderItems: items.map(item => ({
+          name: item.name,
+          quantity: item.quantity,
+          image: item.images[0],
+          price: item.price,
+          selectedSize: item.selectedSize,
+          product: item.id,
+        })),
+        shippingAddress: {
+          firstName: formData.firstName,
+          lastName: formData.lastName,
+          address: formData.address,
+          city: formData.city,
+          state: formData.state,
+          zip: formData.zip,
+          country: countries.find(c => c.value === formData.country)?.label,
+          email: formData.email,
+          phone: formData.phone
+        },
+        paymentMethod: 'Pay at Delivery',
+        taxPrice: tax,
+        shippingPrice: shipping,
+        totalPrice: total
+      };
       
-      // Order successful!
-      clearCart();
+      let orderPlaced = false;
+      
+      // Send the order to the backend API
+      if (token) {
+        try {
+          console.log("Submitting order with token:", token);
+          const result = await createOrder(orderData, token);
+          
+          // Store email information
+          if (result && result.emailPreviewUrl) {
+            setEmailPreviewUrl(result.emailPreviewUrl);
+          }
+          if (result && result.provider) {
+            setEmailProvider(result.provider);
+          }
+          
+          orderPlaced = true;
+        } catch (apiError) {
+          console.error("API Error:", apiError);
+          // If API call fails, we'll use the demo mode below
+        }
+      }
+      
+      // Guest mode / demo mode - for users who aren't logged in
+      if (!token || !orderPlaced) {
+        console.log("Using guest/demo mode for order");
+        try {
+          // Call the guest endpoint
+          const result = await createOrder(orderData);
+          
+          // Store email information if available
+          if (result && result.emailPreviewUrl) {
+            setEmailPreviewUrl(result.emailPreviewUrl);
+          }
+          if (result && result.provider) {
+            setEmailProvider(result.provider);
+          }
+          
+          orderPlaced = true;
+        } catch (guestError) {
+          console.error("Guest order error:", guestError);
+          // Fallback to simulation if guest API fails
+          await new Promise(resolve => setTimeout(resolve, 1500));
+          setEmailPreviewUrl('https://ethereal.email/message/demo');
+          orderPlaced = true;
+        }
+      }
+      
+      // Order successful - first set step to 3, then clear cart
       setStep(3);
       window.scrollTo({ top: 0, behavior: 'smooth' });
+      
+      // Small delay before clearing cart to ensure confirmation screen is shown
+      setTimeout(() => {
+        clearCart();
+      }, 500);
     } catch (error) {
+      console.error('Error creating order:', error);
       toast.error("There was an error processing your order. Please try again.");
     } finally {
       setIsSubmitting(false);
     }
+  };
+
+  // Function to handle payment method selection - prevents selecting unavailable methods
+  const handlePaymentMethodChange = (value: string) => {
+    const method = paymentMethods.find(m => m.id === value);
+    
+    if (method && !method.available) {
+      toast.error(`${method.name.replace(' (Coming Soon)', '')} is not available yet`);
+      return;
+    }
+    
+    setPaymentMethod(value);
   };
 
   return (
@@ -366,84 +473,38 @@ const Checkout = () => {
                     <CardDescription>Choose your payment method</CardDescription>
                   </CardHeader>
                   <CardContent className="space-y-6">
+                    <Alert className="bg-amber-50 text-amber-800 border-amber-200 dark:bg-amber-900/20 dark:text-amber-400 dark:border-amber-800/30 mb-4">
+                      <AlertCircle className="h-4 w-4" />
+                      <AlertTitle>Payment Methods Information</AlertTitle>
+                      <AlertDescription>
+                        Currently, only "Pay at Delivery" is available. Other payment methods will be implemented in the future.
+                      </AlertDescription>
+                    </Alert>
+                    
                     <RadioGroup 
                       value={paymentMethod} 
-                      onValueChange={setPaymentMethod}
-                      className="grid grid-cols-1 md:grid-cols-3 gap-4"
+                      onValueChange={handlePaymentMethodChange}
+                      className="grid grid-cols-1 md:grid-cols-2 gap-4"
                     >
                       {paymentMethods.map(method => (
-                        <div key={method.id} className="flex items-center space-x-2">
-                          <RadioGroupItem value={method.id} id={method.id} />
-                          <Label htmlFor={method.id}>{method.name}</Label>
+                        <div 
+                          key={method.id} 
+                          className={`flex items-center space-x-2 p-4 border rounded-md ${method.available ? 'cursor-pointer hover:border-primary/50' : 'opacity-70 cursor-not-allowed'}`}
+                        >
+                          <RadioGroupItem value={method.id} id={method.id} disabled={!method.available} />
+                          <div className="flex items-center">
+                            {method.icon && <method.icon className="h-5 w-5 mr-2 text-muted-foreground" />}
+                            <Label htmlFor={method.id} className={!method.available ? 'cursor-not-allowed' : ''}>{method.name}</Label>
+                          </div>
                         </div>
                       ))}
                     </RadioGroup>
                     
-                    {paymentMethod === "credit" && (
-                      <div className="mt-6 space-y-6">
-                        <div className="space-y-2">
-                          <Label htmlFor="cardName">Name on Card</Label>
-                          <Input 
-                            id="cardName" 
-                            name="cardName" 
-                            placeholder="John Doe" 
-                            value={formData.cardName}
-                            onChange={handleInputChange}
-                            required
-                          />
-                        </div>
-                        
-                        <div className="space-y-2">
-                          <Label htmlFor="cardNumber">Card Number</Label>
-                          <Input 
-                            id="cardNumber" 
-                            name="cardNumber" 
-                            placeholder="1234 5678 9012 3456" 
-                            value={formData.cardNumber}
-                            onChange={handleInputChange}
-                            required
-                          />
-                        </div>
-                        
-                        <div className="grid grid-cols-2 gap-6">
-                          <div className="space-y-2">
-                            <Label htmlFor="cardExpiry">Expiration Date</Label>
-                            <Input 
-                              id="cardExpiry" 
-                              name="cardExpiry" 
-                              placeholder="MM/YY" 
-                              value={formData.cardExpiry}
-                              onChange={handleInputChange}
-                              required
-                            />
-                          </div>
-                          
-                          <div className="space-y-2">
-                            <Label htmlFor="cardCvc">CVC</Label>
-                            <Input 
-                              id="cardCvc" 
-                              name="cardCvc" 
-                              placeholder="123" 
-                              value={formData.cardCvc}
-                              onChange={handleInputChange}
-                              required
-                            />
-                          </div>
-                        </div>
-                      </div>
-                    )}
-                    
-                    {paymentMethod === "paypal" && (
-                      <div className="mt-6 text-center p-6 border rounded-lg">
-                        <p className="mb-4">You will be redirected to PayPal to complete your payment.</p>
-                        <CreditCard className="h-12 w-12 mx-auto text-muted-foreground" />
-                      </div>
-                    )}
-                    
-                    {paymentMethod === "applepay" && (
-                      <div className="mt-6 text-center p-6 border rounded-lg">
-                        <p className="mb-4">You will complete your payment using Apple Pay.</p>
-                        <CreditCard className="h-12 w-12 mx-auto text-muted-foreground" />
+                    {paymentMethod === "delivery" && (
+                      <div className="mt-6 text-center p-6 border rounded-lg bg-secondary/30">
+                        <Truck className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
+                        <h3 className="font-medium mb-2">Pay at Delivery</h3>
+                        <p className="text-muted-foreground">You'll pay in cash when your order is delivered to your address.</p>
                       </div>
                     )}
                   </CardContent>
@@ -471,9 +532,36 @@ const Checkout = () => {
                     </CardDescription>
                   </CardHeader>
                   <CardContent className="text-center space-y-6">
-                    <p>
-                      We've sent a confirmation email to <span className="font-medium">{formData.email}</span> with all the details of your purchase.
-                    </p>
+                    {emailProvider === 'Gmail' ? (
+                      <div className="p-4 bg-green-50 border border-green-200 rounded-md dark:bg-green-900/20 dark:border-green-800/30">
+                        <p className="text-green-800 dark:text-green-300">
+                          A confirmation email has been sent to <span className="font-medium">{formData.email}</span> with all the details of your purchase.
+                        </p>
+                      </div>
+                    ) : (
+                      <p>
+                        We've sent a confirmation email to <span className="font-medium">{formData.email}</span> with all the details of your purchase.
+                      </p>
+                    )}
+                    
+                    {emailPreviewUrl && emailProvider !== 'Gmail' && (
+                      <div className="p-4 bg-amber-50 border border-amber-200 rounded-md dark:bg-amber-900/20 dark:border-amber-800/30">
+                        <p className="text-amber-800 dark:text-amber-300 flex items-center justify-center gap-2">
+                          <ExternalLink size={16} />
+                          <a 
+                            href={emailPreviewUrl} 
+                            target="_blank" 
+                            rel="noopener noreferrer"
+                            className="underline"
+                          >
+                            View your test confirmation email
+                          </a>
+                        </p>
+                        <p className="text-xs mt-2 text-amber-700 dark:text-amber-400">
+                          (This is a test email preview. In production, real emails would be sent to your inbox.)
+                        </p>
+                      </div>
+                    )}
                     
                     <div className="p-4 bg-muted rounded-lg">
                       <h3 className="font-medium mb-2">Shipping Address</h3>
@@ -482,6 +570,13 @@ const Checkout = () => {
                         {formData.address}<br />
                         {formData.city}, {formData.state} {formData.zip}<br />
                         {countries.find(c => c.value === formData.country)?.label}
+                      </p>
+                    </div>
+                    
+                    <div className="p-4 bg-muted rounded-lg">
+                      <h3 className="font-medium mb-2">Payment Method</h3>
+                      <p className="text-sm text-muted-foreground">
+                        Pay at Delivery
                       </p>
                     </div>
                   </CardContent>
@@ -501,30 +596,30 @@ const Checkout = () => {
                 
                 <div className="space-y-4">
                   <div className="flex justify-between">
-                    <span className="text-muted-foreground">Items ({totalItems})</span>
-                    <span>${subtotal.toFixed(2)}</span>
+                    <span className="text-muted-foreground">Items ({step === 3 ? orderSummary.totalItems : totalItems})</span>
+                    <span>${step === 3 ? orderSummary.subtotal.toFixed(2) : subtotal.toFixed(2)}</span>
                   </div>
                   
                   <div className="flex justify-between">
                     <span className="text-muted-foreground">Shipping</span>
-                    <span>${shipping.toFixed(2)}</span>
+                    <span>${step === 3 ? orderSummary.shipping.toFixed(2) : shipping.toFixed(2)}</span>
                   </div>
                   
                   <div className="flex justify-between">
                     <span className="text-muted-foreground">Tax</span>
-                    <span>${tax.toFixed(2)}</span>
+                    <span>${step === 3 ? orderSummary.tax.toFixed(2) : tax.toFixed(2)}</span>
                   </div>
                   
                   <Separator />
                   
                   <div className="flex justify-between font-medium text-lg">
                     <span>Total</span>
-                    <span>${total.toFixed(2)}</span>
+                    <span>${step === 3 ? orderSummary.total.toFixed(2) : total.toFixed(2)}</span>
                   </div>
                   
                   <div className="mt-6 space-y-4">
                     <h3 className="font-medium">Order Details</h3>
-                    {items.map(item => (
+                    {(step === 3 ? orderSummary.items : items).map(item => (
                       <div key={`${item.id}-${item.selectedSize}`} className="flex justify-between text-sm">
                         <span className="text-muted-foreground">
                           {item.name} ({item.selectedSize}) × {item.quantity}

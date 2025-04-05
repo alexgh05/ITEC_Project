@@ -5,7 +5,15 @@ import connectDB from './config/db.js';
 import productRoutes from './routes/productRoutes.js';
 import userRoutes from './routes/userRoutes.js';
 import orderRoutes from './routes/orderRoutes.js';
+import adminRoutes from './routes/adminRoutes.js';
+import stockNotificationRoutes from './routes/stockNotificationRoutes.js';
 import Product from './models/Product.js';
+import path from 'path';
+import { fileURLToPath } from 'url';
+
+// Get __dirname equivalent in ES modules
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 dotenv.config();
 
@@ -18,10 +26,24 @@ const app = express();
 app.use(express.json());
 app.use(cors());
 
+// Request logging middleware for debugging
+app.use((req, res, next) => {
+  if (req.path.includes('/notifications/stock')) {
+    console.log(`[${new Date().toISOString()}] ${req.method} ${req.path}`);
+    console.log('Request body:', req.body);
+  }
+  next();
+});
+
+// Serve static files from the public directory
+app.use(express.static(path.join(__dirname, '../public')));
+
 // Routes
 app.use('/api/products', productRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/orders', orderRoutes);
+app.use('/api/admin', adminRoutes);
+app.use('/api/notifications/stock', stockNotificationRoutes);
 
 // Simple route to test API
 app.get('/', (req, res) => {
@@ -43,6 +65,7 @@ app.get('/api/seed', async (req, res) => {
         culture: 'Tokyo',
         images: ['/product-1a.jpg', '/product-1b.jpg'],
         description: 'Inspired by the neon-lit streets of Shibuya',
+        countInStock: 25,
         isFeatured: true
       },
       {
@@ -51,7 +74,8 @@ app.get('/api/seed', async (req, res) => {
         category: 'music',
         culture: 'New York',
         images: ['/product-2a.jpg', '/product-2b.jpg'],
-        description: 'Limited edition hip-hop vinyl straight from Brooklyn'
+        description: 'Limited edition hip-hop vinyl straight from Brooklyn',
+        countInStock: 15
       },
       {
         name: 'Lagos Beats Headphones',

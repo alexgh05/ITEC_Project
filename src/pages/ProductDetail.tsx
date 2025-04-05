@@ -7,6 +7,8 @@ import { useThemeStore } from '@/store/useThemeStore';
 import { useCartStore } from '@/store/useCartStore';
 import { useWishlistStore } from '@/store/useWishlistStore';
 import { toast } from 'sonner';
+import NotifyMeButton from '@/components/product/NotifyMeButton';
+import { fetchProduct } from '@/lib/api';
 
 // Mock product data - would come from an API in a real app
 const products = [
@@ -19,7 +21,8 @@ const products = [
     images: ['/product-1a.jpg', '/product-1b.jpg', '/product-1c.jpg'],
     description: 'Inspired by the neon-lit streets of Shibuya, this hoodie features a unique blend of contemporary Japanese street fashion with cyberpunk aesthetics. The glow-in-the-dark print captures the essence of Tokyo\'s vibrant nightlife.',
     sizes: ['S', 'M', 'L', 'XL'],
-    relatedProductIds: ['p5', 'p3', 'p7']
+    relatedProductIds: ['p5', 'p3', 'p7'],
+    countInStock: 25
   },
   // Other products would be defined here
 ];
@@ -35,21 +38,28 @@ const ProductDetailPage = () => {
   const { toggleItem, isInWishlist } = useWishlistStore();
 
   useEffect(() => {
-    // In a real app, this would fetch from an API
-    setLoading(true);
-    
-    // Simulate API call
-    setTimeout(() => {
-      const foundProduct = products.find(p => p.id === id);
-      setProduct(foundProduct || null);
-      setLoading(false);
-      
-      if (foundProduct) {
-        document.title = `${foundProduct.name} | CultureDrop`;
-        // Set the culture theme to match the product
-        setCulture(foundProduct.culture as any);
+    const getProductData = async () => {
+      try {
+        setLoading(true);
+        if (id) {
+          const productData = await fetchProduct(id);
+          setProduct(productData);
+          
+          if (productData) {
+            document.title = `${productData.name} | CultureDrop`;
+            // Set the culture theme to match the product
+            setCulture(productData.culture.toLowerCase() as any);
+          }
+        }
+        setLoading(false);
+      } catch (error) {
+        console.error('Error fetching product:', error);
+        setLoading(false);
+        toast.error('Failed to load product details');
       }
-    }, 500);
+    };
+    
+    getProductData();
     
     // Scroll to top when component mounts
     window.scrollTo(0, 0);
@@ -72,20 +82,20 @@ const ProductDetailPage = () => {
   const handleToggleWishlist = () => {
     if (!product) return;
     toggleItem(product);
-    toast.success(isInWishlist(product.id)
+    toast.success(isInWishlist(product._id)
       ? `${product.name} removed from wishlist!` 
       : `${product.name} added to wishlist!`
     );
   };
 
   const handleNextImage = () => {
-    if (product) {
+    if (product && product.images) {
       setSelectedImage((prev) => (prev + 1) % product.images.length);
     }
   };
 
   const handlePrevImage = () => {
-    if (product) {
+    if (product && product.images) {
       setSelectedImage((prev) => (prev - 1 + product.images.length) % product.images.length);
     }
   };
@@ -115,7 +125,8 @@ const ProductDetailPage = () => {
   }
 
   // Check if the product is in the wishlist
-  const isFavorite = product ? isInWishlist(product.id) : false;
+  const isFavorite = product ? isInWishlist(product._id) : false;
+  const isOutOfStock = product.countInStock <= 0;
 
   return (
     <div className="container mx-auto py-8 px-4">
@@ -137,43 +148,59 @@ const ProductDetailPage = () => {
                 transition={{ duration: 0.3 }}
                 className="absolute inset-0"
               >
-                {/* This would be a real image in a production app */}
-                <div className={`w-full h-full bg-gradient-to-br from-culture to-culture-accent/50 culture-${product.culture}`} />
+                {product.images && product.images.length > 0 ? (
+                  <img 
+                    src={product.images[selectedImage]} 
+                    alt={product.name} 
+                    className="w-full h-full object-cover object-center"
+                  />
+                ) : (
+                  <div className={`w-full h-full bg-gradient-to-br from-culture to-culture-accent/50 culture-${product.culture.toLowerCase()}`} />
+                )}
               </motion.div>
             </AnimatePresence>
             
-            <button 
-              className="absolute left-4 top-1/2 -translate-y-1/2 bg-background/80 rounded-full p-2"
-              onClick={handlePrevImage}
-              aria-label="Previous image"
-            >
-              <ChevronLeft className="h-5 w-5" />
-            </button>
-            
-            <button 
-              className="absolute right-4 top-1/2 -translate-y-1/2 bg-background/80 rounded-full p-2"
-              onClick={handleNextImage}
-              aria-label="Next image"
-            >
-              <ChevronRight className="h-5 w-5" />
-            </button>
+            {product.images && product.images.length > 1 && (
+              <>
+                <button 
+                  className="absolute left-4 top-1/2 -translate-y-1/2 bg-background/80 rounded-full p-2"
+                  onClick={handlePrevImage}
+                  aria-label="Previous image"
+                >
+                  <ChevronLeft className="h-5 w-5" />
+                </button>
+                
+                <button 
+                  className="absolute right-4 top-1/2 -translate-y-1/2 bg-background/80 rounded-full p-2"
+                  onClick={handleNextImage}
+                  aria-label="Next image"
+                >
+                  <ChevronRight className="h-5 w-5" />
+                </button>
+              </>
+            )}
           </div>
 
-          <div className="flex space-x-4">
-            {product.images.map((_, i) => (
-              <button
-                key={i}
-                className={`w-20 h-20 rounded-md bg-muted overflow-hidden border-2 ${
-                  i === selectedImage ? 'border-culture' : 'border-transparent'
-                }`}
-                onClick={() => setSelectedImage(i)}
-                aria-label={`View image ${i + 1}`}
-              >
-                {/* This would be a real thumbnail in a production app */}
-                <div className={`w-full h-full bg-gradient-to-br from-culture to-culture-accent/50 culture-${product.culture}`} />
-              </button>
-            ))}
-          </div>
+          {product.images && product.images.length > 1 && (
+            <div className="flex space-x-4 overflow-x-auto pb-2">
+              {product.images.map((image, i) => (
+                <button
+                  key={i}
+                  className={`w-20 h-20 rounded-md bg-muted overflow-hidden border-2 flex-shrink-0 ${
+                    i === selectedImage ? 'border-culture' : 'border-transparent'
+                  }`}
+                  onClick={() => setSelectedImage(i)}
+                  aria-label={`View image ${i + 1}`}
+                >
+                  <img 
+                    src={image} 
+                    alt={`${product.name} view ${i + 1}`} 
+                    className="w-full h-full object-cover object-center"
+                  />
+                </button>
+              ))}
+            </div>
+          )}
         </div>
 
         {/* Product Details */}
@@ -186,41 +213,67 @@ const ProductDetailPage = () => {
             </span>
           </div>
 
+          <div className={`text-sm mb-2 ${
+            typeof product.countInStock === 'undefined' || product.countInStock === null ? 
+              'text-muted-foreground' : 
+              product.countInStock > 10 ? 
+                'text-green-600 dark:text-green-400' : 
+                product.countInStock > 0 ? 
+                  'text-amber-600 dark:text-amber-400' : 
+                  'text-red-600 dark:text-red-400'
+          }`}>
+            {typeof product.countInStock === 'undefined' || product.countInStock === null ? 
+              'Stock info unavailable' : 
+              product.countInStock > 0 ? 
+                `In stock: ${product.countInStock}` : 
+                'Out of stock'}
+          </div>
+
           <p className="text-muted-foreground mb-6">
             {product.description}
           </p>
 
-          <div className="mb-6">
-            <h3 className="font-medium mb-3">Size</h3>
-            <div className="flex flex-wrap gap-2">
-              {product.sizes.map((size: string) => (
-                <button
-                  key={size}
-                  className={`w-12 h-12 rounded-md border flex items-center justify-center ${
-                    selectedSize === size 
-                      ? 'bg-culture text-culture-foreground' 
-                      : 'bg-secondary hover:bg-secondary/80'
-                  }`}
-                  onClick={() => setSelectedSize(size)}
-                >
-                  {size}
-                </button>
-              ))}
+          {!isOutOfStock && (
+            <div className="mb-6">
+              <h3 className="font-medium mb-3">Size</h3>
+              <div className="flex flex-wrap gap-2">
+                {(product.sizes || ['S', 'M', 'L', 'XL']).map((size: string) => (
+                  <button
+                    key={size}
+                    className={`w-12 h-12 rounded-md border flex items-center justify-center ${
+                      selectedSize === size 
+                        ? 'bg-culture text-culture-foreground' 
+                        : 'bg-secondary hover:bg-secondary/80'
+                    }`}
+                    onClick={() => setSelectedSize(size)}
+                  >
+                    {size}
+                  </button>
+                ))}
+              </div>
+              {!selectedSize && (
+                <p className="text-sm text-muted-foreground mt-2">Please select a size</p>
+              )}
             </div>
-            {!selectedSize && (
-              <p className="text-sm text-muted-foreground mt-2">Please select a size</p>
-            )}
-          </div>
+          )}
 
           <div className="flex space-x-4 mb-8">
-            <Button 
-              className="flex-1 bg-culture text-culture-foreground hover:bg-culture/90"
-              disabled={!selectedSize}
-              onClick={handleAddToCart}
-            >
-              <ShoppingBag className="h-5 w-5 mr-2" />
-              Add to Cart
-            </Button>
+            {isOutOfStock ? (
+              <NotifyMeButton 
+                productId={product._id} 
+                productName={product.name}
+                className="flex-1"
+              />
+            ) : (
+              <Button 
+                className="flex-1 bg-culture text-culture-foreground hover:bg-culture/90"
+                disabled={!selectedSize}
+                onClick={handleAddToCart}
+              >
+                <ShoppingBag className="h-5 w-5 mr-2" />
+                Add to Cart
+              </Button>
+            )}
             
             <Button 
               variant="outline" 

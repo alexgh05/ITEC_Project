@@ -1,9 +1,10 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Link, useNavigate } from 'react-router-dom';
-import { ArrowRight, Music, Pause, Play } from 'lucide-react';
+import { ArrowRight, Music, Volume2, VolumeX, Play, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useThemeStore, CultureTheme } from '@/store/useThemeStore';
+import { useAudio } from '@/providers/ThemeProvider';
 
 interface HeroSlide {
   id: number;
@@ -65,26 +66,24 @@ const heroSlides: HeroSlide[] = [
 
 const HeroSection = () => {
   const [currentSlide, setCurrentSlide] = useState(0);
-  const [isPlaying, setIsPlaying] = useState(false);
   const { culture, setCulture, cultureInfo } = useThemeStore();
+  const { isPlaying, isMuted, toggleAudio, toggleMute } = useAudio();
   const navigate = useNavigate();
   
+  // Control slideshow - always running
   useEffect(() => {
-    let interval: NodeJS.Timeout | null = null;
-    
-    if (isPlaying) {
-      interval = setInterval(() => {
-        const nextSlide = (currentSlide + 1) % heroSlides.length;
-        setCurrentSlide(nextSlide);
-        // Apply theme when auto-changing slides if playing
-        setCulture(heroSlides[nextSlide].culture as CultureTheme);
-      }, 5000);
-    }
+    // Always keep the slideshow running
+    const interval = setInterval(() => {
+      const nextSlide = (currentSlide + 1) % heroSlides.length;
+      setCurrentSlide(nextSlide);
+      // Apply theme when auto-changing slides
+      setCulture(heroSlides[nextSlide].culture as CultureTheme);
+    }, 5000);
     
     return () => {
       if (interval) clearInterval(interval);
     };
-  }, [isPlaying, currentSlide, setCulture]);
+  }, [currentSlide, setCulture]);
 
   const handleSlideChange = (index: number) => {
     setCurrentSlide(index);
@@ -97,6 +96,17 @@ const HeroSection = () => {
     const cultureName = slide.culture === 'newyork' ? 'New York' : 
                         slide.culture.charAt(0).toUpperCase() + slide.culture.slice(1);
     navigate(`/shop?culture=${cultureName}`);
+  };
+
+  // Handle audio controls
+  const handleToggleAudio = () => {
+    if (!isPlaying) {
+      toggleAudio(); // Start playing if not already playing
+    }
+  };
+  
+  const handleToggleMute = () => {
+    toggleMute(); // Toggle between muted and unmuted
   };
 
   return (
@@ -116,19 +126,21 @@ const HeroSection = () => {
               <div className={`absolute inset-0 bg-gradient-to-br from-culture to-culture-accent/30 opacity-90 ${culture === slide.culture ? `culture-${slide.culture}` : ''}`} />
               <div className="absolute inset-0 bg-gradient-to-t from-background to-transparent opacity-90" />
               
-              {/* Music visualizer only visible when playing */}
+              {/* Music visualizer always visible when audio is playing */}
               {isPlaying && (
                 <div className="absolute bottom-0 left-0 right-0 h-16 flex justify-center items-end">
                   {[...Array(20)].map((_, i) => (
                     <motion.div
                       key={i}
-                      className={`w-1 mx-0.5 rounded-t-full bg-culture/40 backdrop-blur-sm`}
+                      className={`w-1 mx-0.5 rounded-t-full ${isMuted ? 'bg-culture/20' : 'bg-culture/40'} backdrop-blur-sm`}
                       animate={{ 
-                        height: [
-                          Math.random() * 20 + 5,
-                          Math.random() * 40 + 10, 
-                          Math.random() * 20 + 5
-                        ],
+                        height: isMuted 
+                          ? 5 // Static small height when muted
+                          : [
+                              Math.random() * 20 + 5,
+                              Math.random() * 40 + 10, 
+                              Math.random() * 20 + 5
+                            ],
                       }}
                       transition={{
                         repeat: Infinity,
@@ -195,14 +207,31 @@ const HeroSection = () => {
       </AnimatePresence>
 
       <div className="absolute bottom-8 left-0 right-0 flex justify-center items-center space-x-2 z-20">
-        <Button
-          variant="ghost"
-          size="icon"
-          onClick={() => setIsPlaying(!isPlaying)}
-          className="mr-2 bg-background/50 backdrop-blur-sm hover:bg-background/80"
-        >
-          {isPlaying ? <Pause className="h-4 w-4" /> : <Play className="h-4 w-4" />}
-        </Button>
+        {!isPlaying ? (
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={handleToggleAudio}
+            className="mr-2 bg-background/50 backdrop-blur-sm hover:bg-background/80"
+            title="Play music"
+          >
+            <Play className="h-4 w-4" />
+          </Button>
+        ) : (
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={handleToggleMute}
+            className="mr-2 bg-background/50 backdrop-blur-sm hover:bg-background/80"
+            title={isMuted ? "Unmute music" : "Mute music"}
+          >
+            {isMuted ? (
+              <VolumeX className="h-4 w-4" />
+            ) : (
+              <Volume2 className="h-4 w-4" />
+            )}
+          </Button>
+        )}
         
         {heroSlides.map((slide, index) => (
           <button

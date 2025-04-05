@@ -12,10 +12,13 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Link, useNavigate } from "react-router-dom";
 import { useCartStore } from "@/store/useCartStore";
+import { useLanguageStore } from "@/store/useLanguageStore";
+import { getTranslation } from "@/lib/translations";
 import { ScrollArea } from "@/components/ui/scroll-area";
 
 const CartDropdown = () => {
   const { items, getTotalItems, getTotalPrice, removeItem, updateQuantity } = useCartStore();
+  const { language } = useLanguageStore();
   const totalItems = getTotalItems();
   const navigate = useNavigate();
   
@@ -39,15 +42,18 @@ const CartDropdown = () => {
       
       <DropdownMenuContent align="end" className="w-80">
         <DropdownMenuLabel className="flex justify-between">
-          <span>Shopping Cart</span>
-          <span>{totalItems} {totalItems === 1 ? 'item' : 'items'}</span>
+          <span>{getTranslation('shoppingCart', language)}</span>
+          <span>{totalItems} {totalItems === 1 
+            ? getTranslation('item', language) 
+            : getTranslation('items', language)}
+          </span>
         </DropdownMenuLabel>
         
         <DropdownMenuSeparator />
         
         {items.length === 0 ? (
           <div className="p-4 text-center text-muted-foreground">
-            Your cart is empty
+            {getTranslation('yourCartIsEmpty', language)}
           </div>
         ) : (
           <ScrollArea className="h-[300px]">
@@ -62,7 +68,7 @@ const CartDropdown = () => {
                     <div className="flex-1 min-w-0">
                       <div className="font-medium truncate">{item.name}</div>
                       <div className="text-sm text-muted-foreground">
-                        {item.culture} {item.selectedSize && `• Size: ${item.selectedSize}`}
+                        {item.culture} {item.selectedSize && `• ${getTranslation('size', language)}: ${item.selectedSize}`}
                       </div>
                       <div className="font-semibold mt-1">${item.price.toFixed(2)}</div>
                       
@@ -112,15 +118,17 @@ const CartDropdown = () => {
           <>
             <div className="p-4 space-y-4">
               <div className="flex justify-between font-medium">
-                <span>Total:</span>
+                <span>{getTranslation('total', language)}:</span>
                 <span>${getTotalPrice().toFixed(2)}</span>
               </div>
               
               <div className="grid grid-cols-2 gap-2">
                 <Button variant="outline" asChild>
-                  <Link to="/cart">View Cart</Link>
+                  <Link to="/cart">{getTranslation('viewCart', language)}</Link>
                 </Button>
-                <Button onClick={() => navigate('/checkout')}>Checkout</Button>
+                <Button onClick={() => navigate('/checkout')}>
+                  {getTranslation('checkout', language)}
+                </Button>
               </div>
             </div>
           </>
