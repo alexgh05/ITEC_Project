@@ -192,13 +192,15 @@ const CultureSelector = () => {
             {/* Music genre label */}
             <div className="mt-2 text-xs flex items-center text-white/70">
               <Music className="h-3 w-3 mr-1" />
-              {option.id === 'berlin' ? 
-                <span className="font-bold text-white">Electronic and Techno</span> :
-                option.id === 'london' ? 
-                  'UK Drill & Rap' : 
-                  (cultureInfo && cultureInfo[option.id] ? 
-                    cultureInfo[option.id].musicGenre : 'Music')
-              }
+              <span className="font-bold text-white">
+                {option.id === 'berlin' ? 
+                  'Electronic and Techno' :
+                  option.id === 'london' ? 
+                    'UK Drill & Rap' : 
+                    (cultureInfo && cultureInfo[option.id] ? 
+                      cultureInfo[option.id].musicGenre : 'Music')
+                }
+              </span>
             </div>
           </div>
           
