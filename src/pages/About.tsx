@@ -48,10 +48,31 @@ const AboutPage = () => {
               whileInView={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.5 }}
               viewport={{ once: true, margin: "-100px" }}
-              className="aspect-square bg-muted rounded-lg overflow-hidden"
+              className="aspect-square bg-muted rounded-lg overflow-hidden shadow-md"
             >
-              {/* This would be a real image in a production app */}
-              <div className="w-full h-full bg-gradient-to-br from-culture to-culture-accent/50" />
+              {/* 
+                Our Story image - To update:
+                1. Place a new image named "our-story.jpg" in the public/about/ directory
+                2. Recommended size: 800x800px or similar aspect ratio
+              */}
+              <img 
+                src="/about/our-story.jpg" 
+                alt="Our Story" 
+                className="w-full h-full object-cover"
+                onError={(e) => {
+                  console.log("Image load error, falling back to gradient");
+                  const target = e.target as HTMLImageElement;
+                  const parent = target.parentElement;
+                  if (parent) {
+                    // Create gradient div as fallback
+                    const fallback = document.createElement('div');
+                    fallback.className = 'w-full h-full bg-gradient-to-br from-culture to-culture-accent/50';
+                    parent.appendChild(fallback);
+                    // Hide the broken image
+                    target.style.display = 'none';
+                  }
+                }}
+              />
             </motion.div>
           </div>
         </div>
@@ -137,7 +158,7 @@ const AboutPage = () => {
                 />
               </div>
               <h3 className="font-bold text-xl">Ghilezan Madalin</h3>
-              <p className="text-muted-foreground">Co-Founder & Creative Director</p>
+              <p className="text-muted-foreground">Co-Founder & Technical Lead</p>
             </motion.div>
 
             <motion.div
@@ -168,7 +189,7 @@ const AboutPage = () => {
                 />
               </div>
               <h3 className="font-bold text-xl">Ghenciu Alexandru</h3>
-              <p className="text-muted-foreground">Co-Founder & Technical Lead</p>
+              <p className="text-muted-foreground">Co-Founder & Creative Director</p>
             </motion.div>
           </div>
 

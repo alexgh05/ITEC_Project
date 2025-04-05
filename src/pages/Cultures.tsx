@@ -127,8 +127,29 @@ const CulturesPage = () => {
                   index % 2 === 1 ? 'md:order-2' : ''
                 }`}
               >
-                {/* This would be a real image in a production app */}
-                <div className={`w-full h-full bg-gradient-to-br from-culture to-culture-accent/50 culture-${culture.id}`} />
+                {/* 
+                  Culture image - To update:
+                  1. Place a new image named "{culture.id}.jpg" in the public/cultures/ directory
+                  2. Recommended size: 800x600px or similar aspect ratio (4:3)
+                */}
+                <img 
+                  src={`/cultures/${culture.id}.jpg`}
+                  alt={`${culture.name} Culture`}
+                  className="w-full h-full object-cover"
+                  onError={(e) => {
+                    console.log("Image load error, falling back to gradient");
+                    const target = e.target as HTMLImageElement;
+                    const parent = target.parentElement;
+                    if (parent) {
+                      // Create gradient div as fallback
+                      const fallback = document.createElement('div');
+                      fallback.className = `w-full h-full bg-gradient-to-br from-culture to-culture-accent/50 culture-${culture.id}`;
+                      parent.appendChild(fallback);
+                      // Hide the broken image
+                      target.style.display = 'none';
+                    }
+                  }}
+                />
               </div>
 
               <div>
