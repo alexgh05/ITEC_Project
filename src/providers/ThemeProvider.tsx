@@ -116,25 +116,37 @@ const ThemeProvider = ({ children }: ThemeProviderProps) => {
     if (!audio) return;
     
     // Add null check for cultureInfo[culture]
-    if (!cultureInfo || !cultureInfo[culture]) return;
+    if (!cultureInfo || !cultureInfo[culture]) {
+      console.warn(`Missing culture info for ${culture}`);
+      return;
+    }
     
     const trackSrc = cultureInfo[culture].sampleTrack;
-    if (!trackSrc) return;
+    if (!trackSrc) {
+      console.warn(`No track source found for ${culture}`);
+      return;
+    }
+    
+    console.log(`Setting audio for ${culture} to ${trackSrc}`);
     
     // Only change if playing or if audio should be enabled
     if (isPlaying || (audioEnabled && culture !== 'default')) {
       // Add timestamp to prevent caching
       const timestamp = new Date().getTime();
-      audio.src = `${trackSrc}?t=${timestamp}`;
+      const fullSrc = `${trackSrc}?t=${timestamp}`;
+      audio.src = fullSrc;
+      console.log(`Audio src set to ${fullSrc}`);
       
       // Only attempt to play if user has interacted with the page
       if (hasUserInteracted && (isPlaying || (audioEnabled && culture !== 'default'))) {
+        console.log(`Attempting to play audio for ${culture}`);
         audio.play()
           .then(() => {
+            console.log(`Successfully playing ${culture} audio`);
             setIsPlaying(true);
           })
           .catch(err => {
-            console.error("Audio playback error on culture change:", err);
+            console.error(`Audio playback error on ${culture} change:`, err);
             setIsPlaying(false);
           });
       }
@@ -147,33 +159,45 @@ const ThemeProvider = ({ children }: ThemeProviderProps) => {
     if (!audio) return;
     
     if (isPlaying) {
+      console.log(`Pausing audio for ${culture}`);
       audio.pause();
       setIsPlaying(false);
     } else {
       // Ensure audio is enabled in the store
       if (!audioEnabled) {
+        console.log('Enabling audio in store');
         enableAudio();
       }
       
       // Set audio source if not already set
       if (!audio.src || audio.src === '') {
         // Add null check for culture info
-        if (!cultureInfo || !cultureInfo[culture] || !cultureInfo[culture].sampleTrack) return;
+        if (!cultureInfo || !cultureInfo[culture] || !cultureInfo[culture].sampleTrack) {
+          console.warn(`Cannot play - missing track for ${culture}`);
+          return;
+        }
         
         const trackSrc = cultureInfo[culture].sampleTrack;
-        if (!trackSrc) return;
+        if (!trackSrc) {
+          console.warn(`No track source for ${culture}`);
+          return;
+        }
         
         // Add timestamp to prevent caching
         const timestamp = new Date().getTime();
-        audio.src = `${trackSrc}?t=${timestamp}`;
+        const fullSrc = `${trackSrc}?t=${timestamp}`;
+        audio.src = fullSrc;
+        console.log(`Audio src set to ${fullSrc} in toggleAudio`);
       }
       
+      console.log(`Attempting to play ${culture} audio in toggleAudio`);
       audio.play()
         .then(() => {
+          console.log(`Successfully playing ${culture} audio in toggleAudio`);
           setIsPlaying(true);
         })
         .catch(err => {
-          console.error("Audio playback error:", err);
+          console.error(`Audio playback error for ${culture}:`, err);
         });
     }
   };

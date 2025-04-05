@@ -124,7 +124,64 @@ const CultureSelector = () => {
     // Stop auto-rotation when user selects a culture
     handleUserInteraction();
     
-    // Immediately apply the theme when clicked
+    console.log(`Culture selected: ${newCulture}`, {
+      previous: culture,
+      isPlaying,
+      audioEnabled
+    });
+    
+    // Special handling for Berlin
+    if (newCulture === 'berlin') {
+      console.log('Berlin special handling activated');
+      
+      // First apply the theme
+      setCulture(newCulture);
+      
+      // Direct audio handling for Berlin
+      try {
+        // Get the audio element from the ref or create a new one
+        const audioElement = document.createElement('audio');
+        audioElement.src = '/audio/berlin-techno.mp3';
+        audioElement.volume = 0.3;
+        audioElement.loop = true;
+        
+        // Pause any existing audio
+        if (isPlaying) {
+          const audio = document.querySelector('audio');
+          if (audio) {
+            audio.pause();
+          }
+        }
+        
+        // Play the Berlin audio directly
+        console.log('Attempting to play Berlin audio directly');
+        const playPromise = audioElement.play();
+        
+        if (playPromise !== undefined) {
+          playPromise
+            .then(() => {
+              console.log('Berlin audio playing successfully');
+            })
+            .catch(err => {
+              console.error('Error playing Berlin audio:', err);
+              // Try the regular toggle as a fallback
+              if (!isPlaying) {
+                toggleAudio();
+              }
+            });
+        }
+      } catch (error) {
+        console.error('Error with direct Berlin audio handling:', error);
+        // Regular toggle as a fallback
+        if (!isPlaying) {
+          toggleAudio();
+        }
+      }
+      
+      return;
+    }
+    
+    // For non-Berlin cultures, use the normal flow
     setCulture(newCulture);
     
     // Auto-play music if it's not already playing when selecting a non-default culture
