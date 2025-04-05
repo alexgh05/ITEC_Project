@@ -8,7 +8,7 @@ type ThemeProviderProps = {
 };
 
 // Create a context for global audio
-export const AudioContext = createContext<{
+const AudioContextInternal = createContext<{
   audioRef: React.RefObject<HTMLAudioElement | null>;
   isPlaying: boolean;
   isMuted: boolean;
@@ -80,7 +80,7 @@ const ThemeProvider = ({ children }: ThemeProviderProps) => {
     // 1. User has interacted with the page (browser requirement)
     // 2. Audio is not already playing
     // 3. We have a culture with music selected
-    if (hasUserInteracted && !isPlaying && culture !== 'default' && cultureInfo[culture].sampleTrack) {
+    if (hasUserInteracted && !isPlaying && culture !== 'default' && cultureInfo && cultureInfo[culture] && cultureInfo[culture].sampleTrack) {
       // Enable audio in the store if it's not already enabled
       if (!audioEnabled) {
         enableAudio();
@@ -115,7 +115,7 @@ const ThemeProvider = ({ children }: ThemeProviderProps) => {
     const audio = audioRef.current;
     if (!audio) return;
     
-    if (!cultureInfo[culture]?.sampleTrack) return;
+ main
     const trackSrc = cultureInfo[culture].sampleTrack;
     if (!trackSrc) return;
     
@@ -155,6 +155,9 @@ const ThemeProvider = ({ children }: ThemeProviderProps) => {
       
       // Set audio source if not already set
       if (!audio.src || audio.src === '') {
+        // Add null check for culture info
+        if (!cultureInfo || !cultureInfo[culture] || !cultureInfo[culture].sampleTrack) return;
+        
         const trackSrc = cultureInfo[culture].sampleTrack;
         if (!trackSrc) return;
         
@@ -206,7 +209,7 @@ const ThemeProvider = ({ children }: ThemeProviderProps) => {
     }
     
     // Handle culture theme
-    html.classList.remove('culture-tokyo', 'culture-newyork', 'culture-lagos', 'culture-seoul', 'culture-london');
+    html.classList.remove('culture-tokyo', 'culture-newyork', 'culture-lagos', 'culture-seoul', 'culture-london', 'culture-berlin');
     if (appliedTheme.culture !== 'default') {
       html.classList.add(`culture-${appliedTheme.culture}`);
     }
@@ -220,15 +223,18 @@ const ThemeProvider = ({ children }: ThemeProviderProps) => {
   }, [appliedTheme]);
 
   return (
-    <AudioContext.Provider value={{ audioRef, isPlaying, isMuted, toggleAudio, toggleMute }}>
+    <AudioContextInternal.Provider value={{ audioRef, isPlaying, isMuted, toggleAudio, toggleMute }}>
       <InteractiveBackground />
       {children}
       <AudioControl />
-    </AudioContext.Provider>
+    </AudioContextInternal.Provider>
   );
 };
 
 export default ThemeProvider;
 
+// Export the AudioContext separately as a named export
+export const AudioContext = AudioContextInternal;
+
 // Helper hook to use audio
-export const useAudio = () => useContext(AudioContext);
+export const useAudio = () => useContext(AudioContextInternal);

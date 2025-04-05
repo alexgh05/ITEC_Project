@@ -12,6 +12,7 @@ interface CultureOption {
   description: string;
   image: string;
   icon: JSX.Element;
+  musicText?: string;
 }
 
 const CultureSelector = () => {
@@ -51,9 +52,17 @@ const CultureSelector = () => {
     {
       id: 'london',
       name: 'London',
-      description: 'Electronic music scene with modern clubwear',
+      description: 'Drill music scene with modern streetwear',
       image: '/culture-london.jpg',
       icon: <Radio className="h-4 w-4 text-white" />
+    },
+    {
+      id: 'berlin',
+      name: 'Berlin',
+      description: 'Techno music scene with futuristic clubwear',
+      image: '/culture-berlin.jpg',
+      icon: <Music className="h-4 w-4 text-white" />,
+      musicText: 'Electronic and Techno'
     }
   ];
 
@@ -114,7 +123,13 @@ const CultureSelector = () => {
             {/* Music genre label */}
             <div className="mt-2 text-xs flex items-center text-white/70">
               <Music className="h-3 w-3 mr-1" />
-              {cultureInfo[option.id].musicGenre}
+              {option.id === 'berlin' ? 
+                <span className="font-bold text-white">Electronic and Techno</span> :
+                option.id === 'london' ? 
+                  'UK Drill & Rap' : 
+                  (cultureInfo && cultureInfo[option.id] ? 
+                    cultureInfo[option.id].musicGenre : 'Music')
+              }
             </div>
           </div>
           

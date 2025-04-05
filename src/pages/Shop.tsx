@@ -7,8 +7,8 @@ import { Button } from '@/components/ui/button';
 import { useThemeStore } from '@/store/useThemeStore';
 import { fetchProducts } from '@/lib/api';
 
-const categories = ['All', 'Fashion', 'Music', 'Accessories', 'Books', 'Art', 'Footwear', 'Clothing'];
-const cultures = ['All', 'Tokyo', 'New York', 'Lagos', 'Seoul', 'London'];
+const categories = ['All', 'Fashion', 'Music', 'Accessories', 'Footwear', 'Clothing'];
+const cultures = ['All', 'Tokyo', 'New York', 'Lagos', 'Seoul', 'London', 'Berlin'];
 
 // Featured category cards
 const featuredCategories = [

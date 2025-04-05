@@ -38,7 +38,7 @@ const AboutPage = () => {
                 We believe that urban cultures around the world create unique expressions that deserve to be celebrated and shared.
               </p>
               <p className="text-muted-foreground">
-                Founded in 2023 by a collective of DJs, fashion designers, and cultural enthusiasts, 
+                Founded in 2025 by a collective of Polytehnica Timisoara students,
                 CultureDrop aims to bring authentic products inspired by global urban cultures to people everywhere.
               </p>
             </motion.div>

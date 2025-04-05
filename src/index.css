@@ -108,6 +108,14 @@
     --culture-rgb: 51, 171, 230;
   }
 
+  /* Berlin culture theme - techno purple theme */
+  .culture-berlin {
+    --culture: 280 70% 50%;
+    --culture-foreground: 0 0% 100%;
+    --culture-muted: 280 40% 80%;
+    --culture-accent: 320 70% 60%;
+  }
+
   * {
     @apply border-border;
   }

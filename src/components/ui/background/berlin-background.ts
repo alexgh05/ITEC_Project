@@ -1,182 +1,118 @@
+
 export const drawBerlinBackground = (ctx: CanvasRenderingContext2D, canvas: HTMLCanvasElement) => {
   const time = performance.now() * 0.001;
   
-  // Dark background with blue tint for Berlin electronic club scene
+  // Dark industrial background with purple tint for Berlin techno scene
   const gradient = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
-  gradient.addColorStop(0, 'rgba(10, 15, 30, 0.4)');
-  gradient.addColorStop(1, 'rgba(5, 10, 20, 0.4)');
+  gradient.addColorStop(0, 'rgba(30, 10, 40, 0.4)');
+  gradient.addColorStop(1, 'rgba(20, 5, 30, 0.4)');
   ctx.fillStyle = gradient;
   ctx.fillRect(0, 0, canvas.width, canvas.height);
   
-  // Draw LED-like grid lines
-  const gridSpacing = 50;
-  ctx.strokeStyle = 'rgba(30, 150, 255, 0.15)';
+  // Draw industrial grid pattern
+  const gridSpacing = 60;
+  ctx.strokeStyle = 'rgba(200, 100, 255, 0.15)';
   ctx.lineWidth = 1;
   
-  // Horizontal lines
+  // Draw horizontal lines
   for (let y = 0; y < canvas.height; y += gridSpacing) {
-    const offsetY = y + Math.sin(time + y * 0.01) * 5;
-    
     ctx.beginPath();
-    ctx.moveTo(0, offsetY);
-    ctx.lineTo(canvas.width, offsetY);
-    ctx.stroke();
-  }
-  
-  // Vertical lines
-  for (let x = 0; x < canvas.width; x += gridSpacing) {
-    const offsetX = x + Math.sin(time + x * 0.01) * 5;
-    
-    ctx.beginPath();
-    ctx.moveTo(offsetX, 0);
-    ctx.lineTo(offsetX, canvas.height);
-    ctx.stroke();
-  }
-  
-  // Draw electronic music visualizer bars
-  const numBars = 20;
-  const barWidth = canvas.width / numBars;
-  
-  for (let i = 0; i < numBars; i++) {
-    const height = Math.sin(time * 2 + i * 0.2) * 40 + 20;
-    const barX = i * barWidth;
-    const barY = canvas.height - height;
-    
-    // Create a gradient for each bar
-    const barGradient = ctx.createLinearGradient(barX, barY, barX, canvas.height);
-    barGradient.addColorStop(0, 'rgba(0, 180, 255, 0.8)');
-    barGradient.addColorStop(1, 'rgba(80, 140, 255, 0.2)');
-    
-    ctx.fillStyle = barGradient;
-    ctx.fillRect(barX, barY, barWidth - 2, height);
-  }
-  
-  // Draw pulsing LED dots
-  for (let i = 0; i < 40; i++) {
-    const x = Math.sin(time * 0.5 + i * 0.3) * canvas.width * 0.5 + canvas.width * 0.5;
-    const y = Math.cos(time * 0.7 + i * 0.2) * canvas.height * 0.5 + canvas.height * 0.5;
-    const radius = 2 + Math.sin(time * 2 + i) * 1;
-    const alpha = 0.3 + Math.sin(time * 3 + i) * 0.2;
-    
-    // Different colors for the LEDs
-    const colors = [
-      `rgba(0, 180, 255, ${alpha})`,   // Blue
-      `rgba(255, 0, 180, ${alpha})`,   // Pink
-      `rgba(180, 255, 0, ${alpha})`    // Green
-    ];
-    
-    ctx.beginPath();
-    ctx.fillStyle = colors[i % colors.length];
-    ctx.arc(x, y, radius, 0, Math.PI * 2);
-    ctx.fill();
-  }
-  
-  // Draw Berlin skyline silhouette
-  const skylineHeight = canvas.height * 0.2; // Increased height for more detail
-  const skylineY = canvas.height - skylineHeight;
-  const waterLevel = canvas.height - skylineHeight * 0.3; // Thames water level
-  
-  ctx.fillStyle = 'rgba(0, 0, 10, 0.6)'; // Slightly darker for better visibility
-  ctx.beginPath();
-  ctx.moveTo(0, canvas.height);
-  
-  // Left side buildings
-  ctx.lineTo(0, skylineY + skylineHeight * 0.4);
-  ctx.lineTo(canvas.width * 0.05, skylineY + skylineHeight * 0.5);
-  ctx.lineTo(canvas.width * 0.1, skylineY + skylineHeight * 0.3);
-  ctx.lineTo(canvas.width * 0.15, skylineY + skylineHeight * 0.4);
-  
-  // Big Ben and Parliament
-  ctx.lineTo(canvas.width * 0.17, skylineY + skylineHeight * 0.4);
-  ctx.lineTo(canvas.width * 0.17, skylineY + skylineHeight * 0.1);
-  ctx.lineTo(canvas.width * 0.175, skylineY);
-  ctx.lineTo(canvas.width * 0.18, skylineY + skylineHeight * 0.1);
-  ctx.lineTo(canvas.width * 0.18, skylineY + skylineHeight * 0.3);
-  ctx.lineTo(canvas.width * 0.22, skylineY + skylineHeight * 0.3);
-  
-  // Some mid skyline buildings
-  ctx.lineTo(canvas.width * 0.25, skylineY + skylineHeight * 0.35);
-  ctx.lineTo(canvas.width * 0.3, skylineY + skylineHeight * 0.25);
-  ctx.lineTo(canvas.width * 0.33, skylineY + skylineHeight * 0.45);
-  
-  // Tower Bridge - Left tower
-  ctx.lineTo(canvas.width * 0.35, skylineY + skylineHeight * 0.45);
-  ctx.lineTo(canvas.width * 0.35, skylineY + skylineHeight * 0.2);
-  ctx.lineTo(canvas.width * 0.37, skylineY + skylineHeight * 0.15);
-  ctx.lineTo(canvas.width * 0.39, skylineY + skylineHeight * 0.2);
-  ctx.lineTo(canvas.width * 0.39, skylineY + skylineHeight * 0.45);
-  
-  // Tower Bridge - Span
-  ctx.lineTo(canvas.width * 0.41, skylineY + skylineHeight * 0.45);
-  ctx.lineTo(canvas.width * 0.41, skylineY + skylineHeight * 0.35);
-  ctx.lineTo(canvas.width * 0.49, skylineY + skylineHeight * 0.35);
-  ctx.lineTo(canvas.width * 0.49, skylineY + skylineHeight * 0.45);
-  
-  // Tower Bridge - Right tower
-  ctx.lineTo(canvas.width * 0.51, skylineY + skylineHeight * 0.45);
-  ctx.lineTo(canvas.width * 0.51, skylineY + skylineHeight * 0.2);
-  ctx.lineTo(canvas.width * 0.53, skylineY + skylineHeight * 0.15);
-  ctx.lineTo(canvas.width * 0.55, skylineY + skylineHeight * 0.2);
-  ctx.lineTo(canvas.width * 0.55, skylineY + skylineHeight * 0.45);
-  
-  // The Shard
-  ctx.lineTo(canvas.width * 0.6, skylineY + skylineHeight * 0.45);
-  ctx.lineTo(canvas.width * 0.6, skylineY + skylineHeight * 0.1);
-  ctx.lineTo(canvas.width * 0.62, skylineY);
-  ctx.lineTo(canvas.width * 0.64, skylineY + skylineHeight * 0.1);
-  ctx.lineTo(canvas.width * 0.64, skylineY + skylineHeight * 0.45);
-  
-  // Berlin TV Tower
-  const eyeX = canvas.width * 0.8;
-  const eyeY = skylineY + skylineHeight * 0.3;
-  const eyeRadius = skylineHeight * 0.6;
-  
-  // Draw buildings leading to the Eye
-  ctx.lineTo(canvas.width * 0.7, skylineY + skylineHeight * 0.4);
-  ctx.lineTo(canvas.width * 0.75, skylineY + skylineHeight * 0.35);
-  
-  // Draw the base of the Berlin TV Tower
-  ctx.lineTo(eyeX - eyeRadius, skylineY + skylineHeight * 0.45);
-  
-  // Draw the Berlin TV Tower
-  ctx.arc(eyeX, eyeY, eyeRadius, Math.PI, 0, true);
-  
-  // Right side buildings
-  ctx.lineTo(canvas.width * 0.9, skylineY + skylineHeight * 0.4);
-  ctx.lineTo(canvas.width * 0.95, skylineY + skylineHeight * 0.3);
-  ctx.lineTo(canvas.width, skylineY + skylineHeight * 0.5);
-  ctx.lineTo(canvas.width, canvas.height);
-  
-  // Complete the silhouette
-  ctx.closePath();
-  ctx.fill();
-  
-  // Add Thames river reflection
-  ctx.fillStyle = 'rgba(0, 100, 180, 0.1)';
-  ctx.fillRect(0, waterLevel, canvas.width, canvas.height - waterLevel);
-  
-  // Add subtle river waves
-  ctx.strokeStyle = 'rgba(0, 150, 255, 0.1)';
-  ctx.lineWidth = 1;
-  
-  for (let i = 0; i < 10; i++) {
-    const waveY = waterLevel + i * 10 + Math.sin(time * 0.5) * 5;
-    
-    ctx.beginPath();
-    ctx.moveTo(0, waveY);
+    ctx.moveTo(0, y);
     
     for (let x = 0; x < canvas.width; x += 20) {
-      const offsetY = Math.sin(x * 0.01 + time + i * 0.2) * 2;
-      ctx.lineTo(x, waveY + offsetY);
+      const offsetY = Math.sin(x * 0.01 + time * 0.5) * 5;
+      ctx.lineTo(x, y + offsetY);
     }
     
     ctx.stroke();
   }
   
-  // Add subtle glow to the skyline
-  const glowGradient = ctx.createLinearGradient(0, skylineY, 0, waterLevel);
-  glowGradient.addColorStop(0, 'rgba(0, 150, 255, 0.05)');
-  glowGradient.addColorStop(1, 'rgba(0, 100, 255, 0)');
-  ctx.fillStyle = glowGradient;
-  ctx.fillRect(0, skylineY, canvas.width, waterLevel - skylineY);
+  // Draw vertical lines
+  for (let x = 0; x < canvas.width; x += gridSpacing) {
+    ctx.beginPath();
+    ctx.moveTo(x, 0);
+    
+    for (let y = 0; y < canvas.height; y += 20) {
+      const offsetX = Math.sin(y * 0.01 + time * 0.5) * 5;
+      ctx.lineTo(x + offsetX, y);
+    }
+    
+    ctx.stroke();
+  }
+  
+  // Draw techno music visualizer - frequency bars
+  const numBars = 16;
+  const barWidth = canvas.width / numBars;
+  const maxBarHeight = canvas.height * 0.3;
+  
+  for (let i = 0; i < numBars; i++) {
+    // Create height pattern that simulates audio frequencies
+    const barHeight = (Math.sin(time * 1.5 + i * 0.4) * 0.5 + 0.5) * maxBarHeight;
+    
+    // Create a gradient for each bar
+    const gradient = ctx.createLinearGradient(0, canvas.height - barHeight, 0, canvas.height);
+    gradient.addColorStop(0, 'rgba(180, 70, 240, 0.6)');
+    gradient.addColorStop(1, 'rgba(100, 20, 180, 0.2)');
+    
+    ctx.fillStyle = gradient;
+    ctx.fillRect(i * barWidth, canvas.height - barHeight, barWidth - 2, barHeight);
+  }
+  
+  // Draw pulsing geometric shapes
+  for (let i = 0; i < 10; i++) {
+    const x = canvas.width * 0.5 + Math.cos(time * 0.3 + i) * canvas.width * 0.4;
+    const y = canvas.height * 0.5 + Math.sin(time * 0.4 + i) * canvas.height * 0.4;
+    const size = 20 + Math.sin(time * 0.8 + i * 0.5) * 10;
+    
+    // Different shape types
+    if (i % 3 === 0) {
+      // Circle
+      ctx.beginPath();
+      ctx.arc(x, y, size, 0, Math.PI * 2);
+      ctx.fillStyle = `rgba(200, 100, 255, ${0.1 + Math.sin(time + i) * 0.05})`;
+      ctx.fill();
+    } else if (i % 3 === 1) {
+      // Rectangle
+      ctx.fillStyle = `rgba(160, 60, 200, ${0.1 + Math.sin(time + i) * 0.05})`;
+      ctx.fillRect(x - size / 2, y - size / 2, size, size);
+    } else {
+      // Triangle
+      ctx.beginPath();
+      ctx.moveTo(x, y - size / 2);
+      ctx.lineTo(x + size / 2, y + size / 2);
+      ctx.lineTo(x - size / 2, y + size / 2);
+      ctx.closePath();
+      ctx.fillStyle = `rgba(140, 40, 180, ${0.1 + Math.sin(time + i) * 0.05})`;
+      ctx.fill();
+    }
+  }
+  
+  // Draw Berlin TV Tower silhouette
+  const tvTowerX = canvas.width * 0.5;
+  const tvTowerHeight = canvas.height * 0.4;
+  const tvTowerY = canvas.height - tvTowerHeight;
+  
+  ctx.fillStyle = 'rgba(10, 5, 15, 0.5)';
+  ctx.beginPath();
+  
+  // Tower base
+  ctx.moveTo(tvTowerX - 40, canvas.height);
+  ctx.lineTo(tvTowerX - 30, tvTowerY + tvTowerHeight * 0.7);
+  ctx.lineTo(tvTowerX + 30, tvTowerY + tvTowerHeight * 0.7);
+  ctx.lineTo(tvTowerX + 40, canvas.height);
+  
+  // Tower shaft
+  ctx.moveTo(tvTowerX - 15, tvTowerY + tvTowerHeight * 0.7);
+  ctx.lineTo(tvTowerX - 15, tvTowerY + tvTowerHeight * 0.2);
+  ctx.lineTo(tvTowerX + 15, tvTowerY + tvTowerHeight * 0.2);
+  ctx.lineTo(tvTowerX + 15, tvTowerY + tvTowerHeight * 0.7);
+  
+  // Tower sphere
+  ctx.arc(tvTowerX, tvTowerY + tvTowerHeight * 0.1, 25, 0, Math.PI * 2);
+  
+  // Tower antenna
+  ctx.moveTo(tvTowerX, tvTowerY + tvTowerHeight * 0.1);
+  ctx.lineTo(tvTowerX, tvTowerY - tvTowerHeight * 0.1);
+  
+  ctx.fill();
 };
