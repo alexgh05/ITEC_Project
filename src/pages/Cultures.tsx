@@ -34,6 +34,20 @@ const cultureInfo = [
     description: "As the epicenter of K-pop and K-drama global phenomena, Seoul represents the perfect blend of technological innovation and heritage. The city's fashion scene emphasizes impeccable style and trend-setting looks that influence global youth culture.",
     musicGenres: ['K-Pop', 'K-Hip-Hop', 'Korean Indie', 'Seoul Electronic'],
     fashionStyles: ['K-Fashion', 'Minimalist Korean', 'Seoul Street', 'Modern Hanbok Fusion']
+  },
+  {
+    id: 'london',
+    name: 'London',
+    description: "London's cultural scene is defined by its diversity and innovation, blending heritage with cutting-edge trends. From UK grime to punk rock revival, London's music shapes global sounds, while its fashion scene combines traditional British tailoring with bold streetwear and avant-garde design.",
+    musicGenres: ['UK Drill', 'Grime', 'British Rock', 'London Electronic'],
+    fashionStyles: ['British Streetwear', 'Modern Punk', 'London Tailoring', 'Urban Goth']
+  },
+  {
+    id: 'berlin',
+    name: 'Berlin',
+    description: "As Europe's creative capital, Berlin embodies a raw, experimental ethos shaped by its complex history. The city's legendary techno scene and club culture have influenced music worldwide, while its fashion approach combines minimalism with industrial aesthetics and sustainable design principles.",
+    musicGenres: ['Techno', 'Electronic', 'Experimental', 'German Hip-Hop'],
+    fashionStyles: ['Berlin Minimalism', 'Techno Club Wear', 'Industrial Style', 'Eco Fashion']
   }
 ];
 
@@ -158,7 +172,7 @@ const CulturesPage = () => {
                 </div>
 
                 <Button asChild className="bg-culture text-culture-foreground hover:bg-culture/90">
-                  <Link to={`/shop`}>
+                  <Link to={`/shop?culture=${culture.name}`}>
                     <ShoppingBag className="h-5 w-5 mr-2" />
                     Shop {culture.name} Products
                   </Link>

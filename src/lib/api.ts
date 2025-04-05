@@ -524,7 +524,7 @@ export const getAdminUsers = async (token: string) => {
 export const uploadProductImage = async (file: File, productId: string | null, token: string, imageIndex?: number) => {
   // Create FormData object
   const formData = new FormData();
-  formData.append('image', file);
+  formData.append('images', file);
   
   // If productId is provided, add it to request
   if (productId) {
@@ -536,7 +536,7 @@ export const uploadProductImage = async (file: File, productId: string | null, t
     formData.append('imageIndex', imageIndex.toString());
   }
   
-  const response = await fetch(`${API_URL}/admin/upload`, {
+  const response = await fetch(`${API_URL}/products/upload`, {
     method: 'POST',
     headers: {
       ...getAuthHeader(token),

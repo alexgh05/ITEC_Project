@@ -105,14 +105,30 @@ export const useThemeStore = create<ThemeState>()(
       },
       setDarkMode: (darkMode) => set({ darkMode }),
       setCulture: (culture) => set((state) => {
+        // Ensure culture is one of the defined values
+        let safeValue: CultureTheme = 'default';
+        
+        // If it's a string, try to normalize it
+        if (typeof culture === 'string') {
+          // Normalize by removing spaces and converting to lowercase
+          const normalized = culture.toLowerCase().replace(/\s+/g, '');
+          
+          // Check if it matches any of our valid cultures
+          if (['default', 'tokyo', 'newyork', 'lagos', 'seoul', 'london', 'berlin'].includes(normalized)) {
+            safeValue = normalized as CultureTheme;
+          } else {
+            console.warn(`Unrecognized culture value: ${culture}, defaulting to 'default'`);
+          }
+        }
+        
         // If changing from default to a culture with music, enable audio
         const shouldEnableAudio = 
           state.culture === 'default' && 
-          culture !== 'default' && 
+          safeValue !== 'default' && 
           !state.audioEnabled;
           
         return { 
-          culture,
+          culture: safeValue,
           // Enable audio if appropriate
           audioEnabled: shouldEnableAudio ? true : state.audioEnabled
         };

@@ -212,8 +212,19 @@ const ThemeProvider = ({ children }: ThemeProviderProps) => {
     
     // Handle culture theme
     html.classList.remove('culture-tokyo', 'culture-newyork', 'culture-lagos', 'culture-seoul', 'culture-london', 'culture-berlin');
-    if (appliedTheme.culture !== 'default') {
-      html.classList.add(`culture-${appliedTheme.culture}`);
+    
+    if (appliedTheme.culture && appliedTheme.culture !== 'default') {
+      try {
+        // Safely convert the culture name to a valid CSS class name
+        // Handle both string and potentially undefined values
+        const cultureName = appliedTheme.culture.toString().toLowerCase().replace(/\s+/g, '');
+        if (cultureName) {
+          html.classList.add(`culture-${cultureName}`);
+        }
+      } catch (error) {
+        console.error('Error applying culture class:', error);
+        // Don't break the app if there's an issue with the culture class
+      }
     }
     
     // Set a transition for smooth theme changes

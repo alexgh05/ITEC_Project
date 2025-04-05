@@ -10,6 +10,7 @@ import stockNotificationRoutes from './routes/stockNotificationRoutes.js';
 import Product from './models/Product.js';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import { notFound, errorHandler } from './middleware/errorMiddleware.js';
 
 // Get __dirname equivalent in ES modules
 const __filename = fileURLToPath(import.meta.url);
@@ -33,7 +34,7 @@ app.use(cors());
 
 // Request logging middleware for debugging
 app.use((req, res, next) => {
-  if (req.path.includes('/notifications/stock')) {
+  if (req.path.includes('/notifications/stock') || req.path.includes('/products/upload')) {
     console.log(`[${new Date().toISOString()}] ${req.method} ${req.path}`);
     console.log('Request body:', req.body);
   }
@@ -134,6 +135,10 @@ app.get('/api/seed', async (req, res) => {
     res.status(500).json({ message: 'Server Error' });
   }
 });
+
+// Error handlers
+app.use(notFound);
+app.use(errorHandler);
 
 const PORT = process.env.PORT || 5000;
 

@@ -61,9 +61,9 @@ const ProductItem = ({ product, originalName, isMusic = false, compact = false, 
   const { darkMode } = useThemeStore();
   
   return (
-    <div className={`relative border rounded-md overflow-hidden product-card ${compact ? 'h-24' : 'h-auto'} ${darkMode ? 'bg-black/40 border-culture/20' : 'bg-white/90 border-culture/40'}`}>
-      <div className={`flex ${compact ? 'flex-row' : 'flex-col'}`}>
-        <div className={`${compact ? 'w-24 h-24' : 'w-full aspect-square'} bg-muted premium-image`}>
+    <div className={`relative border rounded-md overflow-hidden product-card ${compact ? 'h-auto' : 'h-auto'} ${darkMode ? 'bg-black/40 border-culture/20' : 'bg-white/90 border-culture/40'}`}>
+      <div className={`flex ${compact ? 'flex-col' : 'flex-col'}`}>
+        <div className={`${compact ? 'w-full aspect-square' : 'w-full aspect-square'} bg-muted premium-image`}>
           <img 
             src={product.image}
             alt={product.name}
@@ -71,9 +71,9 @@ const ProductItem = ({ product, originalName, isMusic = false, compact = false, 
           />
         </div>
         
-        <div className={`${compact ? 'flex-1 p-2' : 'p-3'} flex flex-col justify-between`}>
+        <div className={`${compact ? 'p-3' : 'p-3'} flex flex-col justify-between`}>
           <div>
-            <h3 className={`${compact ? 'text-sm line-clamp-1' : 'text-base'} font-medium ${darkMode ? 'text-white' : 'text-gray-800'}`}>
+            <h3 className={`${compact ? 'text-sm' : 'text-base'} font-medium ${darkMode ? 'text-white' : 'text-gray-800'}`}>
               {product.name}
             </h3>
             <p className={`text-culture ${compact ? 'text-xs' : 'text-sm'} font-semibold`}>
@@ -81,29 +81,28 @@ const ProductItem = ({ product, originalName, isMusic = false, compact = false, 
             </p>
           </div>
           
-          {!compact && (
-            <div className="mt-2 space-y-2">
-              <p className="text-xs">
-                {product.stock > 10 ? 
-                  <span className="text-green-600">In Stock</span> : 
-                  product.stock > 0 ? 
-                    <span className="text-amber-600">Low Stock: {product.stock}</span> : 
-                    <span className="text-red-600">Out of Stock</span>
-                }
-              </p>
-              
-              <Button 
-                variant="outline" 
-                size="sm" 
-                className="w-full h-8 bg-culture/10 hover:bg-culture/20 text-culture"
-                disabled={product.stock <= 0}
-                onClick={() => onAddToCart(product)}
-                data-product-id={product.id}
-              >
-                Add to Cart
-              </Button>
-            </div>
-          )}
+          {/* Always show Add to Cart button */}
+          <div className="mt-2 space-y-2">
+            <p className="text-xs">
+              {product.stock > 10 ? 
+                <span className="text-green-600">In Stock</span> : 
+                product.stock > 0 ? 
+                  <span className="text-amber-600">Low Stock: {product.stock}</span> : 
+                  <span className="text-red-600">Out of Stock</span>
+              }
+            </p>
+            
+            <Button 
+              variant="outline" 
+              size="sm" 
+              className="w-full h-8 bg-culture/10 hover:bg-culture/20 text-culture"
+              disabled={product.stock <= 0}
+              onClick={() => onAddToCart(product)}
+              data-product-id={product.id}
+            >
+              Add to Cart
+            </Button>
+          </div>
         </div>
       </div>
       
@@ -388,11 +387,6 @@ export const OutfitCard = ({ outfit }: OutfitCardProps) => {
           }}
         >
           <div className="p-6 space-y-6">
-            {/* Store products notice */}
-            <div className="mb-4 inline-block px-3 py-1 rounded-full bg-culture bg-opacity-20 text-culture text-xs font-medium">
-              Real Store Products Only
-            </div>
-            
             <div className="space-y-1">
               <h3 className={`text-2xl font-bold tracking-tight ${darkMode ? 'text-white' : 'text-gray-900'}`}>
           {outfit.name}
@@ -418,63 +412,41 @@ export const OutfitCard = ({ outfit }: OutfitCardProps) => {
             </div>
       
       {/* Product listings */}
-      {!loading && outfit.outfitElements && (
+      {!loading && (
         <div className="space-y-6">
-          {/* Product grid - 2x2 layout */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 items-center justify-items-center w-full">
-            {/* Hat */}
-            {products.hat && (
-              <ProductItem 
-                product={products.hat}
-                originalName={outfit.outfitElements.hat}
-                compact={true}
-                onAddToCart={addToCart}
-              />
-            )}
-            
-            {/* T-Shirt */}
-            {products.tShirt && (
-              <ProductItem 
-                product={products.tShirt}
-                originalName={outfit.outfitElements.tShirt}
-                compact={true}
-                onAddToCart={addToCart}
-              />
-            )}
-            
-            {/* Pants */}
-            {products.pants && (
-              <ProductItem 
-                product={products.pants}
-                originalName={outfit.outfitElements.pants}
-                compact={true}
-                onAddToCart={addToCart}
-              />
-            )}
-            
-            {/* Accessory or Music item */}
-            {products.accessory ? (
-              <ProductItem 
-                product={products.accessory}
-                originalName={outfit.outfitElements.accessory}
-                compact={true}
-                onAddToCart={addToCart}
-              />
-            ) : products.music ? (
-              <ProductItem 
-                product={products.music}
-                originalName={outfit.musicRecommendation || ""}
-                isMusic={true}
-                compact={true}
-                onAddToCart={addToCart}
-              />
-            ) : null}
+          <h4 className={`text-lg font-medium ${darkMode ? 'text-white/90' : 'text-gray-800'}`}>
+            Recommended Products:
+          </h4>
+          
+          {/* Product grid - now 3 columns for better layout with full cards */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 w-full">
+            {/* Now we show any available products */}
+            {Object.entries(products).map(([key, product]) => (
+              product && (
+                <ProductItem 
+                  key={product.id}
+                  product={product}
+                  originalName={key}
+                  isMusic={key === 'music'}
+                  compact={false}
+                  onAddToCart={addToCart}
+                />
+              )
+            ))}
           </div>
+          
+          {/* No products message */}
+          {Object.keys(products).length === 0 && (
+            <div className="text-center p-4 bg-gray-800/50 rounded-md">
+              <p className="text-white/70">No products found for this outfit.</p>
+              <p className="text-white/50 text-sm mt-1">Try generating a new outfit.</p>
+            </div>
+          )}
         </div>
       )}
       
       {/* Buy complete look button */}
-      {!loading && outfit.outfitElements && (
+      {!loading && Object.keys(products).length > 0 && (
         <div className="mt-8 border-t border-culture/20 pt-6 flex justify-center">
           <Button 
             className="w-full max-w-lg mx-auto bg-gradient-to-r from-culture/90 to-culture text-white cursor-pointer flex items-center justify-center shadow-lg shadow-culture/20 py-6 hover:shadow-xl hover:shadow-culture/30 transition-all font-medium text-base group"
@@ -490,7 +462,7 @@ export const OutfitCard = ({ outfit }: OutfitCardProps) => {
               <circle cx="19" cy="21" r="1"/>
               <path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12"/>
             </svg>
-            Buy 4 {outfit.city.charAt(0).toUpperCase() + outfit.city.slice(1)} Items - Save 15%
+            Buy All {Object.keys(products).length} Items - Save 15%
           </Button>
         </div>
       )}
