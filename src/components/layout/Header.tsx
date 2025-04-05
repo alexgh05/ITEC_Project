@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { AnimatePresence, motion } from 'framer-motion';
-import { Menu, X, Moon, Sun, LogIn, User, LogOut, Globe } from 'lucide-react';
+import { Menu, X, Moon, Sun, LogIn, User, LogOut, Globe, Sparkles } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useThemeStore } from '@/store/useThemeStore';
 import { useLanguageStore } from '@/store/useLanguageStore';
@@ -27,6 +27,11 @@ const Header = () => {
     { name: getTranslation('home', language), path: '/' },
     { name: getTranslation('shop', language), path: '/shop' },
     { name: getTranslation('cultures', language), path: '/cultures' },
+    { 
+      name: getTranslation('outfitGenerator', language), 
+      path: '/outfit-generator',
+      icon: <Sparkles className="h-4 w-4 text-culture" />
+    },
     { name: getTranslation('wishlist', language), path: '/wishlist' },
     { name: getTranslation('cart', language), path: '/cart' },
     { name: getTranslation('about', language), path: '/about' }
@@ -84,8 +89,9 @@ const Header = () => {
             <Link
               key={link.name}
               to={link.path}
-              className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
+              className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors flex items-center gap-1"
             >
+              {link.icon && link.icon}
               {link.name}
             </Link>
           ))}
@@ -208,9 +214,10 @@ const Header = () => {
                   <Link
                     key={link.name}
                     to={link.path}
-                    className="text-lg font-medium py-2"
+                    className="text-lg font-medium py-2 flex items-center gap-2"
                     onClick={() => setMobileMenuOpen(false)}
                   >
+                    {link.icon && link.icon}
                     {link.name}
                   </Link>
                 ))}
