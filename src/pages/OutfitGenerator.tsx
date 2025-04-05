@@ -260,7 +260,7 @@ export const OutfitGenerator = () => {
           className="animate-pulse px-4 py-3 bg-yellow-500 hover:bg-yellow-400 text-black font-bold rounded-md shadow-lg border-2 border-yellow-300"
         >
           <span className="flex items-center">
-            <Sparkles className="mr-2 h-5 w-5" />
+            <Sparkles className={`mr-2 h-5 w-5 ${darkMode ? 'text-yellow-400' : 'text-indigo-600'}`} />
             Emergency Generate
           </span>
         </button>
@@ -272,7 +272,7 @@ export const OutfitGenerator = () => {
             e.stopPropagation();
             toggleDarkMode();
           }}
-          className="px-4 py-3 bg-black/50 hover:bg-black/70 text-white font-bold rounded-md shadow-lg border border-culture/30"
+          className={`px-4 py-3 ${darkMode ? 'bg-black/50 hover:bg-black/70 text-white' : 'bg-white/90 hover:bg-white text-gray-800'} font-bold rounded-md shadow-lg border ${darkMode ? 'border-culture/30' : 'border-gray-300'}`}
         >
           <span className="flex items-center">
             {darkMode ? (
@@ -323,7 +323,7 @@ export const OutfitGenerator = () => {
           transition={{ duration: 0.6 }}
           className="text-center mb-12"
         >
-          <h1 className="text-4xl md:text-6xl font-bold text-white tracking-tight mb-4">
+          <h1 className={`text-4xl md:text-6xl font-bold ${darkMode ? 'text-white' : 'text-gray-900'} tracking-tight mb-4`}>
             <span className="text-culture">AI</span> Outfit Generator
             <span className="inline-block ml-3">
               {darkMode ? (
@@ -333,7 +333,7 @@ export const OutfitGenerator = () => {
               )}
             </span>
           </h1>
-          <p className="text-white/70 text-lg max-w-3xl mx-auto">
+          <p className={`${darkMode ? 'text-white/70' : 'text-gray-600'} text-lg max-w-3xl mx-auto`}>
             Create your unique fashion identity with our premium AI stylist. Generate outfits influenced by music genres, emotions, and cities around the world.
           </p>
         </motion.div>
@@ -346,7 +346,7 @@ export const OutfitGenerator = () => {
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.6, delay: 0.2 }}
             >
-              <Card className="p-6 bg-black/40 backdrop-blur-lg border-culture/20 overflow-hidden relative">
+              <Card className={`p-6 ${darkMode ? 'bg-black/40' : 'bg-white/90'} backdrop-blur-lg ${darkMode ? 'border-culture/20' : 'border-gray-300'} overflow-hidden relative`}>
                 <div className="absolute inset-0 opacity-10 overflow-hidden pointer-events-none">
                   <AudioBeatVisualizer
                     className="h-full w-full"
@@ -360,8 +360,8 @@ export const OutfitGenerator = () => {
                   />
                 </div>
                 
-                <h2 className="text-2xl font-bold text-white mb-6 flex items-center">
-                  <Sparkles className="w-5 h-5 mr-2 text-culture" />
+                <h2 className={`text-2xl font-bold ${darkMode ? 'text-white' : 'text-gray-900'} mb-6 flex items-center`}>
+                  <Sparkles className={`w-5 h-5 mr-2 ${darkMode ? 'text-culture' : 'text-indigo-600'}`} />
                   Design Your Style
                   <button
                     onClick={(e) => {
@@ -369,7 +369,7 @@ export const OutfitGenerator = () => {
                       e.stopPropagation();
                       toggleDarkMode();
                     }}
-                    className="ml-auto px-3 py-1 text-sm bg-black/40 hover:bg-black/60 rounded-full border border-culture/20 flex items-center"
+                    className={`ml-auto px-3 py-1 text-sm ${darkMode ? 'bg-black/40 hover:bg-black/60' : 'bg-gray-100 hover:bg-gray-200'} rounded-full border ${darkMode ? 'border-culture/20' : 'border-gray-300'} flex items-center`}
                   >
                     {darkMode ? (
                       <>
@@ -387,15 +387,15 @@ export const OutfitGenerator = () => {
                 
                 <div className="space-y-6" onSubmit={(e) => { e.preventDefault(); console.log('Form submitted, preventing default'); }}>
                   <div className="space-y-2">
-                    <label className="text-white/80 flex items-center text-sm font-medium">
-                      <Music className="w-4 h-4 mr-2 text-culture/80" />
+                    <label className={`${darkMode ? 'text-white/80' : 'text-gray-700'} flex items-center text-sm font-medium`}>
+                      <Music className={`w-4 h-4 mr-2 ${darkMode ? 'text-culture/80' : 'text-indigo-500'}`} />
                       Music Genre
                     </label>
                     <Select value={musicGenre} onValueChange={setMusicGenre}>
-                      <SelectTrigger className="w-full bg-black/50 border-culture/30 text-white">
+                      <SelectTrigger className={`w-full ${darkMode ? 'bg-black/50 border-culture/30 text-white' : 'bg-white border-gray-300 text-gray-900'}`}>
                         <SelectValue placeholder="Select a music genre" />
                       </SelectTrigger>
-                      <SelectContent className="bg-black/90 border-culture/20 text-white">
+                      <SelectContent className={`${darkMode ? 'bg-black/90 border-culture/20 text-white' : 'bg-white border-gray-200 text-gray-900'}`}>
                         {musicGenres.map((genre) => (
                           <SelectItem key={genre.value} value={genre.value}>
                             {genre.label}
@@ -406,15 +406,15 @@ export const OutfitGenerator = () => {
                   </div>
                   
                   <div className="space-y-2">
-                    <label className="text-white/80 flex items-center text-sm font-medium">
-                      <Heart className="w-4 h-4 mr-2 text-culture/80" />
+                    <label className={`${darkMode ? 'text-white/80' : 'text-gray-700'} flex items-center text-sm font-medium`}>
+                      <Heart className={`w-4 h-4 mr-2 ${darkMode ? 'text-culture/80' : 'text-indigo-500'}`} />
                       Emotional State
                     </label>
                     <Select value={emotionalState} onValueChange={setEmotionalState}>
-                      <SelectTrigger className="w-full bg-black/50 border-culture/30 text-white">
+                      <SelectTrigger className={`w-full ${darkMode ? 'bg-black/50 border-culture/30 text-white' : 'bg-white border-gray-300 text-gray-900'}`}>
                         <SelectValue placeholder="Select an emotional state" />
                       </SelectTrigger>
-                      <SelectContent className="bg-black/90 border-culture/20 text-white">
+                      <SelectContent className={`${darkMode ? 'bg-black/90 border-culture/20 text-white' : 'bg-white border-gray-200 text-gray-900'}`}>
                         {emotionalStates.map((state) => (
                           <SelectItem key={state.value} value={state.value}>
                             {state.label}
@@ -425,8 +425,8 @@ export const OutfitGenerator = () => {
                   </div>
                   
                   <div className="space-y-2">
-                    <label className="text-white/80 flex items-center text-sm font-medium">
-                      <Building2 className="w-4 h-4 mr-2 text-culture/80" />
+                    <label className={`${darkMode ? 'text-white/80' : 'text-gray-700'} flex items-center text-sm font-medium`}>
+                      <Building2 className={`w-4 h-4 mr-2 ${darkMode ? 'text-culture/80' : 'text-indigo-500'}`} />
                       City Influence
                     </label>
                     <Select defaultValue={city} onValueChange={(value) => {
@@ -436,10 +436,10 @@ export const OutfitGenerator = () => {
                         setCulture(value as any);
                       }
                     }}>
-                      <SelectTrigger className="w-full bg-black/50 border-culture/30 text-white">
+                      <SelectTrigger className={`w-full ${darkMode ? 'bg-black/50 border-culture/30 text-white' : 'bg-white border-gray-300 text-gray-900'}`}>
                         <SelectValue placeholder="Select a city" />
                       </SelectTrigger>
-                      <SelectContent className="bg-black/90 border-culture/20 text-white">
+                      <SelectContent className={`${darkMode ? 'bg-black/90 border-culture/20 text-white' : 'bg-white border-gray-200 text-gray-900'}`}>
                         {availableCities.map((city) => (
                           <SelectItem key={city.value} value={city.value}>
                             {city.label}
@@ -488,7 +488,7 @@ export const OutfitGenerator = () => {
                     ) : (
                       <span className="flex items-center">
                         Generate Outfit 
-                        <Sparkles className="ml-2 w-4 h-4" />
+                        <Sparkles className={`ml-2 w-4 h-4 ${darkMode ? '' : 'text-indigo-600'}`} />
                       </span>
                     )}
                   </button>
@@ -513,12 +513,12 @@ export const OutfitGenerator = () => {
                     exit={{ opacity: 0 }}
                     className="h-full flex items-center justify-center"
                   >
-                    <div className="p-8 rounded-lg bg-black/30 backdrop-blur-md border border-white/10 text-center">
-                      <div className="w-24 h-24 rounded-full bg-culture/20 mx-auto flex items-center justify-center mb-4">
-                        <Sparkles className="w-10 h-10 text-culture" />
+                    <div className={`p-8 rounded-lg ${darkMode ? 'bg-black/30' : 'bg-white/90'} backdrop-blur-md border ${darkMode ? 'border-white/10' : 'border-gray-200'} text-center`}>
+                      <div className={`w-24 h-24 rounded-full ${darkMode ? 'bg-culture/20' : 'bg-indigo-100'} mx-auto flex items-center justify-center mb-4`}>
+                        <Sparkles className={`w-10 h-10 ${darkMode ? 'text-culture' : 'text-indigo-600'}`} />
                       </div>
-                      <h3 className="text-xl font-medium text-white mb-2">Your Fashion Identity</h3>
-                      <p className="text-white/60">
+                      <h3 className={`text-xl font-medium ${darkMode ? 'text-white' : 'text-gray-900'} mb-2`}>Your Fashion Identity</h3>
+                      <p className={`${darkMode ? 'text-white/60' : 'text-gray-600'}`}>
                         Generate your unique outfit to see your personalized fashion identity
                       </p>
                     </div>
@@ -542,11 +542,11 @@ export const OutfitGenerator = () => {
       
       {/* Loading Overlay */}
       {isGenerating && (
-        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center">
-          <div className="bg-black/80 p-8 rounded-xl border border-culture/30 flex flex-col items-center">
+        <div className={`fixed inset-0 ${darkMode ? 'bg-black/50' : 'bg-white/60'} backdrop-blur-sm z-50 flex items-center justify-center`}>
+          <div className={`${darkMode ? 'bg-black/80' : 'bg-white/90'} p-8 rounded-xl border ${darkMode ? 'border-culture/30' : 'border-gray-300'} flex flex-col items-center`}>
             <div className="w-20 h-20 border-4 border-culture border-t-transparent rounded-full animate-spin mb-4"></div>
-            <div className="text-white text-xl font-medium">Generating your outfit...</div>
-            <div className="text-white/60 mt-2">This will take just a moment</div>
+            <div className={`${darkMode ? 'text-white' : 'text-gray-900'} text-xl font-medium`}>Generating your outfit...</div>
+            <div className={`${darkMode ? 'text-white/60' : 'text-gray-600'} mt-2`}>This will take just a moment</div>
           </div>
         </div>
       )}

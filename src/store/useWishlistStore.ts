@@ -116,28 +116,60 @@ export const useWishlistStore = create<WishlistState>()(
       
       syncWithUser: async (token: string) => {
         try {
-          const wishlistItems = await getUserWishlist(token);
+          // Get current local wishlist items
+          const localItems = get().items;
           
-          // Transform items to ensure they have the necessary fields
-          const formattedItems = wishlistItems.map(item => {
-            // Make sure we have both _id and id
-            return {
-              ...item,
-              id: item.id || (item._id ? item._id.toString() : ''),
-              // Ensure images is always an array
-              images: Array.isArray(item.images) ? item.images : 
-                      (item.images ? [item.images] : []),
-              // Default values for any missing fields
-              price: item.price || 0,
-              name: item.name || 'Unnamed Product',
-              culture: item.culture || 'Unknown Culture',
-              category: item.category || 'Unknown Category',
-              description: item.description || '',
-            };
+          // Get server wishlist items
+          const serverWishlistItems = await getUserWishlist(token);
+          
+          // Transform server items to ensure they have the necessary fields
+          const formattedServerItems = serverWishlistItems.map(item => ({
+            ...item,
+            id: item.id || (item._id ? item._id.toString() : ''),
+            images: Array.isArray(item.images) ? item.images : 
+                    (item.images ? [item.images] : []),
+            price: item.price || 0,
+            name: item.name || 'Unnamed Product',
+            culture: item.culture || 'Unknown Culture',
+            category: item.category || 'Unknown Category',
+            description: item.description || '',
+          }));
+          
+          // Get IDs of items from server wishlist
+          const serverItemIds = formattedServerItems.map(item => item.id);
+          
+          // Find local items that aren't in the server wishlist
+          const localItemsToSync = localItems.filter(item => !serverItemIds.includes(item.id));
+          
+          // If there are local items to sync to the server, add them
+          const syncPromises = localItemsToSync.map(async (item) => {
+            try {
+              await addToWishlist(item.id, token);
+              console.log(`Synced local item to server: ${item.name} (${item.id})`);
+              return item;
+            } catch (error) {
+              console.error(`Failed to sync item to server: ${item.name} (${item.id})`, error);
+              return null;
+            }
           });
           
-          set({ items: formattedItems });
-          console.log('Wishlist synced successfully:', formattedItems);
+          // Wait for all sync operations to complete
+          await Promise.all(syncPromises);
+          
+          // Merge both lists (server items + any local items that may not have synced)
+          const mergedItems = [
+            ...formattedServerItems,
+            ...localItemsToSync.filter(item => !serverItemIds.includes(item.id))
+          ];
+          
+          // Remove any duplicates by ID
+          const uniqueItems = Array.from(
+            new Map(mergedItems.map(item => [item.id, item])).values()
+          );
+          
+          // Update store with merged wishlist
+          set({ items: uniqueItems });
+          console.log('Wishlist synced successfully:', uniqueItems);
         } catch (error) {
           console.error('Failed to sync wishlist with user:', error);
           throw error;

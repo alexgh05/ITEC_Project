@@ -93,7 +93,7 @@ const Wishlist = () => {
       </div>
       <h3 className="text-lg font-medium mb-2">Your wishlist is temporary</h3>
       <p className="text-muted-foreground mb-4">
-        Sign in to save your wishlist permanently and access it from any device.
+        Your wishlist will be cleared when you log out. Sign in to save your wishlist to your account and access it from any device.
       </p>
       <Button asChild>
         <Link to="/login">Sign In</Link>

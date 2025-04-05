@@ -221,6 +221,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     
     // Clear cart when logging out
     useCartStore.getState().clearCart();
+    
+    // Clear wishlist when logging out to prevent other users from seeing it
+    wishlistStore.clearWishlist();
   };
 
   // Update user function
