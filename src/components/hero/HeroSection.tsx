@@ -55,12 +55,21 @@ const heroSlides: HeroSlide[] = [
   },
   {
     id: 5,
-    title: "London Electronic",
-    subtitle: "Electronic music scene with modern clubwear",
+    title: "London Drill",
+    subtitle: "Drill music scene with modern streetwear",
     cta: "Shop London",
     link: "/shop",
     image: "/hero-london.jpg",
     culture: "london"
+  },
+  {
+    id: 6,
+    title: "Berlin Techno",
+    subtitle: "Techno music scene with futuristic clubwear",
+    cta: "Shop Berlin",
+    link: "/shop",
+    image: "/hero-berlin.jpg",
+    culture: "berlin"
   }
 ];
 
@@ -78,7 +87,7 @@ const HeroSection = () => {
       setCurrentSlide(nextSlide);
       // Apply theme when auto-changing slides
       setCulture(heroSlides[nextSlide].culture as CultureTheme);
-    }, 5000);
+    }, 10000);
     
     return () => {
       if (interval) clearInterval(interval);

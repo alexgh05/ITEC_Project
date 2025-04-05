@@ -18,7 +18,12 @@ const __dirname = path.dirname(__filename);
 dotenv.config();
 
 // Connect to MongoDB
-connectDB();
+let isDbConnected = false;
+try {
+  isDbConnected = await connectDB();
+} catch (error) {
+  console.error('Failed to initialize MongoDB connection:', error);
+}
 
 const app = express();
 
@@ -47,11 +52,20 @@ app.use('/api/notifications/stock', stockNotificationRoutes);
 
 // Simple route to test API
 app.get('/', (req, res) => {
-  res.json({ message: 'API is running' });
+  res.json({ 
+    message: 'API is running',
+    dbStatus: isDbConnected ? 'connected' : 'disconnected' 
+  });
 });
 
 // Sample data seeder route
 app.get('/api/seed', async (req, res) => {
+  if (!isDbConnected) {
+    return res.status(503).json({ 
+      message: 'Database not connected. Cannot seed data.' 
+    });
+  }
+
   try {
     // Clear existing products
     await Product.deleteMany({});
@@ -125,4 +139,5 @@ const PORT = process.env.PORT || 5000;
 
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
+  console.log(`Database status: ${isDbConnected ? 'Connected' : 'Disconnected - Running in frontend-only mode'}`);
 }); 

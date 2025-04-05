@@ -1,14 +1,14 @@
 export const drawLondonBackground = (ctx: CanvasRenderingContext2D, canvas: HTMLCanvasElement) => {
   const time = performance.now() * 0.001;
   
-  // Dark background with blue tint for London electronic club scene
+  // Dark background with blue tint for London drill/electronic scene
   const gradient = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
   gradient.addColorStop(0, 'rgba(10, 15, 30, 0.4)');
   gradient.addColorStop(1, 'rgba(5, 10, 20, 0.4)');
   ctx.fillStyle = gradient;
   ctx.fillRect(0, 0, canvas.width, canvas.height);
   
-  // Draw LED-like grid lines
+  // Draw urban grid lines
   const gridSpacing = 50;
   ctx.strokeStyle = 'rgba(30, 150, 255, 0.15)';
   ctx.lineWidth = 1;
@@ -33,12 +33,58 @@ export const drawLondonBackground = (ctx: CanvasRenderingContext2D, canvas: HTML
     ctx.stroke();
   }
   
-  // Draw electronic music visualizer bars
+  // Draw falling balaclavas - improved visibility with black background and white/light gray features
+  const numBalaclavas = 8;
+  for (let i = 0; i < numBalaclavas; i++) {
+    // Create falling animation with different speeds
+    const yOffset = (time * (50 + i * 20)) % canvas.height;
+    const xPosition = canvas.width * (0.1 + (i * 0.1) + Math.sin(time + i) * 0.05);
+    const size = 30 + Math.sin(i * 0.5) * 10;
+    const rotation = Math.sin(time + i) * 0.2;
+    
+    // Draw balaclava (improved visibility)
+    ctx.save();
+    ctx.translate(xPosition, yOffset);
+    ctx.rotate(rotation);
+    
+    // Main balaclava shape (pure black for better visibility)
+    ctx.fillStyle = 'rgba(0, 0, 0, 0.9)';
+    ctx.beginPath();
+    ctx.ellipse(0, 0, size * 0.6, size, 0, 0, Math.PI * 2);
+    ctx.fill();
+    
+    // Add white/gray border for contrast
+    ctx.strokeStyle = 'rgba(120, 120, 120, 0.6)';
+    ctx.lineWidth = 1.5;
+    ctx.stroke();
+    
+    // Eye holes (light gray for visibility in both dark and light mode)
+    ctx.fillStyle = 'rgba(200, 200, 220, 0.9)';
+    // Left eye
+    ctx.beginPath();
+    ctx.ellipse(-size * 0.25, -size * 0.15, size * 0.15, size * 0.1, 0, 0, Math.PI * 2);
+    ctx.fill();
+    // Right eye
+    ctx.beginPath();
+    ctx.ellipse(size * 0.25, -size * 0.15, size * 0.15, size * 0.1, 0, 0, Math.PI * 2);
+    ctx.fill();
+    
+    // Mouth hole (light gray for visibility in both dark and light mode)
+    ctx.beginPath();
+    ctx.ellipse(0, size * 0.2, size * 0.3, size * 0.15, 0, 0, Math.PI * 2);
+    ctx.fill();
+    
+    ctx.restore();
+  }
+  
+  // Draw drill music-inspired bass visualizer bars
   const numBars = 20;
   const barWidth = canvas.width / numBars;
   
   for (let i = 0; i < numBars; i++) {
-    const height = Math.sin(time * 2 + i * 0.2) * 40 + 20;
+    // Create height pattern that simulates drill beats
+    const height = Math.abs(Math.sin(time * 2 + i * 0.2)) * 40 + 
+                   (i % 4 === 0 ? 40 : 20); // Accent on every 4th beat
     const barX = i * barWidth;
     const barY = canvas.height - height;
     
@@ -71,112 +117,108 @@ export const drawLondonBackground = (ctx: CanvasRenderingContext2D, canvas: HTML
     ctx.fill();
   }
   
-  // Draw London skyline silhouette
-  const skylineHeight = canvas.height * 0.2; // Increased height for more detail
+  // Draw London skyline silhouette with more urban elements
+  const skylineHeight = canvas.height * 0.2;
   const skylineY = canvas.height - skylineHeight;
-  const waterLevel = canvas.height - skylineHeight * 0.3; // Thames water level
   
-  ctx.fillStyle = 'rgba(0, 0, 10, 0.6)'; // Slightly darker for better visibility
+  ctx.fillStyle = 'rgba(0, 0, 10, 0.5)';
   ctx.beginPath();
   ctx.moveTo(0, canvas.height);
   
-  // Left side buildings
-  ctx.lineTo(0, skylineY + skylineHeight * 0.4);
-  ctx.lineTo(canvas.width * 0.05, skylineY + skylineHeight * 0.5);
-  ctx.lineTo(canvas.width * 0.1, skylineY + skylineHeight * 0.3);
-  ctx.lineTo(canvas.width * 0.15, skylineY + skylineHeight * 0.4);
+  // Tower blocks and urban elements
+  for (let i = 0; i < 8; i++) {
+    const buildingWidth = canvas.width / 8;
+    const buildingX = i * buildingWidth;
+    const buildingHeight = skylineHeight * (0.5 + Math.random() * 0.5);
+    
+    ctx.rect(buildingX, canvas.height - buildingHeight, buildingWidth * 0.8, buildingHeight);
+    
+    // Add windows to buildings
+    ctx.fillStyle = 'rgba(0, 0, 10, 0.5)';
+    for (let w = 0; w < 6; w++) {
+      for (let h = 0; h < Math.floor(buildingHeight / 20); h++) {
+        const windowOn = Math.random() > 0.6;
+        if (windowOn) {
+          ctx.fillStyle = `rgba(255, 255, 150, ${0.1 + Math.random() * 0.2})`;
+        } else {
+          ctx.fillStyle = 'rgba(0, 0, 10, 0.5)';
+        }
+        
+        ctx.fillRect(
+          buildingX + 10 + w * 15, 
+          canvas.height - buildingHeight + 10 + h * 20, 
+          8, 
+          12
+        );
+      }
+    }
+  }
   
-  // Big Ben and Parliament
-  ctx.lineTo(canvas.width * 0.17, skylineY + skylineHeight * 0.4);
-  ctx.lineTo(canvas.width * 0.17, skylineY + skylineHeight * 0.1);
-  ctx.lineTo(canvas.width * 0.175, skylineY);
-  ctx.lineTo(canvas.width * 0.18, skylineY + skylineHeight * 0.1);
-  ctx.lineTo(canvas.width * 0.18, skylineY + skylineHeight * 0.3);
-  ctx.lineTo(canvas.width * 0.22, skylineY + skylineHeight * 0.3);
-  
-  // Some mid skyline buildings
-  ctx.lineTo(canvas.width * 0.25, skylineY + skylineHeight * 0.35);
-  ctx.lineTo(canvas.width * 0.3, skylineY + skylineHeight * 0.25);
-  ctx.lineTo(canvas.width * 0.33, skylineY + skylineHeight * 0.45);
-  
-  // Tower Bridge - Left tower
-  ctx.lineTo(canvas.width * 0.35, skylineY + skylineHeight * 0.45);
-  ctx.lineTo(canvas.width * 0.35, skylineY + skylineHeight * 0.2);
-  ctx.lineTo(canvas.width * 0.37, skylineY + skylineHeight * 0.15);
-  ctx.lineTo(canvas.width * 0.39, skylineY + skylineHeight * 0.2);
-  ctx.lineTo(canvas.width * 0.39, skylineY + skylineHeight * 0.45);
-  
-  // Tower Bridge - Span
-  ctx.lineTo(canvas.width * 0.41, skylineY + skylineHeight * 0.45);
-  ctx.lineTo(canvas.width * 0.41, skylineY + skylineHeight * 0.35);
-  ctx.lineTo(canvas.width * 0.49, skylineY + skylineHeight * 0.35);
-  ctx.lineTo(canvas.width * 0.49, skylineY + skylineHeight * 0.45);
-  
-  // Tower Bridge - Right tower
-  ctx.lineTo(canvas.width * 0.51, skylineY + skylineHeight * 0.45);
-  ctx.lineTo(canvas.width * 0.51, skylineY + skylineHeight * 0.2);
-  ctx.lineTo(canvas.width * 0.53, skylineY + skylineHeight * 0.15);
-  ctx.lineTo(canvas.width * 0.55, skylineY + skylineHeight * 0.2);
-  ctx.lineTo(canvas.width * 0.55, skylineY + skylineHeight * 0.45);
-  
-  // The Shard
-  ctx.lineTo(canvas.width * 0.6, skylineY + skylineHeight * 0.45);
-  ctx.lineTo(canvas.width * 0.6, skylineY + skylineHeight * 0.1);
-  ctx.lineTo(canvas.width * 0.62, skylineY);
-  ctx.lineTo(canvas.width * 0.64, skylineY + skylineHeight * 0.1);
-  ctx.lineTo(canvas.width * 0.64, skylineY + skylineHeight * 0.45);
-  
-  // London Eye
-  const eyeX = canvas.width * 0.8;
-  const eyeY = skylineY + skylineHeight * 0.3;
-  const eyeRadius = skylineHeight * 0.6;
-  
-  // Draw buildings leading to the Eye
-  ctx.lineTo(canvas.width * 0.7, skylineY + skylineHeight * 0.4);
-  ctx.lineTo(canvas.width * 0.75, skylineY + skylineHeight * 0.35);
-  
-  // Draw the base of the London Eye
-  ctx.lineTo(eyeX - eyeRadius, skylineY + skylineHeight * 0.45);
-  
-  // Draw the London Eye
-  ctx.arc(eyeX, eyeY, eyeRadius, Math.PI, 0, true);
-  
-  // Right side buildings
-  ctx.lineTo(canvas.width * 0.9, skylineY + skylineHeight * 0.4);
-  ctx.lineTo(canvas.width * 0.95, skylineY + skylineHeight * 0.3);
-  ctx.lineTo(canvas.width, skylineY + skylineHeight * 0.5);
-  ctx.lineTo(canvas.width, canvas.height);
-  
-  // Complete the silhouette
-  ctx.closePath();
+  // Big Ben
+  const bigBenX = canvas.width * 0.2;
+  ctx.fillStyle = 'rgba(0, 0, 10, 0.5)';
+  ctx.beginPath();
+  ctx.rect(bigBenX - 15, skylineY + skylineHeight * 0.3, 30, skylineHeight * 0.7);
+  ctx.rect(bigBenX - 20, skylineY + skylineHeight * 0.2, 40, skylineHeight * 0.1);
+  ctx.rect(bigBenX - 10, skylineY, 20, skylineHeight * 0.2);
   ctx.fill();
   
-  // Add Thames river reflection
-  ctx.fillStyle = 'rgba(0, 100, 180, 0.1)';
-  ctx.fillRect(0, waterLevel, canvas.width, canvas.height - waterLevel);
+  // The Shard
+  const shardX = canvas.width * 0.6;
+  ctx.beginPath();
+  ctx.moveTo(shardX, skylineY - skylineHeight * 0.5);
+  ctx.lineTo(shardX + 30, skylineY + skylineHeight);
+  ctx.lineTo(shardX - 30, skylineY + skylineHeight);
+  ctx.closePath();
+  ctx.fill();
+
+  // Draw enhanced London Eye with more prominence
+  const eyeX = canvas.width * 0.8;
+  const eyeY = skylineY + skylineHeight * 0.3;
+  const eyeRadius = skylineHeight * 0.8; // Increased size for more prominence
   
-  // Add subtle river waves
-  ctx.strokeStyle = 'rgba(0, 150, 255, 0.1)';
-  ctx.lineWidth = 1;
+  // Main wheel structure with brighter color
+  ctx.strokeStyle = 'rgba(80, 150, 220, 0.6)'; // Brighter blue color
+  ctx.lineWidth = 3; // Thicker line
+  ctx.beginPath();
+  ctx.arc(eyeX, eyeY, eyeRadius, 0, Math.PI * 2);
+  ctx.stroke();
   
-  for (let i = 0; i < 10; i++) {
-    const waveY = waterLevel + i * 10 + Math.sin(time * 0.5) * 5;
-    
+  // London Eye spokes with animation
+  for (let i = 0; i < 12; i++) { // More spokes
+    const angle = i * Math.PI / 6 + time * 0.1; // Added rotation animation
+    ctx.lineWidth = i % 3 === 0 ? 3 : 1; // Varying thickness for visual interest
     ctx.beginPath();
-    ctx.moveTo(0, waveY);
-    
-    for (let x = 0; x < canvas.width; x += 20) {
-      const offsetY = Math.sin(x * 0.01 + time + i * 0.2) * 2;
-      ctx.lineTo(x, waveY + offsetY);
-    }
-    
+    ctx.moveTo(eyeX, eyeY);
+    ctx.lineTo(
+      eyeX + Math.cos(angle) * eyeRadius,
+      eyeY + Math.sin(angle) * eyeRadius
+    );
     ctx.stroke();
   }
   
-  // Add subtle glow to the skyline
-  const glowGradient = ctx.createLinearGradient(0, skylineY, 0, waterLevel);
-  glowGradient.addColorStop(0, 'rgba(0, 150, 255, 0.05)');
-  glowGradient.addColorStop(1, 'rgba(0, 100, 255, 0)');
-  ctx.fillStyle = glowGradient;
-  ctx.fillRect(0, skylineY, canvas.width, waterLevel - skylineY);
+  // London Eye capsules/pods
+  for (let i = 0; i < 12; i++) { // Add passenger capsules around the wheel
+    const angle = i * Math.PI / 6 + time * 0.1; // Match spoke rotation
+    const podX = eyeX + Math.cos(angle) * eyeRadius;
+    const podY = eyeY + Math.sin(angle) * eyeRadius;
+    
+    // Draw capsule
+    ctx.fillStyle = 'rgba(220, 220, 250, 0.5)';
+    ctx.beginPath();
+    ctx.ellipse(podX, podY, eyeRadius * 0.12, eyeRadius * 0.06, angle, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.strokeStyle = 'rgba(150, 200, 255, 0.7)';
+    ctx.lineWidth = 1;
+    ctx.stroke();
+  }
+  
+  // Center hub of the wheel
+  ctx.fillStyle = 'rgba(100, 170, 255, 0.8)';
+  ctx.beginPath();
+  ctx.arc(eyeX, eyeY, eyeRadius * 0.1, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.strokeStyle = 'rgba(200, 220, 255, 0.9)';
+  ctx.lineWidth = 2;
+  ctx.stroke();
 };

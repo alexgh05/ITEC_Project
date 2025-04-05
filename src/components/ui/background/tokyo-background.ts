@@ -51,43 +51,56 @@ export const drawTokyoBackground = (ctx: CanvasRenderingContext2D, canvas: HTMLC
     ctx.fillText('ト キ オ', x, y + size/10);
   }
   
-  // Draw JDM car silhouettes
   for (let i = 0; i < 3; i++) {
-    const x = ((time * (0.1 + i * 0.05)) % 2) * canvas.width - 150;
+    const x = ((time * (0.1 + i * 0.05)) % 2) * canvas.width - 180;
     const y = canvas.height - 100 - i * 60;
-    
-    ctx.fillStyle = 'rgba(0, 0, 0, 0.8)';
-    
-    // Car body
+  
+    // Car body - sleek, low-profile design
+    ctx.fillStyle = 'rgb(132, 0, 114)';
     ctx.beginPath();
     ctx.moveTo(x, y);
-    ctx.lineTo(x + 100, y);
-    ctx.lineTo(x + 120, y - 20);
-    ctx.lineTo(x + 150, y - 20);
-    ctx.lineTo(x + 170, y);
-    ctx.lineTo(x + 200, y);
-    ctx.lineTo(x + 200, y + 30);
-    ctx.lineTo(x, y + 30);
+    ctx.lineTo(x + 50, y - 10);
+    ctx.lineTo(x + 90, y - 25); // angled front
+    ctx.lineTo(x + 140, y - 25); // roof front
+    ctx.lineTo(x + 170, y - 10); // roof back
+    ctx.lineTo(x + 220, y);
+    ctx.lineTo(x + 220, y + 25);
+    ctx.lineTo(x, y + 25);
     ctx.closePath();
     ctx.fill();
-    
-    // Car windows
-    ctx.fillStyle = `rgba(100, 200, 255, 0.5)`;
+  
+    // Car windows - sharp & low
+    ctx.fillStyle = 'rgba(100, 200, 255, 0.4)';
     ctx.beginPath();
-    ctx.moveTo(x + 100, y);
-    ctx.lineTo(x + 120, y - 20);
-    ctx.lineTo(x + 150, y - 20);
-    ctx.lineTo(x + 170, y);
+    ctx.moveTo(x + 90, y - 25);
+    ctx.lineTo(x + 140, y - 25);
+    ctx.lineTo(x + 165, y - 10);
+    ctx.lineTo(x + 95, y - 10);
     ctx.closePath();
     ctx.fill();
-    
-    // Wheels
-    ctx.fillStyle = 'rgba(40, 40, 40, 0.8)';
+  
+    // Wheels - bigger, sportier
+    ctx.fillStyle = 'rgba(0, 0, 0, 0.85)';
     ctx.beginPath();
-    ctx.arc(x + 50, y + 30, 15, 0, Math.PI * 2);
+    ctx.arc(x + 60, y + 25, 13, 0, Math.PI * 2);
     ctx.fill();
     ctx.beginPath();
-    ctx.arc(x + 150, y + 30, 15, 0, Math.PI * 2);
+    ctx.arc(x + 170, y + 25, 13, 0, Math.PI * 2);
+    ctx.fill();
+  }
+  
+  // Floating treats (unchanged)
+  for (let i = 0; i < 20; i++) {
+    const x = (Math.sin(time * 0.5 + i * 0.4) + 1) * canvas.width * 0.5;
+    const y = (Math.cos(time * 0.3 + i * 0.3) + 1) * canvas.height * 0.5;
+    const radius = 3 + Math.sin(time + i) * 1;
+  
+    ctx.beginPath();
+    const gradient = ctx.createRadialGradient(x, y, 0, x, y, radius * 2);
+    gradient.addColorStop(0, 'rgba(255, 200, 255, 0.8)');
+    gradient.addColorStop(1, 'rgba(0, 255, 255, 0)');
+    ctx.fillStyle = gradient;
+    ctx.arc(x, y, radius * 2, 0, Math.PI * 2);
     ctx.fill();
   }
   
