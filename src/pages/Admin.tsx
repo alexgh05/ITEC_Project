@@ -466,6 +466,7 @@ const Admin = () => {
       category: formData.get('category')?.toString() || '',
       description: formData.get('description')?.toString() || '',
       culture: formData.get('culture')?.toString() || 'Tokyo', // Default culture
+      gender: formData.get('gender')?.toString() || 'unisex', // Default gender
       images: [], // Start with empty images array, we'll add them after upload
     };
     
@@ -528,6 +529,7 @@ const Admin = () => {
       countInStock: parseInt(formData.get('countInStock')?.toString() || '0'),
       category: formData.get('category')?.toString() || '',
       description: formData.get('description')?.toString() || '',
+      gender: formData.get('gender')?.toString() || 'unisex',
       // Keep existing values for other fields
       culture: selectedProduct.culture,
       images: selectedProduct.images
@@ -756,6 +758,15 @@ const Admin = () => {
                           <option value="Seoul">Seoul</option>
                           <option value="London">London</option>
                           <option value="Berlin">Berlin</option>
+                        </select>
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="gender">Gender</Label>
+                        <select id="gender" name="gender" className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50" required>
+                          <option value="">Select a gender</option>
+                          <option value="male">Male</option>
+                          <option value="female">Female</option>
+                          <option value="unisex">Unisex</option>
                         </select>
                       </div>
                       <div className="space-y-2">
@@ -1766,6 +1777,20 @@ const Admin = () => {
                           
                         </select>
                       </div>
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="edit-gender">Gender</Label>
+                      <select
+                        id="edit-gender"
+                        name="gender"
+                        className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                        defaultValue={selectedProduct.gender || 'unisex'}
+                        required
+                      >
+                        <option value="male">Male</option>
+                        <option value="female">Female</option>
+                        <option value="unisex">Unisex</option>
+                      </select>
                     </div>
                     <div className="space-y-2">
                       <Label htmlFor="edit-description">Description</Label>

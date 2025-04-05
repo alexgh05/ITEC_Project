@@ -5,13 +5,14 @@ import { mockProducts } from './mockData';
 const API_URL = 'http://localhost:5000/api';
 
 // Product API calls
-export const fetchProducts = async (category?: string, culture?: string) => {
+export const fetchProducts = async (category?: string, culture?: string, gender?: string) => {
   let url = `${API_URL}/products`;
   
   // Add query parameters if provided
   const params = new URLSearchParams();
   if (category && category !== 'All') params.append('category', category);
   if (culture && culture !== 'All') params.append('culture', culture);
+  if (gender && gender !== 'All') params.append('gender', gender);
   
   if (params.toString()) {
     url += `?${params.toString()}`;
@@ -41,6 +42,12 @@ export const fetchProducts = async (category?: string, culture?: string) => {
     if (culture && culture !== 'All') {
       filteredProducts = filteredProducts.filter(
         product => product.culture?.toLowerCase() === culture.toLowerCase()
+      );
+    }
+    
+    if (gender && gender !== 'All') {
+      filteredProducts = filteredProducts.filter(
+        product => product.gender?.toLowerCase() === gender.toLowerCase()
       );
     }
     

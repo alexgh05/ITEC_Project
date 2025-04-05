@@ -9,6 +9,7 @@ import { fetchProducts } from '@/lib/api';
 
 const categories = ['All', 'Music', 'Accessories', 'Footwear', 'Fashion'];
 const cultures = ['All', 'Tokyo', 'New York', 'Lagos', 'Seoul', 'London', 'Berlin'];
+const genders = ['All', 'Male', 'Female', 'Unisex'];
 
 // Featured category cards
 const featuredCategories = [
@@ -45,6 +46,7 @@ const featuredCategories = [
 const ShopPage = () => {
   const [selectedCategory, setSelectedCategory] = useState('All');
   const [selectedCulture, setSelectedCulture] = useState('All');
+  const [selectedGender, setSelectedGender] = useState('All');
   const [showFilters, setShowFilters] = useState(false);
   const [products, setProducts] = useState([]);
   const [filteredProducts, setFilteredProducts] = useState([]);
@@ -59,7 +61,8 @@ const ShopPage = () => {
         setLoading(true);
         const data = await fetchProducts(
           selectedCategory !== 'All' ? selectedCategory.toLowerCase() : undefined,
-          selectedCulture !== 'All' ? selectedCulture : undefined
+          selectedCulture !== 'All' ? selectedCulture : undefined,
+          selectedGender !== 'All' ? selectedGender.toLowerCase() : undefined
         );
         setProducts(data);
         setFilteredProducts(data);
@@ -71,7 +74,7 @@ const ShopPage = () => {
     };
     
     getProductsData();
-  }, [selectedCategory, selectedCulture]);
+  }, [selectedCategory, selectedCulture, selectedGender]);
 
   // Handle URL parameters for filtering
   useEffect(() => {
@@ -211,7 +214,7 @@ const ShopPage = () => {
                   </div>
                 </div>
                 
-                <div>
+                <div className="mb-6">
                   <h4 className="font-medium mb-2">Culture</h4>
                   <div className="space-y-2">
                     {cultures.map(culture => (
@@ -224,6 +227,24 @@ const ShopPage = () => {
                           className="mr-2"
                         />
                         {culture}
+                      </label>
+                    ))}
+                  </div>
+                </div>
+
+                <div>
+                  <h4 className="font-medium mb-2">Gender</h4>
+                  <div className="space-y-2">
+                    {genders.map(gender => (
+                      <label key={gender} className="flex items-center">
+                        <input
+                          type="radio"
+                          name="gender"
+                          checked={selectedGender === gender}
+                          onChange={() => setSelectedGender(gender)}
+                          className="mr-2"
+                        />
+                        {gender}
                       </label>
                     ))}
                   </div>
