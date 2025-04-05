@@ -80,7 +80,7 @@ const ThemeProvider = ({ children }: ThemeProviderProps) => {
     // 1. User has interacted with the page (browser requirement)
     // 2. Audio is not already playing
     // 3. We have a culture with music selected
-    if (hasUserInteracted && !isPlaying && culture !== 'default' && cultureInfo[culture].sampleTrack) {
+    if (hasUserInteracted && !isPlaying && culture !== 'default' && cultureInfo && cultureInfo[culture] && cultureInfo[culture].sampleTrack) {
       // Enable audio in the store if it's not already enabled
       if (!audioEnabled) {
         enableAudio();
@@ -114,6 +114,9 @@ const ThemeProvider = ({ children }: ThemeProviderProps) => {
   useEffect(() => {
     const audio = audioRef.current;
     if (!audio) return;
+    
+    // Add null check for culture info
+    if (!cultureInfo || !cultureInfo[culture] || !cultureInfo[culture].sampleTrack) return;
     
     const trackSrc = cultureInfo[culture].sampleTrack;
     if (!trackSrc) return;
@@ -154,6 +157,9 @@ const ThemeProvider = ({ children }: ThemeProviderProps) => {
       
       // Set audio source if not already set
       if (!audio.src || audio.src === '') {
+        // Add null check for culture info
+        if (!cultureInfo || !cultureInfo[culture] || !cultureInfo[culture].sampleTrack) return;
+        
         const trackSrc = cultureInfo[culture].sampleTrack;
         if (!trackSrc) return;
         
