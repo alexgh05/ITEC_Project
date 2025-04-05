@@ -186,7 +186,7 @@ const ProductDetailPage = () => {
               {product.images.map((image, i) => (
                 <button
                   key={i}
-                  className={`w-20 h-20 rounded-md bg-muted overflow-hidden border-2 flex-shrink-0 ${
+                  className={`w-20 h-20 rounded-md bg-muted overflow-hidden border-2 flex-shrink-0 relative ${
                     i === selectedImage ? 'border-culture' : 'border-transparent'
                   }`}
                   onClick={() => setSelectedImage(i)}
@@ -197,6 +197,18 @@ const ProductDetailPage = () => {
                     alt={`${product.name} view ${i + 1}`} 
                     className="w-full h-full object-cover object-center"
                   />
+                  
+                  {/* Add labels for front and back views */}
+                  {i === 0 && (
+                    <div className="absolute bottom-0 left-0 right-0 bg-black/50 text-white text-[10px] text-center py-0.5">
+                      Front
+                    </div>
+                  )}
+                  {i === 1 && (
+                    <div className="absolute bottom-0 left-0 right-0 bg-black/50 text-white text-[10px] text-center py-0.5">
+                      Back
+                    </div>
+                  )}
                 </button>
               ))}
             </div>

@@ -198,7 +198,7 @@ export const uploadProductImage = async (req, res) => {
       const imagePath = `/uploads/${path.basename(req.file.path)}`;
       
       // Update product if productId is provided
-      const { productId } = req.body;
+      const { productId, imageIndex } = req.body;
       
       if (productId) {
         try {
@@ -211,8 +211,28 @@ export const uploadProductImage = async (req, res) => {
             });
           }
           
-          // Add new image to product
-          product.images = [imagePath]; // Replace with new image
+          // Initialize images array if it doesn't exist
+          if (!product.images) {
+            product.images = [];
+          }
+          
+          // Handle image based on the imageIndex parameter
+          if (imageIndex !== undefined) {
+            const index = parseInt(imageIndex, 10);
+            console.log(`Adding image at index ${index}:`, imagePath);
+            
+            // Ensure we have enough elements in the array
+            while (product.images.length <= index) {
+              product.images.push('');
+            }
+            
+            // Set the image at the specified index
+            product.images[index] = imagePath;
+          } else {
+            // Default behavior: add to the end of array
+            product.images.push(imagePath);
+          }
+          
           await product.save();
           
           return res.status(200).json({
