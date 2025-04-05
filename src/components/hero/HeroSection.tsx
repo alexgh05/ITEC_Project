@@ -171,7 +171,7 @@ const HeroSection = () => {
                     transition={{ delay: 0.1, duration: 0.4 }}
                   >
                     <Music className="h-5 w-5 mr-2 text-culture animate-pulse" />
-                    <span className="text-culture font-medium">
+                    <span className={`${slide.culture === 'berlin' ? 'text-muted-foreground' : 'text-culture font-medium'}`}>
                       {cultureInfo && cultureInfo[slide.culture as CultureTheme] 
                         ? slide.culture === 'london' 
                           ? 'Drill' 

@@ -9,10 +9,22 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { AudioBeatVisualizer } from '@/components/ui/audio-beat-visualizer';
 import { OutfitCard } from '@/components/outfit/OutfitCard';
 import { useAudio } from '@/providers/ThemeProvider';
+import { useAuthStore } from '@/store/useAuthStore';
+import { useNavigate } from 'react-router-dom';
+import { toast } from 'sonner';
+
+// Extend Window interface to include our custom property
+declare global {
+  interface Window {
+    checkOutfitAuth?: () => boolean;
+  }
+}
 
 export const OutfitGenerator = () => {
   const { culture, setCulture, cultureInfo, darkMode, toggleDarkMode } = useThemeStore();
   const { isPlaying, toggleAudio } = useAudio();
+  const { isAuthenticated } = useAuthStore();
+  const navigate = useNavigate();
   const [musicGenre, setMusicGenre] = useState<string>('trap');
   const [emotionalState, setEmotionalState] = useState<string>('energetic');
   const [city, setCity] = useState<string>('tokyo');
@@ -163,6 +175,69 @@ export const OutfitGenerator = () => {
   useEffect(() => {
     console.log('isGenerating state changed:', isGenerating);
   }, [isGenerating]);
+  
+  // Helper function to check if the user is authenticated
+  const checkAuthentication = () => {
+    if (!isAuthenticated) {
+      toast.error("Please log in to continue with checkout");
+      navigate('/login', { state: { from: '/outfit-generator' } });
+      return false;
+    }
+    return true;
+  };
+  
+  // When clicking on Buy Now or Checkout, ensure the user is logged in
+  const handleOutfitPurchase = (e: React.MouseEvent) => {
+    // Prevent default action if we're going to redirect
+    if (!checkAuthentication()) {
+      e.preventDefault();
+      e.stopPropagation();
+      return false;
+    }
+    return true;
+  };
+  
+  // Share authentication check with OutfitCard component
+  useEffect(() => {
+    // Set a global variable the OutfitCard can access
+    window.checkOutfitAuth = () => checkAuthentication();
+    
+    return () => {
+      // Clean up when component unmounts
+      delete window.checkOutfitAuth;
+    };
+  }, [isAuthenticated]);
+  
+  // Handler for Buy Complete Look button
+  useEffect(() => {
+    // Add event listener for the buy complete look button in OutfitCard
+    const handleBuyNowClick = (event: Event) => {
+      if (!isAuthenticated) {
+        event.preventDefault();
+        event.stopPropagation();
+        
+        toast.error("Please log in to continue with checkout");
+        
+        // Redirect to login page
+        setTimeout(() => {
+          navigate('/login', { state: { from: '/outfit-generator' } });
+        }, 500);
+      }
+    };
+
+    // Find any buttons with 'data-testid="buy-complete-look"'
+    const buyButtons = document.querySelectorAll('[data-testid="buy-complete-look"]');
+    
+    buyButtons.forEach(button => {
+      button.addEventListener('click', handleBuyNowClick);
+    });
+
+    return () => {
+      buyButtons.forEach(button => {
+        button.removeEventListener('click', handleBuyNowClick);
+      });
+    };
+  }, [isAuthenticated, navigate, generatedOutfit]);
   
   // Generate outfit function
   const generateOutfit = () => {

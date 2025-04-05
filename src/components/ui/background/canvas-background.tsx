@@ -30,50 +30,50 @@ export const CanvasBackground: React.FC = () => {
     window.addEventListener('resize', resizeCanvas);
     resizeCanvas();
     
-    // Only redraw background if culture has been explicitly changed by user
-    if (previousCultureRef.current !== culture) {
-      previousCultureRef.current = culture;
+    // Updated to always draw background regardless of culture change
+    // Store current culture for animation
+    previousCultureRef.current = culture;
+    
+    // Different animation patterns based on culture
+    const drawBackground = () => {
+      if (!ctx || !canvas) return;
       
-      // Different animation patterns based on culture
-      const drawBackground = () => {
-        if (!ctx || !canvas) return;
-        
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-        
-        switch(culture) {
-          case 'tokyo':
-            drawTokyoBackground(ctx, canvas);
-            break;
-          case 'newyork':
-            drawNewYorkBackground(ctx, canvas);
-            break;
-          case 'lagos':
-            drawLagosBackground(ctx, canvas);
-            break;
-          case 'seoul':
-            drawSeoulBackground(ctx, canvas);
-            break;
-          case 'london':
-            drawLondonBackground(ctx, canvas);
-            break;
-          case 'berlin':
-            drawBerlinBackground(ctx, canvas);
-            break;
-          default:
-            drawDefaultBackground(ctx, canvas);
-            break;
-        }
-        
-        animationRef.current = requestAnimationFrame(drawBackground);
-      };
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
       
-      // Cancel any existing animation before starting a new one
-      if (animationRef.current) {
-        cancelAnimationFrame(animationRef.current);
+      switch(culture) {
+        case 'tokyo':
+          drawTokyoBackground(ctx, canvas);
+          break;
+        case 'newyork':
+          drawNewYorkBackground(ctx, canvas);
+          break;
+        case 'lagos':
+          drawLagosBackground(ctx, canvas);
+          break;
+        case 'seoul':
+          drawSeoulBackground(ctx, canvas);
+          break;
+        case 'london':
+          drawLondonBackground(ctx, canvas);
+          break;
+        case 'berlin':
+          drawBerlinBackground(ctx, canvas);
+          break;
+        default:
+          drawDefaultBackground(ctx, canvas);
+          break;
       }
       
-      drawBackground();
+      animationRef.current = requestAnimationFrame(drawBackground);
+    };
+    
+    // Cancel any existing animation before starting a new one
+    if (animationRef.current) {
+      cancelAnimationFrame(animationRef.current);
     }
+    
+    // Start animation
+    drawBackground();
     
     return () => {
       window.removeEventListener('resize', resizeCanvas);
@@ -81,7 +81,7 @@ export const CanvasBackground: React.FC = () => {
         cancelAnimationFrame(animationRef.current);
       }
     };
-  }, [culture]);
+  }, [culture]); // Only re-run when culture changes
   
   return (
     <canvas 

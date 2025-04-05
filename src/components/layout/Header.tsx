@@ -73,6 +73,11 @@ const Header = () => {
     >
       <div className="container mx-auto px-4 flex items-center justify-between">
         <Link to="/" className="flex items-center">
+          <img 
+            src="/assets/logo/hypeheritage-logo.svg" 
+            alt="HypeHeritage Logo" 
+            className="h-16 mr-2" 
+          />
           <motion.div 
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -199,7 +204,14 @@ const Header = () => {
           >
             <div className="flex flex-col h-full">
               <div className="flex items-center justify-between p-4 border-b">
-                <div className="text-xl font-bold">HypeHeritage</div>
+                <div className="flex items-center">
+                  <img 
+                    src="/assets/logo/hypeheritage-logo.svg" 
+                    alt="HypeHeritage Logo" 
+                    className="h-14 mr-2" 
+                  />
+                  <div className="text-xl font-bold">HypeHeritage</div>
+                </div>
                 <Button 
                   variant="ghost" 
                   size="icon" 
