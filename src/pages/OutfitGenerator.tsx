@@ -324,178 +324,147 @@ export const OutfitGenerator = () => {
           className="text-center mb-12"
         >
           <h1 className={`text-4xl md:text-6xl font-bold ${darkMode ? 'text-white' : 'text-gray-900'} tracking-tight mb-4`}>
-            <span className="text-culture">AI</span> Outfit Generator
+            <span className={darkMode ? "text-culture" : "text-indigo-600"}>AI</span> Outfit Generator
             <span className="inline-block ml-3">
               {darkMode ? (
                 <Moon className="inline-block w-8 h-8 text-blue-400 opacity-80" />
               ) : (
-                <Sun className="inline-block w-8 h-8 text-yellow-400 opacity-80" />
+                <Sun className="inline-block w-8 h-8 text-yellow-500 opacity-90" />
               )}
             </span>
           </h1>
           <p className={`${darkMode ? 'text-white/70' : 'text-gray-600'} text-lg max-w-3xl mx-auto`}>
-            Create your unique fashion identity with our premium AI stylist. Generate outfits influenced by music genres, emotions, and cities around the world.
+            Create a unique fashion identity based on your preferences
           </p>
         </motion.div>
         
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
-          {/* Input section */}
-          <div className="relative z-20">
-            <motion.div 
-              initial={{ opacity: 0, x: -20 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.6, delay: 0.2 }}
-            >
-              <Card className={`p-6 ${darkMode ? 'bg-black/40' : 'bg-white/90'} backdrop-blur-lg ${darkMode ? 'border-culture/20' : 'border-gray-300'} overflow-hidden relative`}>
-                <div className="absolute inset-0 opacity-10 overflow-hidden pointer-events-none">
-                  <AudioBeatVisualizer
-                    className="h-full w-full"
-                    barCount={40}
-                    barWidth={2}
-                    direction="horizontal"
-                    sensitivity={1.2}
-                    minHeight={2}
-                    maxHeight={100}
-                    rounded={false}
-                  />
-                </div>
-                
-                <h2 className={`text-2xl font-bold ${darkMode ? 'text-white' : 'text-gray-900'} mb-6 flex items-center`}>
-                  <Sparkles className={`w-5 h-5 mr-2 ${darkMode ? 'text-culture' : 'text-indigo-600'}`} />
-                  Design Your Style
-                  <button
-                    onClick={(e) => {
-                      e.preventDefault();
-                      e.stopPropagation();
-                      toggleDarkMode();
-                    }}
-                    className={`ml-auto px-3 py-1 text-sm ${darkMode ? 'bg-black/40 hover:bg-black/60' : 'bg-gray-100 hover:bg-gray-200'} rounded-full border ${darkMode ? 'border-culture/20' : 'border-gray-300'} flex items-center`}
-                  >
-                    {darkMode ? (
-                      <>
-                        <Sun className="w-4 h-4 mr-1 text-yellow-400" />
-                        Light
-                      </>
-                    ) : (
-                      <>
-                        <Moon className="w-4 h-4 mr-1 text-blue-400" />
-                        Dark
-                      </>
-                    )}
-                  </button>
-                </h2>
-                
-                <div className="space-y-6" onSubmit={(e) => { e.preventDefault(); console.log('Form submitted, preventing default'); }}>
-                  <div className="space-y-2">
-                    <label className={`${darkMode ? 'text-white/80' : 'text-gray-700'} flex items-center text-sm font-medium`}>
-                      <Music className={`w-4 h-4 mr-2 ${darkMode ? 'text-culture/80' : 'text-indigo-500'}`} />
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 z-10">
+          <Card 
+            className={`p-6 ${
+              darkMode 
+                ? 'border-white/5 bg-black/30' 
+                : 'border-gray-200 bg-white/95'
+            } backdrop-blur-lg overflow-hidden`}
+          >
+            <div className="space-y-6">
+              <div className="flex items-center">
+                <Sparkles className={`w-5 h-5 mr-2 ${darkMode ? 'text-culture' : 'text-indigo-600'}`} />
+                <h2 className={`text-xl font-semibold ${darkMode ? 'text-white' : 'text-gray-900'}`}>Design Your Style</h2>
+              </div>
+              
+              <div className="space-y-4">
+                {/* Music Genre */}
+                <div className="space-y-2">
+                  <div className="flex items-center space-x-2">
+                    <Music className={`w-4 h-4 ${darkMode ? 'text-culture' : 'text-indigo-600'}`} />
+                    <label htmlFor="musicGenre" className={`text-sm font-medium ${darkMode ? 'text-white' : 'text-gray-900'}`}>
                       Music Genre
                     </label>
-                    <Select value={musicGenre} onValueChange={setMusicGenre}>
-                      <SelectTrigger className={`w-full ${darkMode ? 'bg-black/50 border-culture/30 text-white' : 'bg-white border-gray-300 text-gray-900'}`}>
-                        <SelectValue placeholder="Select a music genre" />
-                      </SelectTrigger>
-                      <SelectContent className={`${darkMode ? 'bg-black/90 border-culture/20 text-white' : 'bg-white border-gray-200 text-gray-900'}`}>
-                        {musicGenres.map((genre) => (
-                          <SelectItem key={genre.value} value={genre.value}>
-                            {genre.label}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
                   </div>
-                  
-                  <div className="space-y-2">
-                    <label className={`${darkMode ? 'text-white/80' : 'text-gray-700'} flex items-center text-sm font-medium`}>
-                      <Heart className={`w-4 h-4 mr-2 ${darkMode ? 'text-culture/80' : 'text-indigo-500'}`} />
+                  <Select value={musicGenre} onValueChange={setMusicGenre}>
+                    <SelectTrigger 
+                      id="musicGenre" 
+                      className={`w-full ${
+                        darkMode 
+                          ? 'border-white/10 bg-white/5 text-white' 
+                          : 'border-gray-200 bg-white text-gray-900'
+                      }`}
+                    >
+                      <SelectValue placeholder="Select music genre" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {musicGenres.map((genre) => (
+                        <SelectItem key={genre.value} value={genre.value}>
+                          {genre.label}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+                
+                {/* Emotional State */}
+                <div className="space-y-2">
+                  <div className="flex items-center space-x-2">
+                    <Heart className={`w-4 h-4 ${darkMode ? 'text-culture' : 'text-indigo-600'}`} />
+                    <label htmlFor="emotionalState" className={`text-sm font-medium ${darkMode ? 'text-white' : 'text-gray-900'}`}>
                       Emotional State
                     </label>
-                    <Select value={emotionalState} onValueChange={setEmotionalState}>
-                      <SelectTrigger className={`w-full ${darkMode ? 'bg-black/50 border-culture/30 text-white' : 'bg-white border-gray-300 text-gray-900'}`}>
-                        <SelectValue placeholder="Select an emotional state" />
-                      </SelectTrigger>
-                      <SelectContent className={`${darkMode ? 'bg-black/90 border-culture/20 text-white' : 'bg-white border-gray-200 text-gray-900'}`}>
-                        {emotionalStates.map((state) => (
-                          <SelectItem key={state.value} value={state.value}>
-                            {state.label}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
                   </div>
-                  
-                  <div className="space-y-2">
-                    <label className={`${darkMode ? 'text-white/80' : 'text-gray-700'} flex items-center text-sm font-medium`}>
-                      <Building2 className={`w-4 h-4 mr-2 ${darkMode ? 'text-culture/80' : 'text-indigo-500'}`} />
+                  <Select value={emotionalState} onValueChange={setEmotionalState}>
+                    <SelectTrigger 
+                      id="emotionalState" 
+                      className={`w-full ${
+                        darkMode 
+                          ? 'border-white/10 bg-white/5 text-white' 
+                          : 'border-gray-200 bg-white text-gray-900'
+                      }`}
+                    >
+                      <SelectValue placeholder="Select emotional state" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {emotionalStates.map((state) => (
+                        <SelectItem key={state.value} value={state.value}>
+                          {state.label}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+                
+                {/* City Influence */}
+                <div className="space-y-2">
+                  <div className="flex items-center space-x-2">
+                    <Building2 className={`w-4 h-4 ${darkMode ? 'text-culture' : 'text-indigo-600'}`} />
+                    <label htmlFor="city" className={`text-sm font-medium ${darkMode ? 'text-white' : 'text-gray-900'}`}>
                       City Influence
                     </label>
-                    <Select defaultValue={city} onValueChange={(value) => {
-                      setCity(value);
-                      // Also set culture to match the city
-                      if (cultureInfo && Object.keys(cultureInfo).includes(value)) {
-                        setCulture(value as any);
-                      }
-                    }}>
-                      <SelectTrigger className={`w-full ${darkMode ? 'bg-black/50 border-culture/30 text-white' : 'bg-white border-gray-300 text-gray-900'}`}>
-                        <SelectValue placeholder="Select a city" />
-                      </SelectTrigger>
-                      <SelectContent className={`${darkMode ? 'bg-black/90 border-culture/20 text-white' : 'bg-white border-gray-200 text-gray-900'}`}>
-                        {availableCities.map((city) => (
-                          <SelectItem key={city.value} value={city.value}>
-                            {city.label}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
                   </div>
-                  
-                  {/* Single primary generate button */}
-                  <button
-                    className="w-full py-3 mt-6 rounded-md font-medium text-white bg-culture hover:bg-culture/90 flex items-center justify-center gap-2 cursor-pointer"
-                    onClick={(e) => {
-                      console.clear(); // Clear previous logs 
-                      console.log('Generate button clicked', e);
-                      e.preventDefault();
-                      e.stopPropagation();
-                      
-                      // Try both approaches - setTimeout might be failing in this environment
-                      setDebugMessage('Attempting outfit generation with multiple approaches');
-                      generateOutfit(); // Standard approach
-                      
-                      // Fallback: If still not generating after 3 seconds, use direct approach
-                      const fallbackTimer = setTimeout(() => {
-                        if (!generatedOutfit) {
-                          console.log('Falling back to direct state update');
-                          setDebugMessage('Falling back to direct approach after timeout');
-                          directUpdateState();
-                        }
-                      }, 3000);
-                      
-                      return false; // Explicitly return false to prevent default
-                    }}
+                  <Select value={city} onValueChange={setCity}>
+                    <SelectTrigger 
+                      id="city" 
+                      className={`w-full ${
+                        darkMode 
+                          ? 'border-white/10 bg-white/5 text-white' 
+                          : 'border-gray-200 bg-white text-gray-900'
+                      }`}
+                    >
+                      <SelectValue placeholder="Select city" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {availableCities.map((cityOption) => (
+                        <SelectItem key={cityOption.value} value={cityOption.value}>
+                          {cityOption.label}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+                
+                {/* This is the main button */}
+                <div className="pt-2">
+                  <Button
+                    ref={nativeButtonRef}
+                    className={`w-full h-12 ${
+                      darkMode 
+                        ? 'bg-culture hover:bg-culture/90 text-white' 
+                        : 'bg-indigo-600 hover:bg-indigo-700 text-white'
+                    }`}
+                    onClick={handleButtonClick(generateOutfit)}
                     disabled={isGenerating}
-                    type="button"
                   >
                     {isGenerating ? (
-                      <span className="flex items-center">
-                        <span className="animate-pulse mr-2">Generating</span>
-                        <span className="flex gap-1">
-                          <span className="inline-block w-1.5 h-1.5 bg-white rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></span>
-                          <span className="inline-block w-1.5 h-1.5 bg-white rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></span>
-                          <span className="inline-block w-1.5 h-1.5 bg-white rounded-full animate-bounce" style={{ animationDelay: '600ms' }}></span>
-                        </span>
-                      </span>
+                      <div className="flex items-center justify-center">
+                        <div className="h-4 w-4 border-2 border-white border-t-transparent rounded-full animate-spin mr-2"></div>
+                        Generating...
+                      </div>
                     ) : (
-                      <span className="flex items-center">
-                        Generate Outfit 
-                        <Sparkles className={`ml-2 w-4 h-4 ${darkMode ? '' : 'text-indigo-600'}`} />
-                      </span>
+                      'Generate Outfit'
                     )}
-                  </button>
+                  </Button>
                 </div>
-              </Card>
-            </motion.div>
-          </div>
+              </div>
+            </div>
+          </Card>
           
           {/* Results section */}
           <div className="relative z-20">
@@ -513,7 +482,7 @@ export const OutfitGenerator = () => {
                     exit={{ opacity: 0 }}
                     className="h-full flex items-center justify-center"
                   >
-                    <div className={`p-8 rounded-lg ${darkMode ? 'bg-black/30' : 'bg-white/90'} backdrop-blur-md border ${darkMode ? 'border-white/10' : 'border-gray-200'} text-center`}>
+                    <div className={`p-8 rounded-lg ${darkMode ? 'bg-black/30' : 'bg-white/95'} backdrop-blur-md border ${darkMode ? 'border-white/10' : 'border-gray-200'} text-center shadow-md`}>
                       <div className={`w-24 h-24 rounded-full ${darkMode ? 'bg-culture/20' : 'bg-indigo-100'} mx-auto flex items-center justify-center mb-4`}>
                         <Sparkles className={`w-10 h-10 ${darkMode ? 'text-culture' : 'text-indigo-600'}`} />
                       </div>

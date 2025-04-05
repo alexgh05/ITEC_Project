@@ -61,7 +61,7 @@ const ProductItem = ({ product, originalName, isMusic = false, compact = false, 
   const { darkMode } = useThemeStore();
   
   return (
-    <div className={`relative border rounded-md overflow-hidden product-card ${compact ? 'h-auto' : 'h-auto'} ${darkMode ? 'bg-black/40 border-culture/20' : 'bg-white/90 border-culture/40'}`}>
+    <div className={`relative border rounded-md overflow-hidden product-card ${compact ? 'h-auto' : 'h-auto'} ${darkMode ? 'bg-black/40 border-culture/20' : 'bg-white/95 border-gray-200'}`}>
       <div className={`flex ${compact ? 'flex-col' : 'flex-col'}`}>
         <div className={`${compact ? 'w-full aspect-square' : 'w-full aspect-square'} bg-muted premium-image`}>
           <img 
@@ -341,7 +341,7 @@ export const OutfitCard = ({ outfit }: OutfitCardProps) => {
   // Check for necessary outfit data
   if (!outfit || !outfit.colorPalette || !outfit.name) {
     return (
-      <div className={`${darkMode ? 'bg-black/60' : 'bg-white/90'} p-8 rounded-lg text-center`}>
+      <div className={`${darkMode ? 'bg-black/60' : 'bg-white/95'} p-8 rounded-lg text-center shadow-md`}>
         <div className={`${darkMode ? 'text-white' : 'text-gray-900'}`}>Error: Incomplete outfit data</div>
       </div>
     );
@@ -368,34 +368,29 @@ export const OutfitCard = ({ outfit }: OutfitCardProps) => {
       ) : (
         <Card 
           className={`overflow-hidden ${
-            darkMode ? 'bg-black/40 border-culture/20' : 'bg-white/90 border-culture/40'
-          } backdrop-blur-md`}
+            darkMode ? 'bg-black/40 border-culture/20' : 'bg-white/95 border-gray-200'
+          } backdrop-blur-md shadow-lg`}
           style={{
-            boxShadow: `0 0 40px rgba(${getRGBFromHex(outfit.dominantColor)}, 0.2)`,
+            boxShadow: darkMode 
+              ? `0 0 40px rgba(${getRGBFromHex(outfit.dominantColor)}, 0.2)`
+              : `0 8px 30px rgba(0, 0, 0, 0.1)`,
             background: darkMode 
               ? `rgba(0, 0, 0, 0.4)`
               : outfit.city && cultureInfo && cultureInfo[outfit.city as CultureTheme]
-                ? `rgba(${cultureInfo[outfit.city as CultureTheme].rgbColor}, 0.9)`
-                : `rgba(${
-                  outfit.city === 'tokyo' ? '255, 255, 255, 0.9)' :
-                  outfit.city === 'newyork' ? '249, 249, 249, 0.9)' :
-                  outfit.city === 'london' ? '184, 235, 208, 0.9)' :
-                  outfit.city === 'seoul' ? '255, 184, 222, 0.9)' :
-                  outfit.city === 'lagos' ? '229, 221, 219, 0.9)' :
-                  outfit.city === 'berlin' ? '220, 200, 255, 0.9)' : '255, 255, 255, 0.9)'
-                }`
+                ? `rgba(255, 255, 255, 0.95)`
+                : `rgba(255, 255, 255, 0.95)`
           }}
         >
           <div className="p-6 space-y-6">
             <div className="space-y-1">
               <h3 className={`text-2xl font-bold tracking-tight ${darkMode ? 'text-white' : 'text-gray-900'}`}>
-          {outfit.name}
-        </h3>
+                {outfit.name}
+              </h3>
               <p className={`text-sm ${darkMode ? 'text-white/70' : 'text-gray-600'}`}>
                 {outfit.city} • {outfit.musicGenre} • {outfit.emotionalState}
-        </p>
-      </div>
-      
+              </p>
+            </div>
+            
             <p className={`text-sm/relaxed ${darkMode ? 'text-white/80' : 'text-gray-700'} whitespace-pre-line`}>
               {outfit.description}
             </p>
@@ -405,7 +400,7 @@ export const OutfitCard = ({ outfit }: OutfitCardProps) => {
               {outfit.colorPalette.map((color, index) => (
                 <div
                   key={index}
-                  className="w-6 h-6 rounded-full border border-white/20"
+                  className={`w-6 h-6 rounded-full ${darkMode ? 'border border-white/20' : 'border border-gray-200'}`}
                   style={{ backgroundColor: color }}
                 ></div>
               ))}
@@ -437,9 +432,9 @@ export const OutfitCard = ({ outfit }: OutfitCardProps) => {
           
           {/* No products message */}
           {Object.keys(products).length === 0 && (
-            <div className="text-center p-4 bg-gray-800/50 rounded-md">
-              <p className="text-white/70">No products found for this outfit.</p>
-              <p className="text-white/50 text-sm mt-1">Try generating a new outfit.</p>
+            <div className={`text-center p-4 ${darkMode ? 'bg-gray-800/50' : 'bg-gray-100'} rounded-md`}>
+              <p className={`${darkMode ? 'text-white/70' : 'text-gray-700'}`}>No products found for this outfit.</p>
+              <p className={`${darkMode ? 'text-white/50' : 'text-gray-500'} text-sm mt-1`}>Try generating a new outfit.</p>
             </div>
           )}
         </div>
