@@ -210,10 +210,8 @@ export const OutfitCard = ({ outfit }: OutfitCardProps) => {
         duration: 3000,
       });
       
-      // Force redirect to login page with a slight delay to ensure the toast is displayed
-      setTimeout(() => {
-        window.location.href = '/login';
-      }, 300);
+      // Navigate to login with proper state for redirect
+      navigate('/login', { state: { from: '/outfit-generator' } });
       return;
     }
     

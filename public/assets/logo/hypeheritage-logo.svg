@@ -1,0 +1,39 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512">
+  <defs>
+    <linearGradient id="gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#00B0FF" />
+      <stop offset="50%" stop-color="#3F51B5" />
+      <stop offset="100%" stop-color="#9C27B0" />
+    </linearGradient>
+  </defs>
+  <rect width="512" height="512" fill="transparent" />
+  
+  <!-- Hoodie -->
+  <path d="M256 150 C 220 150, 190 175, 170 210 L 150 320 L 170 340 L 170 360 L 190 360 L 200 340 L 312 340 L 322 360 L 342 360 L 342 340 L 362 320 L 342 210 C 322 175, 292 150, 256 150" 
+        stroke="url(#gradient)" stroke-width="10" fill="transparent" />
+  
+  <!-- Hood -->
+  <path d="M210 210 C 210 180, 230 150, 256 150 C 282 150, 302 180, 302 210 L 302 230 L 256 230 L 210 230 Z" 
+        stroke="url(#gradient)" stroke-width="10" fill="transparent" />
+  
+  <!-- Drawstrings -->
+  <line x1="240" y1="230" x2="240" y2="260" stroke="url(#gradient)" stroke-width="10" />
+  <line x1="272" y1="230" x2="272" y2="260" stroke="url(#gradient)" stroke-width="10" />
+  
+  <!-- Pocket -->
+  <path d="M220 270 L 292 270 L 302 290 L 210 290 Z" 
+        stroke="url(#gradient)" stroke-width="10" fill="transparent" />
+  
+  <!-- Text -->
+  <text x="256" y="410" font-family="Arial Black, sans-serif" font-size="40" font-weight="bold" text-anchor="middle" fill="url(#gradient)">HYPEHERITAGE</text>
+  
+  <!-- Equalizer bars -->
+  <g transform="translate(230, 440)">
+    <rect x="0" y="0" width="6" height="10" fill="url(#gradient)" />
+    <rect x="10" y="-5" width="6" height="15" fill="url(#gradient)" />
+    <rect x="20" y="-10" width="6" height="20" fill="url(#gradient)" />
+    <rect x="30" y="-3" width="6" height="13" fill="url(#gradient)" />
+    <rect x="40" y="-7" width="6" height="17" fill="url(#gradient)" />
+    <rect x="50" y="-12" width="6" height="22" fill="url(#gradient)" />
+  </g>
+</svg> 
