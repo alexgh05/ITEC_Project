@@ -161,13 +161,21 @@ const HomePage = () => {
 
       <section className="py-16 px-4">
         <div className="container mx-auto">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
+          <div className="flex justify-center">
             <motion.div
-              initial={{ opacity: 0, x: -20 }}
-              whileInView={{ opacity: 1, x: 0 }}
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5 }}
               viewport={{ once: true, margin: "-100px" }}
+              className="text-center max-w-2xl"
             >
+              <div className="flex justify-center mb-8">
+                <img 
+                  src="/assets/logo/hypeheritage-logo.svg" 
+                  alt="HypeHeritage Logo" 
+                  className="h-40" 
+                />
+              </div>
               <h2 className="text-3xl font-bold mb-4">Where Music Meets Fashion</h2>
               <p className="text-muted-foreground mb-6">
                 HypeHeritage is more than just a store. We're a platform that celebrates the intersection of music and fashion across different urban cultures.
@@ -178,17 +186,6 @@ const HomePage = () => {
                   <ArrowRight className="ml-2 h-4 w-4" />
                 </Link>
               </Button>
-            </motion.div>
-            
-            <motion.div
-              initial={{ opacity: 0, x: 20 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.5 }}
-              viewport={{ once: true, margin: "-100px" }}
-              className="aspect-video bg-muted rounded-lg overflow-hidden"
-            >
-              {/* This would be replaced with an actual image in a real app */}
-              <div className="w-full h-full bg-gradient-to-br from-culture to-culture-accent/50" />
             </motion.div>
           </div>
         </div>
