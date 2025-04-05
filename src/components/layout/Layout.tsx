@@ -134,10 +134,10 @@ const Layout = () => {
   }
 
   return (
-    <div className="flex flex-col min-h-screen">
+    <div className="flex flex-col min-h-screen w-full overflow-hidden">
       {showBackground && <InteractiveBackground />}
       <Header />
-      <main className="flex-1 pt-20">
+      <main className="flex-1 pt-20 w-full">
         <AnimatePresence mode="wait">
           <PageTransition>
             <Outlet />

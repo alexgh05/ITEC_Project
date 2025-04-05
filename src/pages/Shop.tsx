@@ -180,7 +180,7 @@ const ShopPage = () => {
   return (
     <>
       <section className="py-12 px-4 bg-secondary/50">
-        <div className="container mx-auto">
+        <div className="container mx-auto max-w-full px-4 sm:px-6 lg:px-8">
           <div className="text-center">
             <h1 className="text-4xl font-bold mb-4">Shop</h1>
             <p className="text-muted-foreground">Discover products from cultures around the world</p>
@@ -190,7 +190,7 @@ const ShopPage = () => {
 
       {/* Featured Categories */}
       <section className="py-12 px-4">
-        <div className="container mx-auto">
+        <div className="container mx-auto max-w-full px-4 sm:px-6 lg:px-8">
           <h2 className="text-2xl font-bold mb-8 text-center">Shop by Category</h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-6">
             {featuredCategories.map((category) => (
@@ -224,7 +224,7 @@ const ShopPage = () => {
       </section>
 
       <section className="py-8 px-4">
-        <div className="container mx-auto">
+        <div className="container mx-auto max-w-full px-4 sm:px-6 lg:px-8">
           <div className="flex flex-wrap justify-between items-center mb-8">
             <div className="mb-4 lg:mb-0">
               <h2 className="text-xl font-medium">
@@ -235,7 +235,7 @@ const ShopPage = () => {
             <div className="flex justify-between w-full lg:w-auto">
               <Button 
                 variant="outline" 
-                className="lg:hidden flex items-center"
+                className="lg:hidden flex items-center w-full"
                 onClick={() => setShowFilters(!showFilters)}
               >
                 {showFilters ? (
@@ -314,7 +314,7 @@ const ShopPage = () => {
               </div>
             </div>
             
-            <div className="lg:w-3/4">
+            <div className="lg:w-3/4 w-full">
               {loading ? (
                 <div className="flex justify-center items-center h-[400px]">
                   <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>

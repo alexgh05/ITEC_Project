@@ -65,31 +65,31 @@ const Header = () => {
   return (
     <header 
       className={cn(
-        "fixed top-0 left-0 right-0 z-50 transition-all duration-300",
+        "fixed top-0 left-0 right-0 z-50 transition-all duration-300 w-full",
         isScrolled 
-          ? "py-2 bg-background/80 backdrop-blur-md shadow-sm" 
-          : "py-4 bg-transparent"
+          ? "py-1 md:py-2 bg-background/80 backdrop-blur-md shadow-sm" 
+          : "py-2 md:py-4 bg-transparent"
       )}
     >
-      <div className="container mx-auto px-4 flex items-center justify-between">
+      <div className="container mx-auto px-2 sm:px-4 flex items-center justify-between max-w-[90%] md:max-w-7xl">
         <Link to="/" className="flex items-center">
           <img 
             src="/assets/logo/hypeheritage-logo.svg" 
             alt="HypeHeritage Logo" 
-            className="h-16 mr-2" 
+            className="h-8 md:h-12 mr-1 md:mr-2" 
           />
           <motion.div 
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}
-            className="text-2xl font-bold text-foreground"
+            className="text-base md:text-xl font-bold text-foreground truncate max-w-[90px] md:max-w-full"
           >
             HypeHeritage
           </motion.div>
         </Link>
 
         {/* Desktop Navigation */}
-        <nav className="hidden md:flex items-center space-x-8">
+        <nav className="hidden md:flex items-center space-x-6 lg:space-x-8">
           {navLinks.map((link) => (
             <Link
               key={link.name}
@@ -102,12 +102,12 @@ const Header = () => {
           ))}
         </nav>
 
-        <div className="flex items-center space-x-4">
+        <div className="flex items-center space-x-1 md:space-x-3">
           {/* Language Dropdown */}
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="ghost" size="icon" className="relative" aria-label="Select language">
-                <Globe className="h-5 w-5" />
+              <Button variant="ghost" size="icon" className="relative hidden md:flex h-8 w-8" aria-label="Select language">
+                <Globe className="h-4 w-4" />
                 <span className="absolute -bottom-1 -right-1 text-xs">{languageFlags[language]}</span>
               </Button>
             </DropdownMenuTrigger>
@@ -174,8 +174,9 @@ const Header = () => {
             size="icon" 
             onClick={toggleDarkMode} 
             aria-label="Toggle theme"
+            className="h-7 w-7 p-0"
           >
-            {darkMode ? <Sun size={20} /> : <Moon size={20} />}
+            {darkMode ? <Sun size={16} /> : <Moon size={16} />}
           </Button>
           
           <CartDropdown />
@@ -183,11 +184,11 @@ const Header = () => {
           <Button 
             variant="ghost" 
             size="icon" 
-            className="md:hidden" 
+            className="md:hidden h-7 w-7 p-0" 
             onClick={() => setMobileMenuOpen(true)}
             aria-label="Open menu"
           >
-            <Menu size={24} />
+            <Menu size={18} />
           </Button>
         </div>
       </div>
@@ -200,15 +201,16 @@ const Header = () => {
             animate={{ opacity: 1, x: 0 }}
             exit={{ opacity: 0, x: "100%" }}
             transition={{ type: "spring", stiffness: 300, damping: 30 }}
-            className="fixed inset-0 bg-background z-50 md:hidden"
+            className="fixed inset-0 bg-background z-50 md:hidden overflow-y-auto w-full h-screen"
+            style={{ backgroundColor: 'var(--background-solid)', backdropFilter: 'none' }}
           >
-            <div className="flex flex-col h-full">
-              <div className="flex items-center justify-between p-4 border-b">
+            <div className="flex flex-col min-h-screen bg-background">
+              <div className="flex items-center justify-between p-4 border-b sticky top-0 z-10 bg-background">
                 <div className="flex items-center">
                   <img 
                     src="/assets/logo/hypeheritage-logo.svg" 
                     alt="HypeHeritage Logo" 
-                    className="h-14 mr-2" 
+                    className="h-10 mr-2" 
                   />
                   <div className="text-xl font-bold">HypeHeritage</div>
                 </div>
@@ -221,118 +223,120 @@ const Header = () => {
                   <X size={24} />
                 </Button>
               </div>
-              <nav className="flex flex-col p-4 space-y-4">
-                {navLinks.map((link) => (
-                  <Link
-                    key={link.name}
-                    to={link.path}
-                    className="text-lg font-medium py-2 flex items-center gap-2"
-                    onClick={() => setMobileMenuOpen(false)}
-                  >
-                    {link.icon && link.icon}
-                    {link.name}
-                  </Link>
-                ))}
-                
-                {/* Language selector for mobile */}
-                <div className="border-t my-2 pt-4">
-                  <div className="text-lg font-medium py-2">{getTranslation('language', language)}</div>
-                  <div className="grid grid-cols-2 gap-2 py-2">
-                    <Button 
-                      variant={language === 'en' ? 'default' : 'outline'} 
-                      size="sm" 
-                      onClick={() => handleLanguageChange('en')}
-                      className="flex items-center justify-center gap-2"
+              <div className="flex-1 overflow-y-auto">
+                <nav className="flex flex-col p-4 space-y-4 bg-background">
+                  {navLinks.map((link) => (
+                    <Link
+                      key={link.name}
+                      to={link.path}
+                      className="text-lg font-medium py-2 flex items-center gap-2"
+                      onClick={() => setMobileMenuOpen(false)}
                     >
-                      <span>🇬🇧</span> {getTranslation('english', language)}
-                    </Button>
-                    <Button 
-                      variant={language === 'ro' ? 'default' : 'outline'} 
-                      size="sm" 
-                      onClick={() => handleLanguageChange('ro')}
-                      className="flex items-center justify-center gap-2"
-                    >
-                      <span>🇷🇴</span> {getTranslation('romanian', language)}
-                    </Button>
-                    <Button 
-                      variant={language === 'es' ? 'default' : 'outline'} 
-                      size="sm" 
-                      onClick={() => handleLanguageChange('es')}
-                      className="flex items-center justify-center gap-2"
-                    >
-                      <span>🇪🇸</span> {getTranslation('spanish', language)}
-                    </Button>
-                    <Button 
-                      variant={language === 'de' ? 'default' : 'outline'} 
-                      size="sm" 
-                      onClick={() => handleLanguageChange('de')}
-                      className="flex items-center justify-center gap-2"
-                    >
-                      <span>🇩🇪</span> {getTranslation('german', language)}
-                    </Button>
+                      {link.icon && link.icon}
+                      {link.name}
+                    </Link>
+                  ))}
+                  
+                  {/* Language selector for mobile */}
+                  <div className="border-t my-2 pt-4">
+                    <div className="text-lg font-medium py-2">{getTranslation('language', language)}</div>
+                    <div className="grid grid-cols-2 gap-2 py-2">
+                      <Button 
+                        variant={language === 'en' ? 'default' : 'outline'} 
+                        size="sm" 
+                        onClick={() => handleLanguageChange('en')}
+                        className="flex items-center justify-center gap-2"
+                      >
+                        <span>🇬🇧</span> {getTranslation('english', language)}
+                      </Button>
+                      <Button 
+                        variant={language === 'ro' ? 'default' : 'outline'} 
+                        size="sm" 
+                        onClick={() => handleLanguageChange('ro')}
+                        className="flex items-center justify-center gap-2"
+                      >
+                        <span>🇷🇴</span> {getTranslation('romanian', language)}
+                      </Button>
+                      <Button 
+                        variant={language === 'es' ? 'default' : 'outline'} 
+                        size="sm" 
+                        onClick={() => handleLanguageChange('es')}
+                        className="flex items-center justify-center gap-2"
+                      >
+                        <span>🇪🇸</span> {getTranslation('spanish', language)}
+                      </Button>
+                      <Button 
+                        variant={language === 'de' ? 'default' : 'outline'} 
+                        size="sm" 
+                        onClick={() => handleLanguageChange('de')}
+                        className="flex items-center justify-center gap-2"
+                      >
+                        <span>🇩🇪</span> {getTranslation('german', language)}
+                      </Button>
+                    </div>
                   </div>
-                </div>
-                
-                {/* Authentication Links for Mobile */}
-                <div className="border-t my-2 pt-4">
-                  {isAuthenticated ? (
-                    <>
-                      <Link
-                        to="/profile"
-                        className="flex items-center gap-2 text-lg font-medium py-2"
-                        onClick={() => setMobileMenuOpen(false)}
-                      >
-                        <User className="h-5 w-5" />
-                        {getTranslation('profile', language)}
-                      </Link>
-                      <Link
-                        to="/orders"
-                        className="text-lg font-medium py-2"
-                        onClick={() => setMobileMenuOpen(false)}
-                      >
-                        {getTranslation('myOrders', language)}
-                      </Link>
-                      {user?.role === 'admin' && (
+                  
+                  {/* Authentication Links for Mobile */}
+                  <div className="border-t my-2 pt-4 mb-20">
+                    {isAuthenticated ? (
+                      <>
                         <Link
-                          to="/admin"
+                          to="/profile"
+                          className="flex items-center gap-2 text-lg font-medium py-2"
+                          onClick={() => setMobileMenuOpen(false)}
+                        >
+                          <User className="h-5 w-5" />
+                          {getTranslation('profile', language)}
+                        </Link>
+                        <Link
+                          to="/orders"
                           className="text-lg font-medium py-2"
                           onClick={() => setMobileMenuOpen(false)}
                         >
-                          {getTranslation('adminDashboard', language)}
+                          {getTranslation('myOrders', language)}
                         </Link>
-                      )}
-                      <button
-                        onClick={() => {
-                          handleLogout();
-                          setMobileMenuOpen(false);
-                        }}
-                        className="flex items-center gap-2 text-lg font-medium py-2 text-destructive"
-                      >
-                        <LogOut className="h-5 w-5" />
-                        {getTranslation('logout', language)}
-                      </button>
-                    </>
-                  ) : (
-                    <>
-                      <Link
-                        to="/login"
-                        className="flex items-center gap-2 text-lg font-medium py-2"
-                        onClick={() => setMobileMenuOpen(false)}
-                      >
-                        <LogIn className="h-5 w-5" />
-                        {getTranslation('login', language)}
-                      </Link>
-                      <Link
-                        to="/register"
-                        className="text-lg font-medium py-2"
-                        onClick={() => setMobileMenuOpen(false)}
-                      >
-                        {getTranslation('register', language)}
-                      </Link>
-                    </>
-                  )}
-                </div>
-              </nav>
+                        {user?.role === 'admin' && (
+                          <Link
+                            to="/admin"
+                            className="text-lg font-medium py-2"
+                            onClick={() => setMobileMenuOpen(false)}
+                          >
+                            {getTranslation('adminDashboard', language)}
+                          </Link>
+                        )}
+                        <button
+                          onClick={() => {
+                            handleLogout();
+                            setMobileMenuOpen(false);
+                          }}
+                          className="flex items-center gap-2 text-lg font-medium py-2 text-destructive"
+                        >
+                          <LogOut className="h-5 w-5" />
+                          {getTranslation('logout', language)}
+                        </button>
+                      </>
+                    ) : (
+                      <>
+                        <Link
+                          to="/login"
+                          className="flex items-center gap-2 text-lg font-medium py-2"
+                          onClick={() => setMobileMenuOpen(false)}
+                        >
+                          <LogIn className="h-5 w-5" />
+                          {getTranslation('login', language)}
+                        </Link>
+                        <Link
+                          to="/register"
+                          className="text-lg font-medium py-2"
+                          onClick={() => setMobileMenuOpen(false)}
+                        >
+                          {getTranslation('register', language)}
+                        </Link>
+                      </>
+                    )}
+                  </div>
+                </nav>
+              </div>
             </div>
           </motion.div>
         )}

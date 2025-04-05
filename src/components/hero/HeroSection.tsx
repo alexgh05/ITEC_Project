@@ -259,13 +259,13 @@ const HeroSection = () => {
   };
 
   return (
-    <section className="relative h-[90vh] overflow-hidden bg-background">
+    <section className="relative h-[90vh] overflow-hidden bg-background w-full">
       <AnimatePresence mode="wait">
         {heroSlides.map((slide, index) => (
           index === currentSlide && (
             <motion.div
               key={slide.id}
-              className="absolute inset-0 flex items-center"
+              className="absolute inset-0 flex items-center w-full"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
@@ -278,7 +278,28 @@ const HeroSection = () => {
               {/* Music visualizer always visible when audio is playing */}
               {isPlaying && (
                 <div className="absolute bottom-0 left-0 right-0 h-16 flex justify-center items-end">
-                  {[...Array(20)].map((_, i) => (
+                  {[...Array(10)].map((_, i) => (
+                    <motion.div
+                      key={i}
+                      className={`w-1 mx-0.5 rounded-t-full ${isMuted ? 'bg-culture/20' : 'bg-culture/40'} backdrop-blur-sm hidden sm:block`}
+                      animate={{ 
+                        height: isMuted 
+                          ? 5 // Static small height when muted
+                          : [
+                              Math.random() * 20 + 5,
+                              Math.random() * 40 + 10, 
+                              Math.random() * 20 + 5
+                            ],
+                      }}
+                      transition={{
+                        repeat: Infinity,
+                        repeatType: "reverse", 
+                        duration: 0.8 + Math.random() * 0.5,
+                        ease: "easeInOut"
+                      }}
+                    />
+                  ))}
+                  {[...Array(10)].map((_, i) => (
                     <motion.div
                       key={i}
                       className={`w-1 mx-0.5 rounded-t-full ${isMuted ? 'bg-culture/20' : 'bg-culture/40'} backdrop-blur-sm`}
@@ -302,7 +323,7 @@ const HeroSection = () => {
                 </div>
               )}
               
-              <div className="container mx-auto px-4 z-10 mt-16">
+              <div className="w-full container mx-auto px-4 sm:px-6 lg:px-8 z-10 mt-16 max-w-screen-2xl">
                 <div className="max-w-2xl">
                   <motion.div
                     className="flex items-center mb-2"
@@ -323,7 +344,7 @@ const HeroSection = () => {
                   </motion.div>
 
                   <motion.h1
-                    className="text-5xl md:text-7xl font-bold text-white mb-4"
+                    className="text-4xl md:text-7xl font-bold text-white mb-4"
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.2, duration: 0.5 }}
@@ -332,7 +353,7 @@ const HeroSection = () => {
                   </motion.h1>
                   
                   <motion.p
-                    className="text-xl text-white/80 mb-8"
+                    className="text-base md:text-xl text-white/80 mb-6 md:mb-8"
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.4, duration: 0.5 }}
@@ -361,7 +382,7 @@ const HeroSection = () => {
         ))}
       </AnimatePresence>
 
-      <div className="absolute bottom-8 left-0 right-0 flex justify-center items-center space-x-2 z-20">
+      <div className="absolute bottom-8 left-0 right-0 flex justify-center items-center space-x-2 z-20 w-full">
         {!isPlaying ? (
           <Button
             variant="ghost"
@@ -388,18 +409,20 @@ const HeroSection = () => {
           </Button>
         )}
         
-        {heroSlides.map((slide, index) => (
-          <button
-            key={slide.id}
-            onClick={() => handleSlideChange(index)}
-            aria-label={`Go to slide ${index + 1}`}
-            className={`w-3 h-3 rounded-full transition-all ${
-              index === currentSlide 
-                ? "bg-culture w-8" 
-                : "bg-white/50 hover:bg-white/80"
-            }`}
-          />
-        ))}
+        <div className="flex space-x-1 sm:space-x-2">
+          {heroSlides.map((slide, index) => (
+            <button
+              key={slide.id}
+              onClick={() => handleSlideChange(index)}
+              aria-label={`Go to slide ${index + 1}`}
+              className={`w-2 sm:w-3 h-2 sm:h-3 rounded-full transition-all ${
+                index === currentSlide 
+                  ? "bg-culture w-4 sm:w-8" 
+                  : "bg-white/50 hover:bg-white/80"
+              }`}
+            />
+          ))}
+        </div>
       </div>
     </section>
   );

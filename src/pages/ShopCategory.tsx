@@ -346,7 +346,7 @@ const ShopCategory = () => {
   return (
     <>
       <section className="py-12 px-4 bg-secondary/50">
-        <div className="container mx-auto">
+        <div className="container mx-auto max-w-full px-4 sm:px-6 lg:px-8">
           <div className="flex items-center mb-4">
             <Button
               variant="ghost"
@@ -361,7 +361,7 @@ const ShopCategory = () => {
             </Button>
           </div>
           
-          <h1 className="text-4xl font-bold">{categoryName}</h1>
+          <h1 className="text-3xl md:text-4xl font-bold">{categoryName}</h1>
           <p className="text-muted-foreground mt-2 max-w-2xl">
             {category === 'music' && 'Discover vinyl records, digital releases, and mixtapes from global urban scenes.'}
             {category === 'fashion' && 'Explore streetwear, limited edition apparel, and cultural fashion statements.'}
@@ -371,16 +371,16 @@ const ShopCategory = () => {
       </section>
       
       <section className="py-12 px-4">
-        <div className="container mx-auto">
+        <div className="container mx-auto max-w-full px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center mb-8 flex-wrap gap-4">
             <h2 className="text-2xl font-bold">
               {filteredProducts.length} {filteredProducts.length === 1 ? 'Product' : 'Products'}
             </h2>
             
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 w-full sm:w-auto justify-end">
               <Popover open={filterOpen} onOpenChange={setFilterOpen}>
                 <PopoverTrigger asChild>
-                  <Button variant="outline" size="sm" className="flex items-center gap-2 bg-black text-white border-zinc-700 hover:bg-zinc-800 hover:text-white">
+                  <Button variant="outline" size="sm" className="flex items-center gap-2 bg-black text-white border-zinc-700 hover:bg-zinc-800 hover:text-white w-full sm:w-auto">
                     <Filter className="h-4 w-4" />
                     Filter
                     {(selectedCultures.length > 0 || priceRange[0] > 0 || priceRange[1] < 200) && (
@@ -482,7 +482,7 @@ const ShopCategory = () => {
 
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button variant="outline" size="sm" className="flex items-center gap-2 bg-black text-white border-zinc-700 hover:bg-zinc-800 hover:text-white">
+                  <Button variant="outline" size="sm" className="flex items-center gap-2 bg-black text-white border-zinc-700 hover:bg-zinc-800 hover:text-white whitespace-nowrap">
                     <SlidersHorizontal className="h-4 w-4" />
                     Sort
                     {sortOption !== 'default' && (

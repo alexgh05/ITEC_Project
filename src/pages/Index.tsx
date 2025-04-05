@@ -204,7 +204,7 @@ const HomePage = () => {
               <span>Thanks for subscribing! We'll keep you updated.</span>
             </div>
           ) : (
-            <form onSubmit={handleSubscribe} className="max-w-md mx-auto flex gap-2">
+            <form onSubmit={handleSubscribe} className="max-w-md mx-auto flex flex-col sm:flex-row gap-2">
               <input
                 type="email"
                 placeholder="Your email address"
@@ -213,7 +213,7 @@ const HomePage = () => {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
               />
-              <Button type="submit">Subscribe</Button>
+              <Button type="submit" className="w-full sm:w-auto">Subscribe</Button>
             </form>
           )}
         </div>
