@@ -187,39 +187,83 @@ export const updateUserProfile = async (profileData: {
 
 // Wishlist API calls
 export const addToWishlist = async (productId: string, token: string) => {
-  const response = await fetch(`${API_URL}/users/wishlist`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      ...getAuthHeader(token),
-    },
-    body: JSON.stringify({ productId }),
-  });
-  
-  if (!response.ok) {
-    const error = await response.json();
-    throw new Error(error.error || 'Failed to add to wishlist');
+  try {
+    console.log(`Adding product to wishlist: ${productId}`);
+    
+    const response = await fetch(`${API_URL}/users/wishlist`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        ...getAuthHeader(token),
+      },
+      body: JSON.stringify({ productId }),
+    });
+    
+    if (!response.ok) {
+      const error = await response.json();
+      console.error('Failed to add to wishlist:', error);
+      throw new Error(error.error || 'Failed to add to wishlist');
+    }
+    
+    const data = await response.json();
+    console.log('Product added to wishlist:', data);
+    return data.data;
+  } catch (error) {
+    console.error('Wishlist add error:', error);
+    throw error;
   }
-  
-  const data = await response.json();
-  return data.data;
 };
 
 export const removeFromWishlist = async (productId: string, token: string) => {
-  const response = await fetch(`${API_URL}/users/wishlist/${productId}`, {
-    method: 'DELETE',
-    headers: {
-      ...getAuthHeader(token),
-    },
-  });
-  
-  if (!response.ok) {
-    const error = await response.json();
-    throw new Error(error.error || 'Failed to remove from wishlist');
+  try {
+    console.log(`Removing product from wishlist: ${productId}`);
+    
+    const response = await fetch(`${API_URL}/users/wishlist/${productId}`, {
+      method: 'DELETE',
+      headers: {
+        ...getAuthHeader(token),
+      },
+    });
+    
+    if (!response.ok) {
+      const error = await response.json();
+      console.error('Failed to remove from wishlist:', error);
+      throw new Error(error.error || 'Failed to remove from wishlist');
+    }
+    
+    const data = await response.json();
+    console.log('Product removed from wishlist:', data);
+    return data.data;
+  } catch (error) {
+    console.error('Wishlist remove error:', error);
+    throw error;
   }
-  
-  const data = await response.json();
-  return data.data;
+};
+
+export const getUserWishlist = async (token: string) => {
+  try {
+    console.log('Fetching user wishlist');
+    
+    const response = await fetch(`${API_URL}/users/wishlist`, {
+      method: 'GET',
+      headers: {
+        ...getAuthHeader(token),
+      },
+    });
+    
+    if (!response.ok) {
+      const error = await response.json();
+      console.error('Failed to fetch wishlist:', error);
+      throw new Error(error.error || 'Failed to fetch wishlist');
+    }
+    
+    const data = await response.json();
+    console.log('Wishlist retrieved:', data);
+    return data.data;
+  } catch (error) {
+    console.error('Wishlist fetch error:', error);
+    throw error;
+  }
 };
 
 // Cart API calls

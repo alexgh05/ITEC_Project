@@ -1,7 +1,7 @@
 import { motion } from 'framer-motion';
 import { useThemeStore, CultureTheme } from '@/store/useThemeStore';
 import { Music, Sparkles, Headphones, Building2, Palmtree, Heart, Radio } from 'lucide-react';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { useAudio } from '@/providers/ThemeProvider';
@@ -19,6 +19,8 @@ const CultureSelector = () => {
   const { culture, setCulture, cultureInfo, audioEnabled } = useThemeStore();
   const { isPlaying, toggleAudio } = useAudio();
   const [hoveredCulture, setHoveredCulture] = useState<CultureTheme | null>(null);
+  const [autoRotate, setAutoRotate] = useState(false);
+  const [currentAutoIndex, setCurrentAutoIndex] = useState(0);
 
   const cultureOptions: CultureOption[] = [
     {
@@ -66,7 +68,54 @@ const CultureSelector = () => {
     }
   ];
 
+  // Filter options to only show cultures that exist in cultureInfo
+  const availableCultureOptions = cultureOptions.filter(option => 
+    cultureInfo && Object.keys(cultureInfo).includes(option.id)
+  );
+
+  // Auto-rotate effect - starts the rotation after 10 seconds
+  useEffect(() => {
+    // Set a timeout to start the auto-rotate after 10 seconds
+    const rotateTimer = setTimeout(() => {
+      setAutoRotate(true);
+    }, 10000);
+
+    // Clear timeout if component unmounts
+    return () => clearTimeout(rotateTimer);
+  }, []);
+
+  // Rotation logic - cycles through cultures automatically
+  useEffect(() => {
+    if (!autoRotate || availableCultureOptions.length === 0) return;
+
+    // Set an interval to rotate every 3 seconds
+    const interval = setInterval(() => {
+      // Move to next culture, wrap around when reaching the end
+      setCurrentAutoIndex(prevIndex => (prevIndex + 1) % availableCultureOptions.length);
+    }, 3000);
+
+    // Clear interval on unmount or if auto-rotate is disabled
+    return () => clearInterval(interval);
+  }, [autoRotate, availableCultureOptions.length]);
+
+  // Effect to hover on the current culture when auto-rotating
+  useEffect(() => {
+    if (!autoRotate) return;
+    if (availableCultureOptions.length > 0) {
+      const currentOption = availableCultureOptions[currentAutoIndex];
+      setHoveredCulture(currentOption.id);
+    }
+  }, [currentAutoIndex, autoRotate, availableCultureOptions]);
+
+  // Stop auto-rotation when user interacts
+  const handleUserInteraction = () => {
+    setAutoRotate(false);
+  };
+
   const handleCultureSelect = (newCulture: CultureTheme) => {
+    // Stop auto-rotation when user selects a culture
+    handleUserInteraction();
+    
     // Immediately apply the theme when clicked
     setCulture(newCulture);
     
@@ -77,8 +126,11 @@ const CultureSelector = () => {
   };
 
   return (
-    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
-      {cultureOptions.map((option) => (
+    <div 
+      className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4"
+      onMouseEnter={handleUserInteraction}
+    >
+      {availableCultureOptions.map((option) => (
         <motion.div
           key={option.id}
           className={`
@@ -88,7 +140,7 @@ const CultureSelector = () => {
           onClick={() => handleCultureSelect(option.id)}
           whileHover={{ scale: 1.03 }}
           onMouseEnter={() => setHoveredCulture(option.id)}
-          onMouseLeave={() => setHoveredCulture(null)}
+          onMouseLeave={() => autoRotate ? null : setHoveredCulture(null)}
         >
           {/* Background image */}
           <div 

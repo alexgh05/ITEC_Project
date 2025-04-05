@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { motion } from 'framer-motion';
 import ProductCard, { Product } from './ProductCard';
@@ -36,16 +35,21 @@ const ProductGrid = ({ products, filters = {} }: ProductGridProps) => {
         animate={{ opacity: 1 }}
         transition={{ staggerChildren: 0.1 }}
       >
-        {displayedProducts.map((product, index) => (
-          <motion.div
-            key={product.id}
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: index * 0.05 }}
-          >
-            <ProductCard product={product} />
-          </motion.div>
-        ))}
+        {displayedProducts.map((product, index) => {
+          // Ensure each product has a valid id for the key prop
+          const key = product.id || product._id || `product-${index}`;
+          
+          return (
+            <motion.div
+              key={key}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: index * 0.05 }}
+            >
+              <ProductCard product={product} />
+            </motion.div>
+          );
+        })}
       </motion.div>
 
       {hasMore && (

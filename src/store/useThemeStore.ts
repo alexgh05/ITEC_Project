@@ -11,6 +11,7 @@ interface CultureInfo {
   sampleTrack?: string;
   backgroundPattern: string;
   themeDescription?: string;
+  rgbColor: string; // RGB values for background color
 }
 
 interface ThemeState {
@@ -39,6 +40,7 @@ export const useThemeStore = create<ThemeState>()(
           primaryColor: "hsl(240, 6%, 10%)",
           musicGenre: "Ambient",
           backgroundPattern: "defaultPattern",
+          rgbColor: "0, 0, 0",
         },
         tokyo: {
           name: "Tokyo",
@@ -48,6 +50,7 @@ export const useThemeStore = create<ThemeState>()(
           sampleTrack: "/audio/tokyo-ambient.mp3",
           backgroundPattern: "neonGrid",
           themeDescription: "Nightlife of Tokyo with neon lights, JDM cars, and Japanese sweets",
+          rgbColor: "20, 10, 40",
         },
         newyork: {
           name: "New York",
@@ -57,6 +60,7 @@ export const useThemeStore = create<ThemeState>()(
           sampleTrack: "/audio/newyork-hiphop.mp3",
           backgroundPattern: "urbanGrids",
           themeDescription: "Dark urban landscape featuring iconic buildings and street culture",
+          rgbColor: "35, 42, 50",
         },
         lagos: {
           name: "Lagos",
@@ -66,6 +70,7 @@ export const useThemeStore = create<ThemeState>()(
           sampleTrack: "/audio/lagos-beats.mp3",
           backgroundPattern: "africanPatterns",
           themeDescription: "Sunny beaches and vibrant Latin-inspired patterns",
+          rgbColor: "255, 180, 0",
         },
         seoul: {
           name: "Seoul",
@@ -75,6 +80,7 @@ export const useThemeStore = create<ThemeState>()(
           sampleTrack: "/audio/seoul-kpop.mp3",
           backgroundPattern: "koreanWaves",
           themeDescription: "K-pop inspired with cute aesthetics, pastels, and hearts",
+          rgbColor: "89, 65, 169",
         },
         london: {
           name: "London",
@@ -84,6 +90,7 @@ export const useThemeStore = create<ThemeState>()(
           sampleTrack: "/audio/london-electronic.mp3",
           backgroundPattern: "electronicGrid",
           themeDescription: "London nightlife with balaclavas, football jerseys, and drill music",
+          rgbColor: "44, 62, 80",
         },
         berlin: {
           name: "Berlin",
@@ -93,6 +100,7 @@ export const useThemeStore = create<ThemeState>()(
           sampleTrack: "/audio/berlin-techno.mp3",
           backgroundPattern: "technoGrid",
           themeDescription: "Berlin underground techno scene with industrial aesthetics and dark tones",
+          rgbColor: "50, 23, 77",
         },
       },
       setDarkMode: (darkMode) => set({ darkMode }),

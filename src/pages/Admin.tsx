@@ -408,6 +408,7 @@ const Admin = () => {
     }
     
     const productData = {
+      productId: formData.get('productId')?.toString() || '',
       name: formData.get('name')?.toString() || '',
       price: parseFloat(formData.get('price')?.toString() || '0'),
       countInStock: parseInt(formData.get('countInStock')?.toString() || '0'),
@@ -641,7 +642,7 @@ const Admin = () => {
                     Add Product
                   </Button>
                 </DialogTrigger>
-                <DialogContent className="sm:max-w-[625px]">
+                <DialogContent className="sm:max-w-[625px] max-h-[90vh] overflow-y-auto">
                   <DialogHeader>
                     <DialogTitle>Add New Product</DialogTitle>
                     <DialogDescription>
@@ -650,6 +651,13 @@ const Admin = () => {
                   </DialogHeader>
                   <form onSubmit={handleAddProduct}>
                     <div className="space-y-4 py-4">
+                      <div className="space-y-2">
+                        <Label htmlFor="productId">Product ID (Required)</Label>
+                        <Input id="productId" name="productId" placeholder="Enter a unique product identifier" required />
+                        <p className="text-xs text-muted-foreground mt-1">
+                          This ID must be unique and will be used for inventory management
+                        </p>
+                      </div>
                       <div className="grid grid-cols-2 gap-4">
                         <div className="space-y-2">
                           <Label htmlFor="name">Product Name</Label>
@@ -762,9 +770,11 @@ const Admin = () => {
                         </div>
                       </div>
                     </div>
-                    <DialogFooter>
+                    <DialogFooter className="mt-6 sticky bottom-0 bg-background pb-2 pt-4">
                       <Button variant="outline" onClick={() => setIsAddDialogOpen(false)}>Cancel</Button>
-                      <Button type="submit">Save Product</Button>
+                      <Button type="submit" className="bg-primary text-primary-foreground hover:bg-primary/90 font-medium">
+                        Save Product
+                      </Button>
                     </DialogFooter>
                   </form>
                 </DialogContent>
@@ -1571,7 +1581,7 @@ const Admin = () => {
           {/* Edit Product Dialog */}
           {selectedProduct && (
             <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
-              <DialogContent className="sm:max-w-[625px]">
+              <DialogContent className="sm:max-w-[625px] max-h-[90vh] overflow-y-auto">
                 <DialogHeader>
                   <DialogTitle>Edit Product</DialogTitle>
                   <DialogDescription>
@@ -1580,6 +1590,18 @@ const Admin = () => {
                 </DialogHeader>
                 <form onSubmit={handleEditProduct}>
                   <div className="space-y-4 py-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="edit-productId">Product ID</Label>
+                      <Input
+                        id="edit-productId"
+                        name="productId"
+                        defaultValue={selectedProduct.productId}
+                        disabled  // Make it read-only in edit mode to prevent changing the ID
+                      />
+                      <p className="text-xs text-muted-foreground mt-1">
+                        Product ID cannot be changed after creation
+                      </p>
+                    </div>
                     <div className="grid grid-cols-2 gap-4">
                       <div className="space-y-2">
                         <Label htmlFor="edit-name">Product Name</Label>
@@ -1695,9 +1717,11 @@ const Admin = () => {
                       </div>
                     </div>
                   </div>
-                  <DialogFooter className="gap-2">
+                  <DialogFooter className="mt-6 sticky bottom-0 bg-background pb-2 pt-4">
                     <Button variant="outline" onClick={() => setIsEditDialogOpen(false)}>Cancel</Button>
-                    <Button type="submit">Update Product</Button>
+                    <Button type="submit" className="bg-primary text-primary-foreground hover:bg-primary/90 font-medium">
+                      Update Product
+                    </Button>
                   </DialogFooter>
                 </form>
               </DialogContent>

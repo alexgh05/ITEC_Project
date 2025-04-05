@@ -1,12 +1,23 @@
 import { useState, useEffect, useRef } from 'react';
-import { Music, Heart, Building2, Sparkles } from 'lucide-react';
+import { Music, Heart, Building2, Sparkles, User } from 'lucide-react';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Card } from '@/components/ui/card';
 import { OutfitCard } from '@/components/outfit/OutfitCard';
 import { toast } from '@/components/ui/use-toast';
+import { useThemeStore } from '@/store/useThemeStore';
+import { Button } from '@/components/ui/button';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { useAuthStore } from '@/store/useAuthStore';
+import { useNavigate } from 'react-router-dom';
 
 // Simple, reliable outfit generator
 export const FinalOutfitGenerator = () => {
+  // Access theme store for culture theme - moving this to the top
+  const { culture, setCulture, cultureInfo, darkMode } = useThemeStore();
+
+  // User auth state
+  const { user, isAuthenticated } = useAuthStore();
+  
   const [musicGenre, setMusicGenre] = useState<string>('trap');
   const [emotionalState, setEmotionalState] = useState<string>('energetic');
   const [city, setCity] = useState<string>('tokyo');
@@ -15,39 +26,42 @@ export const FinalOutfitGenerator = () => {
   // Track previous selections to avoid regenerating the same outfit
   const prevSelectionsRef = useRef({ musicGenre, emotionalState, city });
   
-  // Data for selects
+  // Simulated data for the UI demo
   const musicGenres = [
     { value: 'trap', label: 'Trap' },
-    { value: 'jazz', label: 'Jazz' },
-    { value: 'techno', label: 'Techno' },
     { value: 'hiphop', label: 'Hip Hop' },
-    { value: 'pop', label: 'Pop' },
-    { value: 'rock', label: 'Rock' },
-    { value: 'latin', label: 'Latin' },
+    { value: 'techno', label: 'Techno' },
+    { value: 'drill', label: 'Drill' },
     { value: 'kpop', label: 'K-Pop' },
+    { value: 'afrobeats', label: 'Afrobeats' }
   ];
   
   const emotionalStates = [
     { value: 'energetic', label: 'Energetic' },
-    { value: 'nostalgic', label: 'Nostalgic' },
-    { value: 'rebellious', label: 'Rebellious' },
-    { value: 'romantic', label: 'Romantic' },
-    { value: 'melancholic', label: 'Melancholic' },
-    { value: 'joyful', label: 'Joyful' },
     { value: 'confident', label: 'Confident' },
-    { value: 'mysterious', label: 'Mysterious' },
+    { value: 'rebellious', label: 'Rebellious' },
+    { value: 'mysterious', label: 'Mysterious' }
   ];
   
   const cities = [
     { value: 'tokyo', label: 'Tokyo' },
-    { value: 'paris', label: 'Paris' },
     { value: 'newyork', label: 'New York' },
     { value: 'london', label: 'London' },
     { value: 'seoul', label: 'Seoul' },
     { value: 'lagos', label: 'Lagos' },
-    { value: 'mumbai', label: 'Mumbai' },
-    { value: 'rio', label: 'Rio de Janeiro' },
+    { value: 'berlin', label: 'Berlin' }
   ];
+  
+  // Function to get city options based on what's in the theme store
+  const getAvailableCities = () => {
+    // We're simply returning our cities, filtered to match those available in cultureInfo
+    if (cultureInfo) {
+      return cities.filter(cityOption => 
+        Object.keys(cultureInfo).includes(cityOption.value)
+      );
+    }
+    return cities;
+  };
   
   const getMusicGenreLabel = (value: string): string => {
     return musicGenres.find(genre => genre.value === value)?.label || value;
@@ -123,25 +137,21 @@ export const FinalOutfitGenerator = () => {
     // Color palettes by city
     const colorPalettes = {
       'tokyo': ['#FF2E7E', '#3649FF', '#00F0FF', '#111111'],
-      'paris': ['#F5D6C6', '#3A3042', '#EF9D87', '#4F5165'],
       'newyork': ['#232528', '#2C55A2', '#D64045', '#F9F9F9'],
       'london': ['#5863F8', '#0E2535', '#EAF205', '#B8EBD0'],
       'seoul': ['#FFB8DE', '#A5AAF2', '#FFF07A', '#121212'],
       'lagos': ['#FFB400', '#3F173F', '#29A0B1', '#E5DDDB'],
-      'mumbai': ['#FF7400', '#FFDB58', '#7851A9', '#00539C'],
-      'rio': ['#97C93D', '#FCDB00', '#7CBBDE', '#F3752B']
+      'berlin': ['#9932CC', '#8A2BE2', '#4B0082', '#191919']
     };
     
     // Outfit names by genre
     const outfitNames = {
       'trap': ['Neon Ronin', 'Street Prophet', 'Urban Samurai', 'Chrome Bandit'],
-      'jazz': ['Velvet Noir', 'Midnight Serenade', 'Blue Note Dreamer', 'Smooth Operator'],
-      'techno': ['Digital Nomad', 'Cyber Pulse', 'Quantum Drift', 'Electric Horizon'],
       'hiphop': ['Flow Master', 'Concrete Poet', 'Rhythm Rebel', 'Lyrical Ghost'],
-      'pop': ['Candy Haze', 'Prism Wave', 'Sparkle Shift', 'Bubblegum Halo'],
-      'rock': ['Vintage Vortex', 'Leather Legend', 'Riff Runner', 'Shadow Stance'],
-      'latin': ['Tropical Pulse', 'Salsa Sunset', 'Vibrant Rhythm', 'Spice Wave'],
-      'kpop': ['Pastel Dream', 'Neon Daydream', 'Soft Focus', 'Candy Floss Warrior']
+      'techno': ['Digital Nomad', 'Cyber Pulse', 'Quantum Drift', 'Electric Horizon'],
+      'drill': ['Shadow Crew', 'Dark Streets', 'Urban Knight', 'Night Runner'],
+      'kpop': ['Pastel Dream', 'Neon Daydream', 'Soft Focus', 'Candy Floss Warrior'],
+      'afrobeats': ['Rhythm King', 'Lagos Nights', 'Vibrant Pulse', 'Golden Flow']
     };
     
     // Generate outfit elements based on selections
@@ -160,11 +170,6 @@ export const FinalOutfitGenerator = () => {
         'mysterious': '21 Savage & Metro Boomin - "Savage Mode II" Vinyl'
       },
       // Additional genres with their mood-based recommendations
-      'jazz': {
-        'energetic': 'Kamasi Washington - "The Epic" Triple Vinyl',
-        'nostalgic': 'Miles Davis - "Kind of Blue" Classic Vinyl',
-        'confident': 'Esperanza Spalding - "Emily\'s D+Evolution" Album'
-      },
       'techno': {
         'energetic': 'Amelie Lens - "Hypnotized" EP',
         'mysterious': 'Gesaffelstein - "Aleph" Vinyl'
@@ -189,8 +194,12 @@ export const FinalOutfitGenerator = () => {
     let description = '';
     if (city === 'tokyo' && musicGenre === 'trap' && emotionalState === 'energetic') {
       description = `A futuristic cyberpunk ensemble featuring ${outfitElements.hat}, ${outfitElements.tShirt}, ${outfitElements.pants}, and ${outfitElements.accessory}. Pairs perfectly with ${musicRecommendation}.`;
-    } else if (city === 'paris' && musicGenre === 'jazz' && emotionalState === 'nostalgic') {
-      description = `A sophisticated vintage-inspired look with a modern twist. ${outfitElements.hat} paired with ${outfitElements.tShirt}, ${outfitElements.pants}, and ${outfitElements.accessory}. Complete the vibe with ${musicRecommendation}.`;
+    } else if (city === 'newyork' && musicGenre === 'hiphop' && emotionalState === 'confident') {
+      description = `A bold urban look with authentic New York street style. ${outfitElements.hat} paired with ${outfitElements.tShirt}, ${outfitElements.pants}, and ${outfitElements.accessory}. Complete the vibe with ${musicRecommendation}.`;
+    } else if (city === 'london' && musicGenre === 'drill' && emotionalState === 'rebellious') {
+      description = `A cutting-edge outfit inspired by London's drill scene. ${outfitElements.hat} matched with ${outfitElements.tShirt}, ${outfitElements.pants}, and ${outfitElements.accessory}. Best enjoyed with ${musicRecommendation}.`;
+    } else if (city === 'berlin' && musicGenre === 'techno' && emotionalState === 'mysterious') {
+      description = `A sleek Berlin nightlife look with industrial influences. ${outfitElements.hat} combined with ${outfitElements.tShirt}, ${outfitElements.pants}, and ${outfitElements.accessory}. Enhances the experience of ${musicRecommendation}.`;
     } else {
       description = `A unique blend of ${cities.find(c => c.value === city)?.label || city}'s cultural aesthetic and ${musicGenres.find(g => g.value === musicGenre)?.label || musicGenre} influences, expressing a ${emotionalStates.find(e => e.value === emotionalState)?.label || emotionalState} mood. Features ${outfitElements.hat}, ${outfitElements.tShirt}, ${outfitElements.pants}, and ${outfitElements.accessory}. Soundtrack: ${musicRecommendation}.`;
     }
@@ -219,18 +228,17 @@ export const FinalOutfitGenerator = () => {
     const hatOptions = {
       'tokyo': {
         'trap': 'Neon bucket hat with holographic details',
-        'jazz': 'Minimalist fedora with subtle geometric pattern',
         'techno': 'Reflective cap with LED trim',
         'default': 'Structured snapback with kanji embroidery'
-      },
-      'paris': {
-        'jazz': 'Classic beret in muted tones',
-        'default': 'Tailored flat cap with subtle check pattern'
       },
       'newyork': {
         'hiphop': 'Vintage Yankees fitted cap',
         'trap': 'High-end designer beanie',
         'default': 'Five-panel camp cap with minimalist graphic'
+      },
+      'london': {
+        'drill': 'Black balaclava with subtle branding',
+        'default': 'Signature check pattern bucket hat'
       },
       'default': 'Structured snapback with urban graphics'
     };
@@ -239,13 +247,11 @@ export const FinalOutfitGenerator = () => {
     const tShirtOptions = {
       'energetic': {
         'trap': 'Oversized graphic tee with bold digital prints',
-        'jazz': 'Slim-fit abstract pattern tee in premium cotton',
+        'techno': 'Reflective technical tee with minimal design',
         'default': 'Vibrant color-block tee with contrast stitching'
       },
-      'nostalgic': {
-        'default': 'Vintage-wash band tee with faded graphics'
-      },
       'rebellious': {
+        'drill': 'Dark oversized tee with distressed elements',
         'default': 'Distressed tee with provocative slogans'
       },
       'default': 'Premium cotton tee with subtle tonal embroidery'
@@ -263,6 +269,7 @@ export const FinalOutfitGenerator = () => {
         'default': 'Slim straight chinos with side tape detail'
       },
       'london': {
+        'drill': 'Black tactical joggers with multiple pockets',
         'default': 'Tailored track pants with contrast piping'
       },
       'default': 'Relaxed-fit pants with tonal detailing'
@@ -275,13 +282,25 @@ export const FinalOutfitGenerator = () => {
         'techno': 'Smart LED bracelet that pulses with the music',
         'default': 'Minimalist crossbody bag with geometric hardware'
       },
-      'paris': {
-        'jazz': 'Vintage-inspired pocket watch on a delicate chain',
+      'newyork': {
+        'hiphop': 'Vintage-inspired leather backpack',
         'default': 'Artisanal leather wristband with subtle pattern'
       },
       'seoul': {
         'kpop': 'Statement earrings with colorful geometric shapes',
         'default': 'Multi-layer necklace with mixed materials'
+      },
+      'london': {
+        'drill': 'Statement chain with urban-inspired pendant',
+        'default': 'Premium leather belt with matte buckle'
+      },
+      'lagos': {
+        'afrobeats': 'Beaded bracelet with cultural patterns',
+        'default': 'Woven statement necklace with natural materials'
+      },
+      'berlin': {
+        'techno': 'Industrial-style pendant with LED accent',
+        'default': 'Minimalist watch with unique architectural details'
       },
       'default': 'Statement watch with unique architectural details'
     };
@@ -305,7 +324,7 @@ export const FinalOutfitGenerator = () => {
       accessory
     };
   };
-  
+
   return (
     <div className="min-h-screen bg-black p-6 text-white">
       <div className="max-w-6xl mx-auto">
@@ -374,7 +393,7 @@ export const FinalOutfitGenerator = () => {
                     <SelectValue placeholder="Select a city" />
                   </SelectTrigger>
                   <SelectContent className="bg-gray-800 border-gray-700 text-white">
-                    {cities.map((city) => (
+                    {getAvailableCities().map((city) => (
                       <SelectItem key={city.value} value={city.value}>
                         {city.label}
                       </SelectItem>

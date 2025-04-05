@@ -5,6 +5,7 @@ import { Heart, ShoppingCart, ChevronDown } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useCartStore } from '@/store/useCartStore';
 import { useWishlistStore } from '@/store/useWishlistStore';
+import { useAuthStore } from '@/store/useAuthStore';
 import { toast } from 'sonner';
 import {
   Popover,
@@ -36,6 +37,7 @@ const ProductCard = ({ product }: ProductCardProps) => {
   const [isHovered, setIsHovered] = useState(false);
   const { addItem } = useCartStore();
   const { toggleItem, isInWishlist } = useWishlistStore();
+  const { isAuthenticated, token } = useAuthStore();
   const [selectedSize, setSelectedSize] = useState<string | null>(null);
   const [popoverOpen, setPopoverOpen] = useState(false);
   const isFavorite = isInWishlist(product.id);
@@ -73,13 +75,25 @@ const ProductCard = ({ product }: ProductCardProps) => {
     setPopoverOpen(false); // Close popover after adding to cart
   };
 
-  const handleToggleWishlist = (e: React.MouseEvent) => {
+  const handleToggleWishlist = async (e: React.MouseEvent) => {
     e.preventDefault();
-    toggleItem(product);
-    toast.success(isFavorite 
-      ? `${product.name} removed from wishlist!` 
-      : `${product.name} added to wishlist!`
-    );
+    
+    // Check if product has a valid ID before proceeding
+    if (!product.id) {
+      console.error('Cannot add product to wishlist: Missing product ID', product);
+      toast.error('Cannot add to wishlist: Invalid product');
+      return;
+    }
+    
+    try {
+      await toggleItem(product, isAuthenticated ? token : undefined);
+      toast.success(isFavorite 
+        ? `${product.name} removed from wishlist!` 
+        : `${product.name} added to wishlist!`
+      );
+    } catch (error) {
+      toast.error(`Failed to ${isFavorite ? 'remove from' : 'add to'} wishlist`);
+    }
   };
 
   // Check if product is out of stock

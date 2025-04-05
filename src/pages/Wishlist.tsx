@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useWishlistStore } from '@/store/useWishlistStore';
 import { useCartStore } from '@/store/useCartStore';
+import { useAuthStore } from '@/store/useAuthStore';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import { Heart, ShoppingCart, ArrowLeft, Eye, GripVertical, ChevronDown } from 'lucide-react';
@@ -13,11 +14,13 @@ import {
 } from "@/components/ui/popover";
 
 const Wishlist = () => {
-  const { items, removeItem, clearWishlist, setItems } = useWishlistStore();
+  const { items, removeItem, clearWishlist, setItems, syncWithUser } = useWishlistStore();
   const { addItem } = useCartStore();
+  const { user, token, isAuthenticated } = useAuthStore();
   const navigate = useNavigate();
   const [reorderEnabled, setReorderEnabled] = useState(false);
   const [reorderItems, setReorderItems] = useState(items);
+  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
     // Set page title
@@ -26,6 +29,29 @@ const Wishlist = () => {
     // Scroll to top when component mounts
     window.scrollTo(0, 0);
     
+    // If user is authenticated, sync wishlist with server data
+    const syncWishlistIfAuthenticated = async () => {
+      if (isAuthenticated && token) {
+        setIsLoading(true);
+        try {
+          await syncWithUser(token);
+          console.log('Wishlist synced with server:', items);
+          toast.success('Wishlist synced with your account');
+        } catch (error) {
+          console.error('Failed to load wishlist:', error);
+          toast.error('Failed to load your wishlist');
+        } finally {
+          setIsLoading(false);
+        }
+      } else {
+        console.log('User not authenticated, using local wishlist:', items);
+      }
+    };
+    
+    syncWishlistIfAuthenticated();
+  }, [isAuthenticated, token, syncWithUser]);
+  
+  useEffect(() => {
     // Sync reorderItems with items when items change
     setReorderItems(items);
   }, [items]);
@@ -38,9 +64,13 @@ const Wishlist = () => {
     toast.success(`${product.name} (${selectedSize}) added to cart!`);
   };
 
-  const handleRemoveFromWishlist = (product: any) => {
-    removeItem(product.id);
-    toast.success(`${product.name} removed from wishlist!`);
+  const handleRemoveFromWishlist = async (product: any) => {
+    try {
+      await removeItem(product.id, token);
+      toast.success(`${product.name} removed from wishlist!`);
+    } catch (error) {
+      toast.error('Failed to remove from wishlist');
+    }
   };
   
   const handleViewProduct = (product: any) => {
@@ -52,6 +82,24 @@ const Wishlist = () => {
     setReorderEnabled(false);
     toast.success('Wishlist order saved!');
   };
+
+  // Content for unauthenticated users
+  const unauthenticatedContent = (
+    <div className="text-center py-6 mt-4 bg-muted/30 rounded-lg p-6">
+      <div className="text-amber-600 dark:text-amber-400 mb-4">
+        <svg xmlns="http://www.w3.org/2000/svg" className="h-12 w-12 mx-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m0 0v2m0-2h2m-2 0H8m10 0a9 9 0 11-18 0 9 9 0 0118 0z" />
+        </svg>
+      </div>
+      <h3 className="text-lg font-medium mb-2">Your wishlist is temporary</h3>
+      <p className="text-muted-foreground mb-4">
+        Sign in to save your wishlist permanently and access it from any device.
+      </p>
+      <Button asChild>
+        <Link to="/login">Sign In</Link>
+      </Button>
+    </div>
+  );
 
   return (
     <>
@@ -71,7 +119,12 @@ const Wishlist = () => {
 
       <section className="py-8 px-4">
         <div className="container mx-auto">
-          {items.length === 0 ? (
+          {isLoading ? (
+            <div className="text-center py-12">
+              <div className="animate-spin h-8 w-8 border-4 border-primary border-t-transparent rounded-full mx-auto"></div>
+              <p className="mt-4">Loading your wishlist...</p>
+            </div>
+          ) : items.length === 0 ? (
             <div className="text-center py-12">
               <Heart className="mx-auto h-12 w-12 text-muted-foreground" />
               <h2 className="mt-4 text-xl font-medium">Your wishlist is empty</h2>
@@ -82,6 +135,8 @@ const Wishlist = () => {
             </div>
           ) : (
             <div className="space-y-6">
+              {!isAuthenticated && unauthenticatedContent}
+              
               <div className="flex justify-between items-center">
                 <h2 className="text-xl font-medium">
                   {items.length} {items.length === 1 ? 'Item' : 'Items'}
@@ -143,8 +198,31 @@ const Wishlist = () => {
 const WishlistItem = ({ product, handleRemoveFromWishlist, handleAddToCart, handleViewProduct }) => {
   const [selectedSize, setSelectedSize] = useState<string | null>(null);
   const [popoverOpen, setPopoverOpen] = useState(false);
+  
+  // Validate product data - show error if critical data is missing
+  if (!product || !product.id) {
+    return (
+      <div className="bg-card rounded-lg p-4 border border-red-300">
+        <p className="text-red-500">Invalid product data</p>
+        <Button 
+          size="sm" 
+          variant="destructive" 
+          className="mt-2"
+          onClick={() => handleRemoveFromWishlist({ id: product?.id || 'unknown', name: 'Unknown Product' })}
+        >
+          Remove Invalid Item
+        </Button>
+      </div>
+    );
+  }
+  
   // Default sizes if the product doesn't specify any
   const sizes = product.sizes || ['S', 'M', 'L', 'XL'];
+  
+  // Ensure product has images
+  const productImage = product.images && product.images.length > 0 
+    ? product.images[0] 
+    : '/placeholder-product.jpg';
 
   const handleSizeSelect = (size: string) => {
     setSelectedSize(size);
@@ -165,9 +243,13 @@ const WishlistItem = ({ product, handleRemoveFromWishlist, handleAddToCart, hand
         onClick={() => handleViewProduct(product)}
       >
         <img 
-          src={product.images[0]} 
-          alt={product.name} 
+          src={productImage} 
+          alt={product.name || 'Product image'} 
           className="w-full h-full object-cover object-center transition-transform group-hover:scale-105 duration-300"
+          onError={(e) => {
+            // Fallback to placeholder if image fails to load
+            e.currentTarget.src = '/placeholder-product.jpg';
+          }}
         />
         <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
           <Button 

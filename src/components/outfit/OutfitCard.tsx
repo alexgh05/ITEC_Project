@@ -5,6 +5,8 @@ import { toast } from '@/components/ui/use-toast';
 import { useCartStore } from '@/store/useCartStore';
 import { useNavigate } from 'react-router-dom';
 import { useAuthStore } from '@/store/useAuthStore';
+import { fetchProducts } from '@/lib/api';
+import { useThemeStore, CultureTheme } from '@/store/useThemeStore';
 
 // OutfitResult type definition
 interface OutfitResult {
@@ -32,154 +34,156 @@ interface OutfitCardProps {
 // Product interface - making it compatible with the app's ProductCard Product type
 interface Product {
   id: string;
+  _id?: string;
   name: string;
   price: number;
-  stock: number;
-  image: string;
+  stock?: number;
+  image?: string;
   category: string;
   culture?: string;
   images?: string[];
   description?: string;
   selectedSize?: string;
-  // Add compatibility with cart store
   countInStock?: number;
 }
 
-// Local product database - using the actual product images from public/products
-const localProducts: Product[] = [
-  {
-    id: 'tokyo-hoodie-1',
-    name: 'Tokyo Neon Hoodie',
-    price: 89.99,
-    stock: 14,
-    image: '/products/tokyo-neon-hoodie-1.svg',
-    category: 'tops'
-  },
-  {
-    id: 'tokyo-hoodie-2',
-    name: 'Tokyo Streetwear Hoodie',
-    price: 94.99,
-    stock: 8,
-    image: '/products/tokyo-neon-hoodie-2.svg',
-    category: 'tops'
-  },
-  {
-    id: 'rio-tshirt-1',
-    name: 'Rio Festival T-Shirt',
-    price: 39.99,
-    stock: 23,
-    image: '/products/rio-festival-tshirt-1.svg',
-    category: 'tops'
-  },
-  {
-    id: 'rio-tshirt-2',
-    name: 'Rio Vibrant Graphic Tee',
-    price: 42.99,
-    stock: 17,
-    image: '/products/rio-festival-tshirt-2.svg',
-    category: 'tops'
-  },
-  {
-    id: 'seoul-jacket-1',
-    name: 'Seoul Streetwear Jacket',
-    price: 129.99,
-    stock: 6,
-    image: '/products/seoul-streetwear-jacket-1.svg',
-    category: 'tops'
-  },
-  {
-    id: 'seoul-jacket-2',
-    name: 'Seoul Urban Jacket',
-    price: 135.99,
-    stock: 5,
-    image: '/products/seoul-streetwear-jacket-2.svg',
-    category: 'tops'
-  },
-  {
-    id: 'nyc-cap-1',
-    name: 'NYC Graffiti Cap',
-    price: 34.99,
-    stock: 19,
-    image: '/products/nyc-graffiti-cap-1.svg',
-    category: 'accessories'
-  },
-  {
-    id: 'nyc-cap-2',
-    name: 'NYC Urban Snapback',
-    price: 39.99,
-    stock: 12,
-    image: '/products/nyc-graffiti-cap-2.svg',
-    category: 'accessories'
-  },
-  {
-    id: 'london-umbrella-1',
-    name: 'London Fog Umbrella',
-    price: 49.99,
-    stock: 9,
-    image: '/products/london-fog-umbrella-1.svg',
-    category: 'accessories'
-  },
-  {
-    id: 'london-umbrella-2',
-    name: 'London Rainy Day Umbrella',
-    price: 54.99,
-    stock: 7,
-    image: '/products/london-fog-umbrella-2.svg',
-    category: 'accessories'
-  },
-  {
-    id: 'nyc-vinyl-1',
-    name: 'NYC Underground Vinyl',
-    price: 29.99,
-    stock: 15,
-    image: '/products/nyc-underground-vinyl-1.svg',
-    category: 'music'
-  },
-  {
-    id: 'nyc-vinyl-2',
-    name: 'NYC Hip-Hop Classics Vinyl',
-    price: 34.99,
-    stock: 8,
-    image: '/products/nyc-underground-vinyl-2.svg',
-    category: 'music'
-  },
-  {
-    id: 'lagos-headphones-1',
-    name: 'Lagos Beats Headphones',
-    price: 149.99,
-    stock: 11,
-    image: '/products/lagos-beats-headphones-1.svg',
-    category: 'accessories'
-  },
-  {
-    id: 'lagos-headphones-2',
-    name: 'Lagos Premium Headphones',
-    price: 179.99,
-    stock: 6,
-    image: '/products/lagos-beats-headphones-2.svg',
-    category: 'accessories'
-  }
-];
+// ProductItem component
+interface ProductItemProps {
+  product: Product;
+  originalName: string;
+  isMusic?: boolean;
+  compact?: boolean;
+  onAddToCart: (product: Product) => void;
+}
+
+const ProductItem = ({ product, originalName, isMusic = false, compact = false, onAddToCart }: ProductItemProps) => {
+  if (!product) return null;
+  const { darkMode } = useThemeStore();
+  
+  return (
+    <div className={`relative border rounded-md overflow-hidden product-card ${compact ? 'h-24' : 'h-auto'} ${darkMode ? 'bg-black/40 border-culture/20' : 'bg-white/90 border-culture/40'}`}>
+      <div className={`flex ${compact ? 'flex-row' : 'flex-col'}`}>
+        <div className={`${compact ? 'w-24 h-24' : 'w-full aspect-square'} bg-muted premium-image`}>
+          <img 
+            src={product.image}
+            alt={product.name}
+            className="w-full h-full object-cover"
+          />
+        </div>
+        
+        <div className={`${compact ? 'flex-1 p-2' : 'p-3'} flex flex-col justify-between`}>
+          <div>
+            <h3 className={`${compact ? 'text-sm line-clamp-1' : 'text-base'} font-medium ${darkMode ? 'text-white' : 'text-gray-800'}`}>
+              {product.name}
+            </h3>
+            <p className={`text-culture ${compact ? 'text-xs' : 'text-sm'} font-semibold`}>
+              ${product.price.toFixed(2)}
+            </p>
+          </div>
+          
+          {!compact && (
+            <div className="mt-2 space-y-2">
+              <p className="text-xs">
+                {product.stock > 10 ? 
+                  <span className="text-green-600">In Stock</span> : 
+                  product.stock > 0 ? 
+                    <span className="text-amber-600">Low Stock: {product.stock}</span> : 
+                    <span className="text-red-600">Out of Stock</span>
+                }
+              </p>
+              
+              <Button 
+                variant="outline" 
+                size="sm" 
+                className="w-full h-8 bg-culture/10 hover:bg-culture/20 text-culture"
+                disabled={product.stock <= 0}
+                onClick={() => onAddToCart(product)}
+                data-product-id={product.id}
+              >
+                Add to Cart
+              </Button>
+            </div>
+          )}
+        </div>
+      </div>
+      
+      {isMusic && (
+        <div className="absolute top-2 right-2 bg-black/60 rounded-full p-1.5">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M9 18V6L21 3V15" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+            <circle cx="6" cy="18" r="3" stroke="white" strokeWidth="2"/>
+            <circle cx="18" cy="15" r="3" stroke="white" strokeWidth="2"/>
+          </svg>
+        </div>
+      )}
+    </div>
+  );
+};
 
 export const OutfitCard = ({ outfit }: OutfitCardProps) => {
   const [showImage, setShowImage] = useState(false);
   const [products, setProducts] = useState<Record<string, Product>>({});
   const [loading, setLoading] = useState(true);
+  const [storeProducts, setStoreProducts] = useState<Product[]>([]);
   
   // Use the global cart store
   const { addItem, items, getTotalItems } = useCartStore();
   const navigate = useNavigate();
   const { isAuthenticated } = useAuthStore();
   
+  // Add theme store access for dark mode
+  const { darkMode, cultureInfo } = useThemeStore();
+  
+  // Fetch real products from the store
+  useEffect(() => {
+    const getStoreProducts = async () => {
+      try {
+        setLoading(true);
+        // Fetch products with the same culture as the outfit if possible
+        const products = await fetchProducts(undefined, outfit.city);
+        
+        // If no products match the exact culture, fetch all products
+        if (products.length === 0) {
+          const allProducts = await fetchProducts();
+          setStoreProducts(allProducts.map(product => ({
+            ...product,
+            id: product._id || product.id, // Ensure id is set for consistency
+            image: product.images && product.images.length > 0 ? product.images[0] : '',
+            stock: product.countInStock
+          })));
+        } else {
+          setStoreProducts(products.map(product => ({
+            ...product,
+            id: product._id || product.id, // Ensure id is set for consistency
+            image: product.images && product.images.length > 0 ? product.images[0] : '',
+            stock: product.countInStock
+          })));
+        }
+        
+        setLoading(false);
+      } catch (error) {
+        console.error('Error fetching products:', error);
+        toast({
+          title: "Error fetching products",
+          description: "Could not load store products. Using limited selection.",
+          duration: 3000,
+        });
+        setLoading(false);
+      }
+    };
+    
+    getStoreProducts();
+  }, [outfit.city]);
+  
   // Add to cart function
   const addToCart = (product: Product) => {
     // Add mock images array since the cart expects it
     const cartProduct = {
       ...product,
-      images: [product.image],
-      culture: outfit.city,
-      description: `From the ${outfit.name} collection.`,
-      countInStock: product.stock,
+      images: product.images || [product.image || ''],
+      culture: product.culture || outfit.city,
+      description: product.description || `From the ${outfit.name} collection.`,
+      countInStock: product.countInStock || product.stock || 0,
       selectedSize: 'M' // Default size
     };
     
@@ -233,10 +237,10 @@ export const OutfitCard = ({ outfit }: OutfitCardProps) => {
       // Create a cart product with 15% discount
       const cartProduct = {
         ...product,
-        images: [product.image],
-        culture: outfit.city,
-        description: `From the ${outfit.name} collection. SAVE 15% with Complete Look!`,
-        countInStock: product.stock,
+        images: product.images || [product.image || ''],
+        culture: product.culture || outfit.city,
+        description: product.description || `From the ${outfit.name} collection. SAVE 15% with Complete Look!`,
+        countInStock: product.countInStock || product.stock || 0,
         selectedSize: 'M' // Default size
       };
       
@@ -251,215 +255,167 @@ export const OutfitCard = ({ outfit }: OutfitCardProps) => {
       duration: 3000,
     });
     
-    // Add visual feedback
-    const buyButton = document.querySelector('[data-testid="buy-complete-look"]') as HTMLElement;
-    if (buyButton) {
-      buyButton.classList.add('button-flash');
-      setTimeout(() => {
-        buyButton.classList.remove('button-flash');
-      }, 200);
-    }
-    
-    // Navigate to cart after delay
-    setTimeout(() => navigate('/cart'), 1000);
+    // Navigate to cart page
+    navigate('/cart');
   };
   
-  // Match outfit elements to products in our local database
+  // Generate product recommendations based on the outfit
   useEffect(() => {
-    const matchProducts = () => {
-      try {
-        setLoading(true);
-        
-        // Categorize our products by type for easier selection
-        const productsByCategory = {
-          tops: localProducts.filter(p => p.category === 'tops'),
-          accessories: localProducts.filter(p => p.category === 'accessories'),
-          music: localProducts.filter(p => p.category === 'music')
-        };
-        
-        // Initialize product data object
-        const productData: Record<string, Product> = {};
-        
-        // Helper function to get products that match the city
-        const getProductsByCity = (products: Product[], cityName: string) => {
-          // First attempt exact match by city name in product name
-          const exactMatches = products.filter(p => 
-            p.name.toLowerCase().includes(cityName.toLowerCase())
-          );
-          
-          if (exactMatches.length > 0) {
-            return exactMatches;
-          }
-          
-          // For some cities, use alternative keywords that represent the city style
-          const cityKeywords: Record<string, string[]> = {
-            'london': ['london', 'fog', 'british', 'uk'],
-            'tokyo': ['tokyo', 'japan', 'neon'],
-            'newyork': ['nyc', 'new york', 'yankees', 'urban'],
-            'paris': ['paris', 'french'],
-            'seoul': ['seoul', 'korean'],
-            'rio': ['rio', 'brazil', 'festival'],
-            'lagos': ['lagos', 'africa', 'beats'],
-            'mumbai': ['mumbai', 'indian']
-          };
-          
-          const keywords = cityKeywords[cityName.toLowerCase()] || [cityName.toLowerCase()];
-          
-          // Search for products that match any of the city keywords
-          const keywordMatches = products.filter(p => 
-            keywords.some(keyword => p.name.toLowerCase().includes(keyword))
-          );
-          
-          return keywordMatches.length > 0 ? keywordMatches : products;
-        };
-        
-        if (outfit.outfitElements) {
-          // We always want exactly 4 products total
-          
-          // Filter products by city first
-          const cityTops = getProductsByCity(productsByCategory.tops, outfit.city);
-          const cityAccessories = getProductsByCity(productsByCategory.accessories, outfit.city);
-          const cityMusic = getProductsByCity(productsByCategory.music, outfit.city);
-          
-          // 1. Add top item (always included)
-          if (cityTops.length > 0) {
-            const randomTop = cityTops[Math.floor(Math.random() * cityTops.length)];
-            productData.tShirt = randomTop;
-          } else if (productsByCategory.tops.length > 0) {
-            // Fallback to any top if no city-specific ones are found
-            productData.tShirt = productsByCategory.tops[Math.floor(Math.random() * productsByCategory.tops.length)];
-          }
-          
-          // 2. Add hat (always included)
-          // Try to find a hat specific to the city
-          const hats = cityAccessories.filter(p => 
-            p.name.toLowerCase().includes('cap') || 
-            p.name.toLowerCase().includes('hat')
-          );
-          
-          if (hats.length > 0) {
-            productData.hat = hats[Math.floor(Math.random() * hats.length)];
-          } else {
-            // No city-specific hat found, try any hat
-            const anyHats = productsByCategory.accessories.filter(p => 
-              p.name.toLowerCase().includes('cap') || 
-              p.name.toLowerCase().includes('hat')
-            );
-            
-            if (anyHats.length > 0) {
-              productData.hat = anyHats[Math.floor(Math.random() * anyHats.length)];
-            } else {
-              // No hat found at all, use any city-specific accessory
-              if (cityAccessories.length > 0) {
-                productData.hat = cityAccessories[Math.floor(Math.random() * cityAccessories.length)];
-              }
-            }
-          }
-          
-          // 3. Add pants (always included)
-          // For pants, create a custom product using an existing image but with city-specific name
-          const pantsTemplate = cityTops.length > 0 
-            ? cityTops[Math.floor(Math.random() * cityTops.length)]
-            : productsByCategory.tops[Math.floor(Math.random() * productsByCategory.tops.length)];
-            
-          productData.pants = {
-            ...pantsTemplate,
-            id: 'custom-pants-' + Math.floor(Math.random() * 1000),
-            name: getCityPrefix(outfit.city) + ' ' + outfit.outfitElements.pants,
-            price: 79.99 + (Math.random() * 60),
-            stock: 5 + Math.floor(Math.random() * 15)
-          };
-          
-          // 4. Add accessory or music (prioritize accessory over music)
-          // Find a non-hat accessory specific to the city
-          const usedHatId = productData.hat?.id;
-          
-          const nonHatAccessories = cityAccessories.filter(p => 
-            p.id !== usedHatId && 
-            !(p.name.toLowerCase().includes('cap') || p.name.toLowerCase().includes('hat'))
-          );
-          
-          if (nonHatAccessories.length > 0) {
-            // Add a non-hat accessory as the 4th item
-            productData.accessory = nonHatAccessories[Math.floor(Math.random() * nonHatAccessories.length)];
-          } else if (cityMusic.length > 0) {
-            // If no suitable accessory, add city-specific music
-            productData.music = cityMusic[Math.floor(Math.random() * cityMusic.length)];
-          } else if (outfit.musicRecommendation && productsByCategory.music.length > 0) {
-            // Or any music if available
-            const randomMusicProduct = productsByCategory.music[
-              Math.floor(Math.random() * productsByCategory.music.length)
-            ];
-            
-            productData.music = {
-              ...randomMusicProduct,
-              name: outfit.musicRecommendation,
-              price: 24.99 + (Math.random() * 15),
-              stock: 3 + Math.floor(Math.random() * 8)
-            };
-          } else {
-            // Last resort - create a city-themed accessory
-            productData.accessory = {
-              ...(cityAccessories[0] || productsByCategory.accessories[0] || localProducts[0]),
-              id: 'custom-accessory-' + Math.floor(Math.random() * 1000),
-              name: getCityPrefix(outfit.city) + ' Fashion Accessory',
-              price: 49.99 + (Math.random() * 30),
-              stock: 4 + Math.floor(Math.random() * 6)
-            };
-          }
-        }
-        
-        setProducts(productData);
-      } catch (error) {
-        console.error('Error matching products:', error);
-      } finally {
-        setLoading(false);
-        setShowImage(true);
-      }
-    };
+    if (storeProducts.length === 0 && !loading) return;
     
-    // Helper function to get a stylistic prefix for a city
-    const getCityPrefix = (city: string): string => {
-      const cityPrefixes: Record<string, string> = {
-        'tokyo': 'Tokyo Neon',
-        'paris': 'Paris Chic',
-        'newyork': 'NYC Urban',
-        'london': 'London Fog',
-        'seoul': 'Seoul K-Style',
-        'lagos': 'Lagos Premium',
-        'mumbai': 'Mumbai Vibrant',
-        'rio': 'Rio Festival'
+    // Match products to the outfit
+    const matchProducts = () => {
+      // Group products by category
+      const productsByCategory = storeProducts.reduce((acc, product) => {
+        // Normalize category
+        const category = product.category.toLowerCase();
+        if (!acc[category]) {
+          acc[category] = [];
+        }
+        acc[category].push(product);
+        return acc;
+      }, { tops: [], bottoms: [], accessories: [], footwear: [], headwear: [], outerwear: [], music: [] });
+      
+      // Helper to get products that match the city
+      const getProductsByCity = (products: Product[], cityName: string) => {
+        const cityCulture = cityName.toLowerCase();
+        
+        // Try to match by exact culture first
+        const cultureMatch = products.filter(
+          p => p.culture && p.culture.toLowerCase() === cityCulture
+        );
+        
+        return cultureMatch.length > 0 
+          ? cultureMatch 
+          : products; // If no match, return all products in that category
       };
       
-      return cityPrefixes[city.toLowerCase()] || city;
+      // Select one product from each relevant category
+      // First try to match products by city, then fall back to any product in the category
+      const categoryProducts: Record<string, Product | undefined> = {};
+      
+      // Get products matching the outfit's city for each category
+      const cityTops = getProductsByCity(productsByCategory.tops || [], outfit.city);
+      const cityAccessories = getProductsByCity(productsByCategory.accessories || [], outfit.city);
+      const cityMusic = getProductsByCity(productsByCategory.music || [], outfit.city);
+      const cityHeadwear = getProductsByCity(productsByCategory.headwear || [], outfit.city);
+      const cityFootwear = getProductsByCity(productsByCategory.footwear || [], outfit.city);
+      const cityOuterwear = getProductsByCity(productsByCategory.outerwear || [], outfit.city);
+      const cityBottoms = getProductsByCity(productsByCategory.bottoms || [], outfit.city);
+      
+      // Function to get a random item from an array
+      const getRandomItem = (items: any[]) => items[Math.floor(Math.random() * items.length)];
+      
+      // Select one product from each category if available
+      if (cityTops.length > 0) categoryProducts.top = getRandomItem(cityTops);
+      if (cityAccessories.length > 0) categoryProducts.accessory = getRandomItem(cityAccessories);
+      if (cityMusic.length > 0) categoryProducts.music = getRandomItem(cityMusic);
+      if (cityHeadwear.length > 0) categoryProducts.headwear = getRandomItem(cityHeadwear);
+      if (cityFootwear.length > 0) categoryProducts.footwear = getRandomItem(cityFootwear);
+      if (cityOuterwear.length > 0) categoryProducts.outerwear = getRandomItem(cityOuterwear);
+      if (cityBottoms.length > 0) categoryProducts.bottom = getRandomItem(cityBottoms);
+      
+      // Update state with selected products
+      setProducts(categoryProducts);
     };
     
-    matchProducts();
-  }, [outfit]);
+    // Call matchProducts when storeProducts is loaded
+    if (!loading && storeProducts.length > 0) {
+      matchProducts();
+    }
+  }, [storeProducts, outfit, loading]);
+  
+  // Utility function to convert hex color to RGB values
+  const getRGBFromHex = (hex: string): string => {
+    // Remove # if present
+    hex = hex.replace('#', '');
+    
+    // Parse the hex values
+    const r = parseInt(hex.substring(0, 2), 16);
+    const g = parseInt(hex.substring(2, 4), 16);
+    const b = parseInt(hex.substring(4, 6), 16);
+    
+    // Return as comma-separated string for use in rgba()
+    return `${r}, ${g}, ${b}`;
+  };
+  
+  // Check for necessary outfit data
+  if (!outfit || !outfit.colorPalette || !outfit.name) {
+    return (
+      <div className={`${darkMode ? 'bg-black/60' : 'bg-white/90'} p-8 rounded-lg text-center`}>
+        <div>Error: Incomplete outfit data</div>
+      </div>
+    );
+  }
   
   return (
-    <Card className="overflow-hidden bg-black/40 backdrop-blur-xl border-culture/20 p-6 premium-shadow">
-      {/* Header with outfit name */}
-      <div className="mb-6 border-b border-culture/20 pb-4">
-        <h3 className="text-2xl font-bold text-white bg-clip-text text-transparent bg-gradient-to-r from-white to-white/80">
+    <div className="w-full max-w-6xl mx-auto">
+      {loading ? (
+        <Card className="w-full p-6 animate-pulse">
+          <div className="h-8 w-3/4 bg-muted mb-4 rounded"></div>
+          <div className="h-4 w-full bg-muted mb-2 rounded"></div>
+          <div className="h-4 w-5/6 bg-muted mb-2 rounded"></div>
+          <div className="h-4 w-4/6 bg-muted mb-8 rounded"></div>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            {[...Array(4)].map((_, i) => (
+              <div key={i} className="space-y-2">
+                <div className="h-40 bg-muted rounded"></div>
+                <div className="h-4 w-3/4 bg-muted rounded"></div>
+                <div className="h-4 w-1/2 bg-muted rounded"></div>
+              </div>
+            ))}
+          </div>
+        </Card>
+      ) : (
+        <Card 
+          className={`overflow-hidden ${
+            darkMode ? 'bg-black/40 border-culture/20' : 'bg-white/90 border-culture/40'
+          } backdrop-blur-md`}
+          style={{
+            boxShadow: `0 0 40px rgba(${getRGBFromHex(outfit.dominantColor)}, 0.2)`,
+            background: darkMode 
+              ? `rgba(0, 0, 0, 0.4)`
+              : outfit.city && cultureInfo && cultureInfo[outfit.city as CultureTheme]
+                ? `rgba(${cultureInfo[outfit.city as CultureTheme].rgbColor}, 0.9)`
+                : `rgba(${
+                  outfit.city === 'tokyo' ? '255, 255, 255, 0.9)' :
+                  outfit.city === 'newyork' ? '249, 249, 249, 0.9)' :
+                  outfit.city === 'london' ? '184, 235, 208, 0.9)' :
+                  outfit.city === 'seoul' ? '255, 184, 222, 0.9)' :
+                  outfit.city === 'lagos' ? '229, 221, 219, 0.9)' :
+                  outfit.city === 'berlin' ? '220, 200, 255, 0.9)' : '255, 255, 255, 0.9)'
+                }`
+          }}
+        >
+          <div className="p-6 space-y-6">
+            {/* Store products notice */}
+            <div className="mb-4 inline-block px-3 py-1 rounded-full bg-culture bg-opacity-20 text-culture text-xs font-medium">
+              Real Store Products Only
+            </div>
+            
+            <div className="space-y-1">
+              <h3 className={`text-2xl font-bold tracking-tight ${darkMode ? 'text-white' : 'text-gray-900'}`}>
           {outfit.name}
         </h3>
-        <p className="text-white/70 mt-2">
-          {outfit.description}
+              <p className={`text-sm ${darkMode ? 'text-white/70' : 'text-gray-600'}`}>
+                {outfit.city} • {outfit.musicGenre} • {outfit.emotionalState}
         </p>
       </div>
       
-      {/* Loading state */}
-      {loading && (
-        <div className="py-8 flex flex-col items-center justify-center">
-          <div className="animate-pulse flex flex-col items-center">
-            <div className="w-16 h-16 rounded-full border-2 border-culture flex items-center justify-center">
-              <div className="w-10 h-10 rounded-full bg-culture/20 animate-ping"></div>
+            <p className={`text-sm/relaxed ${darkMode ? 'text-white/80' : 'text-gray-700'} whitespace-pre-line`}>
+              {outfit.description}
+            </p>
+            
+            {/* Color palette display */}
+            <div className="flex space-x-2">
+              {outfit.colorPalette.map((color, index) => (
+                <div
+                  key={index}
+                  className="w-6 h-6 rounded-full border border-white/20"
+                  style={{ backgroundColor: color }}
+                ></div>
+              ))}
             </div>
-            <div className="mt-4 text-culture/80 text-sm">Finding products from our collection...</div>
-          </div>
-        </div>
-      )}
       
       {/* Product listings */}
       {!loading && outfit.outfitElements && (
@@ -555,77 +511,9 @@ export const OutfitCard = ({ outfit }: OutfitCardProps) => {
           </div>
         </div>
       </div>
-    </Card>
-  );
-};
-
-// Product item component
-interface ProductItemProps {
-  product: Product;
-  originalName: string;
-  isMusic?: boolean;
-  compact?: boolean;
-  onAddToCart: (product: Product) => void;
-}
-
-const ProductItem = ({ product, originalName, isMusic = false, compact = false, onAddToCart }: ProductItemProps) => {
-  console.log('Rendering ProductItem:', { 
-    product, 
-    imagePath: product.image,
-    exists: typeof product.image === 'string'
-  });
-  
-  return (
-    <div className="premium-card rounded-lg overflow-hidden w-full max-w-[280px]">
-      {/* Product image */}
-      <div className="premium-image w-full h-36">
-        <img 
-          src={product.image.startsWith('/') ? product.image : `/${product.image}`} 
-          alt={product.name}
-          className="w-full h-full object-cover"
-          loading="lazy"
-          onError={(e) => {
-            console.error(`Failed to load image: ${product.image}`);
-            const target = e.target as HTMLImageElement;
-            target.src = '/fashion-placeholder.jpg';
-          }}
-        />
-      </div>
-      
-      {/* Product details */}
-      <div className="p-4">
-        <div className="flex justify-between items-start">
-          <div className="text-white text-sm font-medium line-clamp-1 flex-1">
-            {product.name}
-            {product.name !== originalName && !product.name.includes(originalName) && isMusic && (
-              <div className="text-culture/70 text-xs mt-0.5 line-clamp-1">
-                Album: {originalName}
-              </div>
-            )}
           </div>
-          <div className="ml-2 text-culture text-lg font-bold">${product.price.toFixed(2)}</div>
-        </div>
-        
-        <div className="flex justify-between items-center mt-2 mb-3">
-          <div className="text-white/60 text-xs">{product.stock} in stock</div>
-          {product.stock < 10 && (
-            <div className="text-culture/80 text-xs font-medium">Limited availability</div>
-          )}
-        </div>
-        
-        <button 
-          className="w-full bg-culture hover:bg-culture/90 text-white text-xs py-2.5 px-3 rounded-md flex items-center justify-center shadow-md shadow-culture/10 hover:shadow-lg transition-all"
-          onClick={() => onAddToCart(product)}
-          data-product-id={product.id}
-        >
-          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mr-1">
-            <circle cx="8" cy="21" r="1"/>
-            <circle cx="19" cy="21" r="1"/>
-            <path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12"/>
-          </svg>
-          Add to Cart
-        </button>
-      </div>
+        </Card>
+      )}
     </div>
   );
 }; 

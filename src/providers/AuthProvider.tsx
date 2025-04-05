@@ -1,5 +1,6 @@
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { loginUser, registerUser, loginWithGoogleApi, registerWithGoogleApi } from '@/lib/api';
+import { useWishlistStore } from '@/store/useWishlistStore';
 
 interface User {
   _id: string;
@@ -29,6 +30,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [persistMode, setPersistMode] = useState<'local' | 'session'>('session');
+  const wishlistStore = useWishlistStore();
 
   // Initialize auth state from storage (either localStorage or sessionStorage)
   useEffect(() => {
@@ -96,6 +98,13 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         // Store in the appropriate storage based on rememberMe
         saveAuthData(userWithoutToken, token, rememberMe);
         
+        // Sync wishlist with server
+        try {
+          await wishlistStore.syncWithUser(token);
+        } catch (error) {
+          console.error('Failed to sync wishlist after login:', error);
+        }
+        
         return userData; // Return successful login data
       } else {
         throw new Error('Invalid response from server');
@@ -137,6 +146,13 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         
         // Store in the appropriate storage (default to sessionStorage for security)
         saveAuthData(userWithoutToken, token, false);
+        
+        // Sync wishlist with server
+        try {
+          await wishlistStore.syncWithUser(token);
+        } catch (error) {
+          console.error('Failed to sync wishlist after Google login:', error);
+        }
         
         return userData; // Return successful login data
       } else {

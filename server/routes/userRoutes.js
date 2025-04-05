@@ -8,6 +8,7 @@ import {
   resetPasswordWithToken,
   addToWishlist,
   removeFromWishlist,
+  getUserWishlist,
   addToCart,
   removeFromCart,
   loginWithGoogle,
@@ -31,6 +32,7 @@ router.post('/google/register', registerWithGoogle);
 router.get('/profile', protect, getUserProfile);
 router.put('/profile', protect, updateUserProfile);
 router.post('/wishlist', protect, addToWishlist);
+router.get('/wishlist', protect, getUserWishlist);
 router.delete('/wishlist/:productId', protect, removeFromWishlist);
 router.post('/cart', protect, addToCart);
 router.delete('/cart/:productId', protect, removeFromCart);

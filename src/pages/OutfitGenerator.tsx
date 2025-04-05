@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Music, Heart, Building2, Sparkles } from 'lucide-react';
+import { Music, Heart, Building2, Sparkles, Sun, Moon } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useThemeStore } from '@/store/useThemeStore';
 import { Button } from '@/components/ui/button';
@@ -11,7 +11,7 @@ import { OutfitCard } from '@/components/outfit/OutfitCard';
 import { useAudio } from '@/providers/ThemeProvider';
 
 export const OutfitGenerator = () => {
-  const { culture, setCulture, cultureInfo } = useThemeStore();
+  const { culture, setCulture, cultureInfo, darkMode, toggleDarkMode } = useThemeStore();
   const { isPlaying, toggleAudio } = useAudio();
   const [musicGenre, setMusicGenre] = useState<string>('trap');
   const [emotionalState, setEmotionalState] = useState<string>('energetic');
@@ -38,7 +38,8 @@ export const OutfitGenerator = () => {
       musicGenre: musicGenre,
       city: city,
       emotionalState: emotionalState,
-      imageUrl: `/outfits/${city}-${musicGenre}.png`
+      imageUrl: `/outfits/${city}-${musicGenre}.png`,
+      storeProducts: true
     };
     
     // Force render by ensuring state updates are applied
@@ -82,36 +83,33 @@ export const OutfitGenerator = () => {
   // Simulated data for the UI demo
   const musicGenres = [
     { value: 'trap', label: 'Trap' },
-    { value: 'jazz', label: 'Jazz' },
-    { value: 'techno', label: 'Techno' },
     { value: 'hiphop', label: 'Hip Hop' },
-    { value: 'pop', label: 'Pop' },
-    { value: 'rock', label: 'Rock' },
-    { value: 'latin', label: 'Latin' },
+    { value: 'techno', label: 'Techno' },
+    { value: 'drill', label: 'Drill' },
     { value: 'kpop', label: 'K-Pop' },
+    { value: 'afrobeats', label: 'Afrobeats' }
   ];
   
   const emotionalStates = [
     { value: 'energetic', label: 'Energetic' },
-    { value: 'nostalgic', label: 'Nostalgic' },
-    { value: 'rebellious', label: 'Rebellious' },
-    { value: 'romantic', label: 'Romantic' },
-    { value: 'melancholic', label: 'Melancholic' },
-    { value: 'joyful', label: 'Joyful' },
     { value: 'confident', label: 'Confident' },
-    { value: 'mysterious', label: 'Mysterious' },
+    { value: 'rebellious', label: 'Rebellious' },
+    { value: 'mysterious', label: 'Mysterious' }
   ];
   
   const cities = [
     { value: 'tokyo', label: 'Tokyo' },
-    { value: 'paris', label: 'Paris' },
     { value: 'newyork', label: 'New York' },
     { value: 'london', label: 'London' },
     { value: 'seoul', label: 'Seoul' },
     { value: 'lagos', label: 'Lagos' },
-    { value: 'mumbai', label: 'Mumbai' },
-    { value: 'rio', label: 'Rio de Janeiro' },
+    { value: 'berlin', label: 'Berlin' }
   ];
+  
+  // Filter cities to only show those that exist in cultureInfo
+  const availableCities = cities.filter(cityOption => 
+    cultureInfo && Object.keys(cultureInfo).includes(cityOption.value)
+  );
   
   // When a city is selected, update the culture theme to match if available
   useEffect(() => {
@@ -121,6 +119,7 @@ export const OutfitGenerator = () => {
       'london': 'london',
       'seoul': 'seoul',
       'lagos': 'lagos',
+      'berlin': 'berlin'
     };
     
     if (cityCultureMap[city] && cityCultureMap[city] !== culture) {
@@ -181,24 +180,20 @@ export const OutfitGenerator = () => {
           // Example outfit generation based on inputs
           const colorPalettes: Record<string, string[]> = {
             'tokyo': ['#FF2E7E', '#3649FF', '#00F0FF', '#111111'],
-            'paris': ['#F5D6C6', '#3A3042', '#EF9D87', '#4F5165'],
             'newyork': ['#232528', '#2C55A2', '#D64045', '#F9F9F9'],
             'london': ['#5863F8', '#0E2535', '#EAF205', '#B8EBD0'],
             'seoul': ['#FFB8DE', '#A5AAF2', '#FFF07A', '#121212'],
             'lagos': ['#FFB400', '#3F173F', '#29A0B1', '#E5DDDB'],
-            'mumbai': ['#FF7400', '#FFDB58', '#7851A9', '#00539C'],
-            'rio': ['#97C93D', '#FCDB00', '#7CBBDE', '#F3752B'],
+            'berlin': ['#9932CC', '#8A2BE2', '#4B0082', '#191919']
           };
           
           const outfitNames: Record<string, string[]> = {
             'trap': ['Neon Ronin', 'Street Prophet', 'Urban Samurai', 'Chrome Bandit'],
-            'jazz': ['Velvet Noir', 'Midnight Serenade', 'Blue Note Dreamer', 'Smooth Operator'],
-            'techno': ['Digital Nomad', 'Cyber Pulse', 'Quantum Drift', 'Electric Horizon'],
             'hiphop': ['Flow Master', 'Concrete Poet', 'Rhythm Rebel', 'Lyrical Ghost'],
-            'pop': ['Candy Haze', 'Prism Wave', 'Sparkle Shift', 'Bubblegum Halo'],
-            'rock': ['Vintage Vortex', 'Leather Legend', 'Riff Runner', 'Shadow Stance'],
-            'latin': ['Tropical Pulse', 'Salsa Sunset', 'Vibrant Rhythm', 'Spice Wave'],
+            'techno': ['Digital Nomad', 'Cyber Pulse', 'Quantum Drift', 'Electric Horizon'],
+            'drill': ['Shadow Crew', 'Dark Streets', 'Urban Knight', 'Night Runner'],
             'kpop': ['Pastel Dream', 'Neon Daydream', 'Soft Focus', 'Candy Floss Warrior'],
+            'afrobeats': ['Rhythm King', 'Lagos Nights', 'Vibrant Pulse', 'Golden Flow']
           };
           
           // Generate a random outfit name based on genre
@@ -209,15 +204,10 @@ export const OutfitGenerator = () => {
           const colors = colorPalettes[city] || colorPalettes.tokyo;
           
           // Create outfit description based on inputs
-          let outfitDescription = '';
+          let outfitDescription = `A personalized outfit curated from our in-store products that captures the essence of ${city}'s ${musicGenre} scene. This ${emotionalState} look uses actual items from our store's collection.`;
           
-          if (city === 'tokyo' && musicGenre === 'trap' && emotionalState === 'energetic') {
-            outfitDescription = 'A futuristic cyberpunk ensemble featuring a holographic windbreaker with reflective panels, fitted cargo pants with multiple utility pockets, chunky platform sneakers with LED accents, and tech-inspired accessories. Completed with a sleek crossbody bag and fingerless gloves.';
-          } else if (city === 'paris' && musicGenre === 'jazz' && emotionalState === 'nostalgic') {
-            outfitDescription = 'A sophisticated vintage-inspired look with a modern twist. Flowing high-waisted trousers paired with a silk blouse, oversized blazer with subtle patterns, and classic leather oxfords. Accessorized with minimal gold jewelry and a beret for timeless Parisian elegance.';
-          } else {
-            outfitDescription = `A unique blend of ${city}'s cultural aesthetic and ${musicGenre} influences, expressing a ${emotionalState} mood. The outfit features distinctive silhouettes, bold textural elements, and culturally-inspired details that create a striking visual statement.`;
-          }
+          // Add a note about store products
+          outfitDescription += "\n\nAll items shown are available in our store and can be purchased individually or as a complete look with a special discount.";
           
           const result: OutfitResult = {
             name: randomName,
@@ -227,7 +217,9 @@ export const OutfitGenerator = () => {
             musicGenre: musicGenre,
             city: city,
             emotionalState: emotionalState,
-            imageUrl: `/outfits/${city}-${musicGenre}.png` // This would be a generated image in a real app
+            imageUrl: `/outfits/${city}-${musicGenre}.png`, // This would be a generated image in a real app
+            // Remove specific outfit elements since we'll use actual store products
+            storeProducts: true
           };
           
           // Log before state update
@@ -248,7 +240,7 @@ export const OutfitGenerator = () => {
       }, 1500); // Shortened to 1.5 seconds for testing
     } catch (e) {
       console.error('Error in generateOutfit function:', e);
-      setDebugMessage(`Top-level error: ${e instanceof Error ? e.message : String(e)}`);
+      setDebugMessage(`Error in generateOutfit: ${e instanceof Error ? e.message : String(e)}`);
       setIsGenerating(false);
     }
   };
@@ -258,7 +250,7 @@ export const OutfitGenerator = () => {
       <div className="fixed inset-0 bg-black/30 backdrop-blur-[2px] z-0" />
       
       {/* Fixed top emergency button */}
-      <div className="fixed top-20 right-4 z-[9999] shadow-xl">
+      <div className="fixed top-20 right-4 z-[9999] shadow-xl flex flex-col gap-3">
         <button
           onClick={(e) => {
             e.preventDefault();
@@ -272,6 +264,30 @@ export const OutfitGenerator = () => {
             Emergency Generate
           </span>
         </button>
+        
+        {/* Dark/Light Mode Toggle */}
+        <button
+          onClick={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            toggleDarkMode();
+          }}
+          className="px-4 py-3 bg-black/50 hover:bg-black/70 text-white font-bold rounded-md shadow-lg border border-culture/30"
+        >
+          <span className="flex items-center">
+            {darkMode ? (
+              <>
+                <Sun className="mr-2 h-5 w-5 text-yellow-400" />
+                Light Mode
+              </>
+            ) : (
+              <>
+                <Moon className="mr-2 h-5 w-5 text-blue-400" />
+                Dark Mode
+              </>
+            )}
+          </span>
+        </button>
       </div>
       
       {/* Dynamic background effect */}
@@ -281,7 +297,21 @@ export const OutfitGenerator = () => {
           backgroundImage: `radial-gradient(circle at 50% 50%, 
             rgba(var(--culture-rgb), 0.3) 0%, 
             rgba(var(--culture-rgb), 0.1) 40%, 
-            transparent 70%)`
+            transparent 70%)`,
+          backgroundColor: darkMode 
+            ? `rgba(0, 0, 0, 0.8)` 
+            : culture && cultureInfo && cultureInfo[culture]
+              ? `rgba(${cultureInfo[culture].rgbColor || '0, 0, 0'}, 0.2)`
+              : `rgba(${
+                city === 'tokyo' ? '20, 10, 40, 0.3' :
+                city === 'newyork' ? '35, 42, 50, 0.3' :
+                city === 'london' ? '44, 62, 80, 0.3' :
+                city === 'seoul' ? '89, 65, 169, 0.3' :
+                city === 'lagos' ? '255, 180, 0, 0.2' :
+                city === 'berlin' ? '50, 23, 77, 0.3' : '0, 0, 0, 0.2'
+              })`,
+          backgroundBlendMode: 'overlay',
+          transition: 'background-color 0.5s ease-in-out'
         }}
       />
       
@@ -295,6 +325,13 @@ export const OutfitGenerator = () => {
         >
           <h1 className="text-4xl md:text-6xl font-bold text-white tracking-tight mb-4">
             <span className="text-culture">AI</span> Outfit Generator
+            <span className="inline-block ml-3">
+              {darkMode ? (
+                <Moon className="inline-block w-8 h-8 text-blue-400 opacity-80" />
+              ) : (
+                <Sun className="inline-block w-8 h-8 text-yellow-400 opacity-80" />
+              )}
+            </span>
           </h1>
           <p className="text-white/70 text-lg max-w-3xl mx-auto">
             Create your unique fashion identity with our premium AI stylist. Generate outfits influenced by music genres, emotions, and cities around the world.
@@ -326,6 +363,26 @@ export const OutfitGenerator = () => {
                 <h2 className="text-2xl font-bold text-white mb-6 flex items-center">
                   <Sparkles className="w-5 h-5 mr-2 text-culture" />
                   Design Your Style
+                  <button
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      toggleDarkMode();
+                    }}
+                    className="ml-auto px-3 py-1 text-sm bg-black/40 hover:bg-black/60 rounded-full border border-culture/20 flex items-center"
+                  >
+                    {darkMode ? (
+                      <>
+                        <Sun className="w-4 h-4 mr-1 text-yellow-400" />
+                        Light
+                      </>
+                    ) : (
+                      <>
+                        <Moon className="w-4 h-4 mr-1 text-blue-400" />
+                        Dark
+                      </>
+                    )}
+                  </button>
                 </h2>
                 
                 <div className="space-y-6" onSubmit={(e) => { e.preventDefault(); console.log('Form submitted, preventing default'); }}>
@@ -372,12 +429,18 @@ export const OutfitGenerator = () => {
                       <Building2 className="w-4 h-4 mr-2 text-culture/80" />
                       City Influence
                     </label>
-                    <Select value={city} onValueChange={setCity}>
+                    <Select defaultValue={city} onValueChange={(value) => {
+                      setCity(value);
+                      // Also set culture to match the city
+                      if (cultureInfo && Object.keys(cultureInfo).includes(value)) {
+                        setCulture(value as any);
+                      }
+                    }}>
                       <SelectTrigger className="w-full bg-black/50 border-culture/30 text-white">
                         <SelectValue placeholder="Select a city" />
                       </SelectTrigger>
                       <SelectContent className="bg-black/90 border-culture/20 text-white">
-                        {cities.map((city) => (
+                        {availableCities.map((city) => (
                           <SelectItem key={city.value} value={city.value}>
                             {city.label}
                           </SelectItem>
@@ -532,6 +595,14 @@ interface OutfitResult {
   city: string;
   emotionalState: string;
   imageUrl: string;
+  outfitElements?: {
+    hat: string;
+    tShirt: string;
+    pants: string;
+    accessory: string;
+  };
+  musicRecommendation?: string;
+  storeProducts?: boolean;
 }
 
 export default OutfitGenerator; 

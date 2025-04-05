@@ -1,6 +1,12 @@
 import mongoose from 'mongoose';
 
 const productSchema = new mongoose.Schema({
+  productId: {
+    type: String,
+    required: [true, 'Please add a product ID'],
+    unique: true,
+    trim: true
+  },
   name: {
     type: String,
     required: [true, 'Please add a product name'],
@@ -46,6 +52,15 @@ const productSchema = new mongoose.Schema({
     type: Date,
     default: Date.now
   }
+}, {
+  // Enable virtuals
+  toJSON: { virtuals: true },
+  toObject: { virtuals: true }
+});
+
+// Add a virtual for 'id' that returns the _id as a string
+productSchema.virtual('id').get(function() {
+  return this._id.toString();
 });
 
 // Pre-save hook to set slug if not provided

@@ -5,6 +5,7 @@ import bcrypt from 'bcryptjs';
 // We'll need nodemailer for sending emails
 import nodemailer from 'nodemailer';
 import { sendPasswordResetEmail } from '../utils/emailService.js';
+import mongoose from 'mongoose';
 
 // Generate JWT token
 const generateToken = (id) => {
@@ -184,6 +185,13 @@ export const addToWishlist = async (req, res) => {
   try {
     const { productId } = req.body;
     
+    if (!productId) {
+      return res.status(400).json({
+        success: false,
+        error: 'Product ID is required'
+      });
+    }
+    
     const user = await User.findById(req.user._id);
     
     if (!user) {
@@ -194,10 +202,23 @@ export const addToWishlist = async (req, res) => {
     }
     
     // Check if product is already in wishlist
-    if (user.wishlist.includes(productId)) {
+    // Convert all IDs to strings for comparison
+    const wishlistIds = user.wishlist.map(id => id.toString());
+    
+    if (wishlistIds.includes(productId.toString())) {
       return res.status(400).json({
         success: false,
         error: 'Product already in wishlist'
+      });
+    }
+    
+    // Verify that the product exists
+    const product = await mongoose.model('Product').findById(productId).catch(err => null);
+    
+    if (!product) {
+      return res.status(404).json({
+        success: false,
+        error: 'Product not found'
       });
     }
     
@@ -209,6 +230,7 @@ export const addToWishlist = async (req, res) => {
       data: user.wishlist
     });
   } catch (error) {
+    console.error('Error adding to wishlist:', error);
     res.status(500).json({
       success: false,
       error: 'Server Error'
@@ -221,6 +243,15 @@ export const addToWishlist = async (req, res) => {
 // @access  Private
 export const removeFromWishlist = async (req, res) => {
   try {
+    const productId = req.params.productId;
+    
+    if (!productId) {
+      return res.status(400).json({
+        success: false,
+        error: 'Product ID is required'
+      });
+    }
+    
     const user = await User.findById(req.user._id);
     
     if (!user) {
@@ -230,8 +261,9 @@ export const removeFromWishlist = async (req, res) => {
       });
     }
     
+    // Filter out the product by converting all ids to strings
     user.wishlist = user.wishlist.filter(
-      id => id.toString() !== req.params.productId
+      id => id.toString() !== productId.toString()
     );
     
     await user.save();
@@ -241,6 +273,7 @@ export const removeFromWishlist = async (req, res) => {
       data: user.wishlist
     });
   } catch (error) {
+    console.error('Error removing from wishlist:', error);
     res.status(500).json({
       success: false,
       error: 'Server Error'
@@ -648,6 +681,46 @@ export const registerWithGoogle = async (req, res) => {
     }
   } catch (error) {
     console.error('Google registration error:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Server Error'
+    });
+  }
+};
+
+// @desc    Get user wishlist
+// @route   GET /api/users/wishlist
+// @access  Private
+export const getUserWishlist = async (req, res) => {
+  try {
+    const user = await User.findById(req.user._id).populate('wishlist');
+    
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        error: 'User not found'
+      });
+    }
+    
+    // Transform the wishlist data to match frontend format
+    const transformedWishlist = user.wishlist.map(product => {
+      // Convert Mongoose document to plain object
+      const productObj = product.toObject ? product.toObject() : product;
+      
+      // Ensure product has an id field that matches _id
+      if (productObj._id && !productObj.id) {
+        productObj.id = productObj._id.toString();
+      }
+      
+      return productObj;
+    });
+    
+    res.status(200).json({
+      success: true,
+      data: transformedWishlist
+    });
+  } catch (error) {
+    console.error('Error getting wishlist:', error);
     res.status(500).json({
       success: false,
       error: 'Server Error'

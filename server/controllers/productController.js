@@ -21,12 +21,20 @@ export const getProducts = async (req, res) => {
     
     const products = await Product.find(filter);
     
+    // The virtual 'id' property will be included thanks to the schema settings
+    // but let's ensure consistency by explicitly mapping the results
+    const productsWithId = products.map(product => ({
+      ...product.toObject(),
+      id: product._id.toString() // Ensure id is always available
+    }));
+    
     res.status(200).json({
       success: true,
-      count: products.length,
-      data: products
+      count: productsWithId.length,
+      data: productsWithId
     });
   } catch (error) {
+    console.error('Error fetching products:', error);
     res.status(500).json({
       success: false,
       error: 'Server Error'
@@ -48,11 +56,18 @@ export const getProduct = async (req, res) => {
       });
     }
     
+    // Ensure the product has an id field
+    const productWithId = {
+      ...product.toObject(),
+      id: product._id.toString() // Ensure id is always available
+    };
+    
     res.status(200).json({
       success: true,
-      data: product
+      data: productWithId
     });
   } catch (error) {
+    console.error('Error fetching product:', error);
     res.status(500).json({
       success: false,
       error: 'Server Error'
@@ -65,19 +80,43 @@ export const getProduct = async (req, res) => {
 // @access  Private/Admin
 export const createProduct = async (req, res) => {
   try {
+    // Check if productId already exists
+    const existingProduct = await Product.findOne({ productId: req.body.productId });
+    if (existingProduct) {
+      return res.status(400).json({
+        success: false,
+        error: 'Product ID already exists. Please use a unique Product ID.'
+      });
+    }
+
+    // Create the product with the provided data
     const product = await Product.create(req.body);
+    
+    // The virtual 'id' field will be included in the response
+    // thanks to the schema settings, but let's ensure it's there
+    const productResponse = {
+      ...product.toObject(),
+      id: product._id.toString()
+    };
     
     res.status(201).json({
       success: true,
-      data: product
+      data: productResponse
     });
   } catch (error) {
+    console.error('Error creating product:', error);
     if (error.name === 'ValidationError') {
       const messages = Object.values(error.errors).map(err => err.message);
       
       return res.status(400).json({
         success: false,
         error: messages
+      });
+    } else if (error.code === 11000) {
+      // Duplicate key error (e.g., duplicate productId)
+      return res.status(400).json({
+        success: false,
+        error: 'Product ID must be unique. This ID is already in use.'
       });
     } else {
       res.status(500).json({
@@ -122,6 +161,12 @@ export const updateProduct = async (req, res) => {
       runValidators: true
     });
 
+    // Ensure the updated product has an id field
+    const updatedProductWithId = {
+      ...product.toObject(),
+      id: product._id.toString()
+    };
+
     // If product was out of stock and is now in stock, process notifications
     if (stockNotificationsNeeded) {
       console.log(`Product ${product._id} (${product.name}) is back in stock. Processing notifications...`);
@@ -147,7 +192,7 @@ export const updateProduct = async (req, res) => {
     
     res.status(200).json({
       success: true,
-      data: product
+      data: updatedProductWithId
     });
   } catch (error) {
     console.error('Error updating product:', error);
