@@ -4,7 +4,8 @@ import CultureSelector from '@/components/ui/culture-selector';
 import { Button } from '@/components/ui/button';
 import { Link, useLocation } from 'react-router-dom';
 import { ShoppingBag, Music, Hash } from 'lucide-react';
-import { useThemeStore } from '@/store/useThemeStore';
+import { useThemeStore, CultureTheme } from '@/store/useThemeStore';
+import { useAudio } from '@/providers/ThemeProvider';
 
 const cultureInfo = [
   {
@@ -54,6 +55,7 @@ const cultureInfo = [
 const CulturesPage = () => {
   const location = useLocation();
   const { setCulture } = useThemeStore();
+  const { audioRef, isPlaying } = useAudio();
   const cultureRefs = useRef<Record<string, HTMLElement | null>>({});
   
   // Extract culture from URL path if present
@@ -80,11 +82,58 @@ const CulturesPage = () => {
           cultureRefs.current[selectedCulture]?.scrollIntoView({ behavior: 'smooth', block: 'start' });
           
           // Update the active culture theme
-          setCulture(selectedCulture);
+          setCulture(selectedCulture as CultureTheme);
+          
+          // Handle Berlin-specific audio if the selected culture is Berlin
+          if (selectedCulture === 'berlin') {
+            // Pause the default audio
+            if (audioRef?.current) {
+              audioRef.current.pause();
+            }
+            
+            // Initialize or get Berlin audio
+            let berlinAudio = document.getElementById('berlin-audio') as HTMLAudioElement;
+            if (!berlinAudio) {
+              berlinAudio = document.createElement('audio');
+              berlinAudio.id = 'berlin-audio';
+              berlinAudio.src = '/audio/berlin-techno.mp3';
+              berlinAudio.volume = 0.3;
+              berlinAudio.loop = true;
+              document.body.appendChild(berlinAudio);
+            }
+            
+            // Play Berlin audio if global audio is playing
+            if (isPlaying) {
+              berlinAudio.play()
+                .then(() => console.log('Berlin audio playing on cultures page'))
+                .catch(err => console.error('Berlin audio play error on cultures page:', err));
+            }
+          } else {
+            // For other cultures, stop Berlin audio if it's playing
+            const berlinAudio = document.getElementById('berlin-audio') as HTMLAudioElement;
+            if (berlinAudio && !berlinAudio.paused) {
+              berlinAudio.pause();
+            }
+          }
         }
       }, 300);
+    } else {
+      // If no specific culture is selected, make sure Berlin audio is stopped
+      const berlinAudio = document.getElementById('berlin-audio') as HTMLAudioElement;
+      if (berlinAudio && !berlinAudio.paused) {
+        berlinAudio.pause();
+      }
     }
-  }, [selectedCulture, setCulture]);
+    
+    // Clean up when component unmounts
+    return () => {
+      // Stop Berlin audio when leaving the page
+      const berlinAudio = document.getElementById('berlin-audio') as HTMLAudioElement;
+      if (berlinAudio && !berlinAudio.paused) {
+        berlinAudio.pause();
+      }
+    };
+  }, [selectedCulture, setCulture, audioRef, isPlaying]);
 
   return (
     <>

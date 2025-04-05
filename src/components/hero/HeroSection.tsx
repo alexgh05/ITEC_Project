@@ -76,12 +76,15 @@ const heroSlides: HeroSlide[] = [
 const HeroSection = () => {
   const [currentSlide, setCurrentSlide] = useState(0);
   const { culture, setCulture, cultureInfo } = useThemeStore();
-  const { isPlaying, isMuted, toggleAudio, toggleMute } = useAudio();
+  const { isPlaying, isMuted, toggleAudio, toggleMute, audioRef } = useAudio();
   const navigate = useNavigate();
+  const [autoSlideEnabled, setAutoSlideEnabled] = useState(true);
   
-  // Control slideshow - always running
+  // Control slideshow - only when auto-slide is enabled
   useEffect(() => {
-    // Always keep the slideshow running
+    if (!autoSlideEnabled) return;
+    
+    // Auto-cycle slideshow
     const interval = setInterval(() => {
       const nextSlide = (currentSlide + 1) % heroSlides.length;
       setCurrentSlide(nextSlide);
@@ -92,9 +95,75 @@ const HeroSection = () => {
     return () => {
       if (interval) clearInterval(interval);
     };
-  }, [currentSlide, setCulture]);
+  }, [currentSlide, setCulture, autoSlideEnabled]);
+
+  // New effect to handle Berlin audio when culture changes to Berlin
+  useEffect(() => {
+    // Helper function to manage Berlin audio
+    const manageBerlinAudio = () => {
+      try {
+        // First, stop the default audio from ThemeProvider
+        const defaultAudio = audioRef?.current;
+        if (defaultAudio && !defaultAudio.paused) {
+          defaultAudio.pause();
+        }
+        
+        let berlinAudio = document.getElementById('berlin-audio') as HTMLAudioElement;
+        
+        if (!berlinAudio) {
+          berlinAudio = document.createElement('audio');
+          berlinAudio.id = 'berlin-audio';
+          berlinAudio.src = '/audio/berlin-techno.mp3';
+          berlinAudio.volume = 0.3;
+          berlinAudio.loop = true;
+          document.body.appendChild(berlinAudio);
+        }
+        
+        // Reset the audio to start from the beginning
+        berlinAudio.currentTime = 0;
+        
+        // Sync with global audio state
+        berlinAudio.muted = isMuted;
+        
+        // Only play if global audio is playing
+        if (isPlaying) {
+          // Check if it's already playing to avoid restarting
+          if (berlinAudio.paused) {
+            berlinAudio.play()
+              .then(() => console.log('Berlin audio playing from HeroSection'))
+              .catch(err => console.error('Berlin audio play error in HeroSection:', err));
+          }
+        } else {
+          // Make sure it's paused if global audio is paused
+          berlinAudio.pause();
+        }
+      } catch (error) {
+        console.error('Error handling Berlin audio in HeroSection:', error);
+      }
+    };
+    
+    // Handle based on current culture
+    if (culture === 'berlin') {
+      manageBerlinAudio();
+    } else {
+      // Stop Berlin audio when switching to other cultures
+      const berlinAudio = document.getElementById('berlin-audio') as HTMLAudioElement;
+      if (berlinAudio && !berlinAudio.paused) {
+        berlinAudio.pause();
+      }
+      
+      // Ensure default audio can play if it should be playing
+      if (isPlaying && audioRef?.current?.paused) {
+        audioRef.current.play()
+          .catch(err => console.error('Error resuming default audio:', err));
+      }
+    }
+  }, [culture, isPlaying, isMuted, audioRef]);
 
   const handleSlideChange = (index: number) => {
+    // Disable auto-sliding when user manually selects a slide
+    setAutoSlideEnabled(false);
+    
     setCurrentSlide(index);
     // Automatically apply the theme when clicking on slide indicators
     setCulture(heroSlides[index].culture as CultureTheme);
@@ -127,13 +196,23 @@ const HeroSection = () => {
           document.body.appendChild(berlinAudio);
         }
         
-        // Toggle playback
+        // First, ensure the default audio is paused
+        if (audioRef?.current && !audioRef.current.paused) {
+          audioRef.current.pause();
+        }
+        
+        // Update global state first - this will affect visualizer display
         if (berlinAudio.paused) {
+          // We're turning audio on
+          toggleAudio(); // This will set isPlaying to true
+          
           berlinAudio.play()
-            .then(() => console.log('Berlin audio playing from hero'))
+            .then(() => console.log('Berlin audio playing from toggle'))
             .catch(err => console.error('Berlin audio play error:', err));
         } else {
+          // We're turning audio off  
           berlinAudio.pause();
+          toggleAudio(); // This will set isPlaying to false
         }
       } catch (error) {
         console.error('Error handling Berlin audio in hero:', error);
@@ -141,6 +220,12 @@ const HeroSection = () => {
         toggleAudio();
       }
     } else {
+      // For other cultures, ensure Berlin audio is stopped
+      const berlinAudio = document.getElementById('berlin-audio') as HTMLAudioElement;
+      if (berlinAudio && !berlinAudio.paused) {
+        berlinAudio.pause();
+      }
+      
       // Regular toggle for other cultures
       toggleAudio();
     }
@@ -151,11 +236,24 @@ const HeroSection = () => {
     if (culture === 'berlin') {
       const berlinAudio = document.getElementById('berlin-audio') as HTMLAudioElement;
       if (berlinAudio) {
-        berlinAudio.muted = !berlinAudio.muted;
-      } else {
-        toggleMute();
+        berlinAudio.muted = !isMuted;
+      } 
+      
+      // Also mute default audio to be safe
+      if (audioRef?.current) {
+        audioRef.current.muted = !isMuted;
       }
+      
+      // Toggle global mute state
+      toggleMute();
     } else {
+      // For other cultures, also mute Berlin audio if it exists
+      const berlinAudio = document.getElementById('berlin-audio') as HTMLAudioElement;
+      if (berlinAudio) {
+        berlinAudio.muted = !isMuted;
+      }
+      
+      // Regular toggle for other cultures
       toggleMute();
     }
   };

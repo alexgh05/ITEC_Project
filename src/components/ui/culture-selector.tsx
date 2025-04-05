@@ -17,7 +17,7 @@ interface CultureOption {
 
 const CultureSelector = () => {
   const { culture, setCulture, cultureInfo, audioEnabled } = useThemeStore();
-  const { isPlaying, toggleAudio } = useAudio();
+  const { isPlaying, toggleAudio, audioRef } = useAudio();
   const [hoveredCulture, setHoveredCulture] = useState<CultureTheme | null>(null);
   const [autoRotate, setAutoRotate] = useState(false);
   const [currentAutoIndex, setCurrentAutoIndex] = useState(0);
@@ -139,29 +139,32 @@ const CultureSelector = () => {
       
       // Direct audio handling for Berlin
       try {
-        // Get the audio element from the ref or create a new one
-        const audioElement = document.createElement('audio');
-        audioElement.src = '/audio/berlin-techno.mp3';
-        audioElement.volume = 0.3;
-        audioElement.loop = true;
-        
-        // Pause any existing audio
-        if (isPlaying) {
-          const audio = document.querySelector('audio');
-          if (audio) {
-            audio.pause();
-          }
+        // Stop the default audio first
+        if (audioRef?.current && !audioRef.current.paused) {
+          audioRef.current.pause();
         }
         
-        // Play the Berlin audio directly
-        console.log('Attempting to play Berlin audio directly');
-        const playPromise = audioElement.play();
+        // Check if we already have a Berlin audio element
+        let berlinAudio = document.getElementById('berlin-audio') as HTMLAudioElement;
         
-        if (playPromise !== undefined) {
-          playPromise
-            .then(() => {
-              console.log('Berlin audio playing successfully');
-            })
+        // If not, create one
+        if (!berlinAudio) {
+          berlinAudio = document.createElement('audio');
+          berlinAudio.id = 'berlin-audio';
+          berlinAudio.src = '/audio/berlin-techno.mp3';
+          berlinAudio.volume = 0.3;
+          berlinAudio.loop = true;
+          document.body.appendChild(berlinAudio);
+        }
+        
+        // Reset the audio to start from the beginning
+        berlinAudio.currentTime = 0;
+        
+        // Play the Berlin audio if global audio should be playing
+        if (isPlaying) {
+          console.log('Attempting to play Berlin audio');
+          berlinAudio.play()
+            .then(() => console.log('Berlin audio playing successfully'))
             .catch(err => {
               console.error('Error playing Berlin audio:', err);
               // Try the regular toggle as a fallback
@@ -171,7 +174,7 @@ const CultureSelector = () => {
             });
         }
       } catch (error) {
-        console.error('Error with direct Berlin audio handling:', error);
+        console.error('Error with Berlin audio handling:', error);
         // Regular toggle as a fallback
         if (!isPlaying) {
           toggleAudio();
@@ -179,6 +182,12 @@ const CultureSelector = () => {
       }
       
       return;
+    }
+    
+    // For non-Berlin cultures, stop Berlin audio if it's playing
+    const berlinAudio = document.getElementById('berlin-audio') as HTMLAudioElement;
+    if (berlinAudio && !berlinAudio.paused) {
+      berlinAudio.pause();
     }
     
     // For non-Berlin cultures, use the normal flow

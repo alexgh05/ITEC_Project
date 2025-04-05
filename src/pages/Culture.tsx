@@ -3,7 +3,8 @@ import { motion } from 'framer-motion';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { ShoppingBag, Music, Hash, ArrowLeft } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { useThemeStore } from '@/store/useThemeStore';
+import { useThemeStore, CultureTheme } from '@/store/useThemeStore';
+import { useAudio } from '@/providers/ThemeProvider';
 
 // Use the same culture information from the Cultures page
 const cultureInfo = [
@@ -55,6 +56,7 @@ const CulturePage = () => {
   const { cultureId } = useParams<{ cultureId: string }>();
   const navigate = useNavigate();
   const { setCulture } = useThemeStore();
+  const { audioRef, isPlaying, toggleAudio } = useAudio();
   
   // Find the culture data based on the URL parameter
   const culture = cultureInfo.find(c => c.id === cultureId);
@@ -73,13 +75,53 @@ const CulturePage = () => {
     window.scrollTo(0, 0);
     
     // Set the active culture theme
-    setCulture(culture.id);
+    setCulture(culture.id as CultureTheme);
+    
+    // Handle Berlin-specific audio
+    if (culture.id === 'berlin') {
+      // Pause the default audio
+      if (audioRef?.current) {
+        audioRef.current.pause();
+      }
+      
+      // Initialize or get Berlin audio
+      let berlinAudio = document.getElementById('berlin-audio') as HTMLAudioElement;
+      if (!berlinAudio) {
+        berlinAudio = document.createElement('audio');
+        berlinAudio.id = 'berlin-audio';
+        berlinAudio.src = '/audio/berlin-techno.mp3';
+        berlinAudio.volume = 0.3;
+        berlinAudio.loop = true;
+        document.body.appendChild(berlinAudio);
+      }
+      
+      // Reset the audio to start from the beginning
+      berlinAudio.currentTime = 0;
+      
+      // Play Berlin audio if global audio is playing
+      if (isPlaying) {
+        berlinAudio.play()
+          .then(() => console.log('Berlin audio playing on culture page'))
+          .catch(err => console.error('Berlin audio play error on culture page:', err));
+      }
+    } else {
+      // For other cultures, stop Berlin audio if it's playing
+      const berlinAudio = document.getElementById('berlin-audio') as HTMLAudioElement;
+      if (berlinAudio && !berlinAudio.paused) {
+        berlinAudio.pause();
+      }
+    }
     
     // Clean up - reset culture when leaving
     return () => {
       setCulture('default');
+      // Stop Berlin audio when leaving the page
+      const berlinAudio = document.getElementById('berlin-audio') as HTMLAudioElement;
+      if (berlinAudio && !berlinAudio.paused) {
+        berlinAudio.pause();
+      }
     };
-  }, [culture, cultureId, navigate, setCulture]);
+  }, [culture, cultureId, navigate, setCulture, audioRef, isPlaying]);
   
   if (!culture) {
     return null; // Will redirect in the useEffect
