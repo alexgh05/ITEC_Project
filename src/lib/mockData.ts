@@ -180,4 +180,68 @@ export const mockProducts = [
     sizes: ["N/A"],
     selectedSize: "N/A"
   }
+];
+
+// Explicitly featured products for homepage (limited to 4)
+export const featuredProducts = [
+  {
+    id: "f1",
+    name: "Harajuku Street Hoodie",
+    description: "Vibrant hoodie inspired by Tokyo's Harajuku district fashion.",
+    price: 59.99,
+    countInStock: 10,
+    rating: 4.6,
+    numReviews: 14,
+    images: ["https://images.unsplash.com/photo-1572495673508-62a6b369c380?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3"],
+    category: "fashion",
+    culture: "tokyo",
+    isFeatured: true,
+    sizes: ["S", "M", "L", "XL"],
+    selectedSize: "M"
+  },
+  {
+    id: "m4",
+    name: "Seoul K-Pop Classics",
+    description: "The definitive compilation of K-Pop hits that changed global music.",
+    price: 22.99,
+    countInStock: 12,
+    rating: 4.9,
+    numReviews: 32,
+    images: ["https://images.unsplash.com/photo-1578380277096-75063e5858d3?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3"],
+    category: "music",
+    culture: "seoul",
+    isFeatured: true,
+    sizes: ["N/A"],
+    selectedSize: "N/A"
+  },
+  {
+    id: "a3",
+    name: "Lagos Beaded Necklace",
+    description: "Handcrafted beaded necklace made by Nigerian artisans.",
+    price: 39.99,
+    countInStock: 6,
+    rating: 5.0,
+    numReviews: 8,
+    images: ["https://images.unsplash.com/photo-1599459183200-89f6f64c1a3c?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3"],
+    category: "accessories",
+    culture: "lagos",
+    isFeatured: true,
+    sizes: ["N/A"],
+    selectedSize: "N/A"
+  },
+  {
+    id: "m1",
+    name: "Tokyo Beats Vinyl",
+    description: "Limited edition vinyl featuring the best of Tokyo's electronic music scene.",
+    price: 29.99,
+    countInStock: 15,
+    rating: 4.5,
+    numReviews: 12,
+    images: ["https://images.unsplash.com/photo-1614613535308-eb5fbd3d2c17?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3"],
+    category: "music",
+    culture: "tokyo",
+    isFeatured: true,
+    sizes: ["N/A"],
+    selectedSize: "N/A"
+  }
 ]; 

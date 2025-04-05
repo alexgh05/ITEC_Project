@@ -19,13 +19,15 @@ export const fetchProducts = async (category?: string, culture?: string, gender?
   }
   
   try {
+    console.log('Fetching products from:', url);
     const response = await fetch(url);
     
     if (!response.ok) {
-      throw new Error('Failed to fetch products');
+      throw new Error(`Failed to fetch products: ${response.status} ${response.statusText}`);
     }
     
     const data = await response.json();
+    console.log('Products fetched successfully:', data.data?.length || 0);
     return data.data;
   } catch (error) {
     console.warn('Using mock data for products due to API error:', error);
@@ -45,12 +47,11 @@ export const fetchProducts = async (category?: string, culture?: string, gender?
       );
     }
     
-    if (gender && gender !== 'All') {
-      filteredProducts = filteredProducts.filter(
-        product => product.gender?.toLowerCase() === gender.toLowerCase()
-      );
-    }
+    // We'll skip gender filtering for mock data as it's not in the structure
+    // If needed, add this property to mockProducts in mockData.ts
     
+    console.log('Returning mock data products:', filteredProducts.length);
+    console.log('Featured mock products:', filteredProducts.filter(p => p.isFeatured).length);
     return filteredProducts;
   }
 };

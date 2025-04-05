@@ -8,10 +8,12 @@ import { Button } from '@/components/ui/button';
 import { Link } from 'react-router-dom';
 import { useThemeStore } from '@/store/useThemeStore';
 import { fetchProducts } from '@/lib/api';
+import { featuredProducts as fallbackFeaturedProducts } from '@/lib/mockData';
+import ProductCard from '@/components/product/ProductCard';
 
 const HomePage = () => {
   const { darkMode, toggleDarkMode } = useThemeStore();
-  const [featuredProducts, setFeaturedProducts] = useState([]);
+  const [featuredProducts, setFeaturedProducts] = useState(fallbackFeaturedProducts || []);
   const [loading, setLoading] = useState(true);
   const [email, setEmail] = useState('');
   const [subscribed, setSubscribed] = useState(false);
@@ -22,13 +24,31 @@ const HomePage = () => {
       try {
         setLoading(true);
         const products = await fetchProducts();
-        // Filter featured products or take the first 4 products
-        const featured = products.filter(product => product.isFeatured) || products.slice(0, 4);
+        console.log('Fetched products:', products); // Debug log
+        
+        // Filter featured products or take the first 4 products if none are featured
+        let featured = products.filter(product => product.isFeatured === true);
+        
+        // If no featured products found, take the first 4 products
+        if (featured.length === 0) {
+          console.log('No featured products found, using first 4 products');
+          featured = products.slice(0, 4);
+        } else if (featured.length > 4) {
+          // Limit to 4 featured products
+          console.log('Limiting to 4 featured products');
+          featured = featured.slice(0, 4);
+        }
+        
+        console.log('Featured products:', featured); // Debug log
         setFeaturedProducts(featured);
         setLoading(false);
       } catch (error) {
         console.error('Error fetching products:', error);
         setLoading(false);
+        
+        // Fall back to hard-coded featured products
+        console.log('Using fallback featured products (limited to 4)');
+        setFeaturedProducts(fallbackFeaturedProducts.slice(0, 4));
       }
     };
     
@@ -77,7 +97,18 @@ const HomePage = () => {
               <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
             </div>
           ) : (
-            <ProductGrid products={featuredProducts} />
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
+              {featuredProducts.map((product, index) => (
+                <motion.div
+                  key={product.id || `product-${index}`}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: index * 0.1 }}
+                >
+                  <ProductCard product={product} />
+                </motion.div>
+              ))}
+            </div>
           )}
           
           <div className="mt-12 text-center">
