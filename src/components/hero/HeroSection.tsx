@@ -109,13 +109,55 @@ const HeroSection = () => {
 
   // Handle audio controls
   const handleToggleAudio = () => {
-    if (!isPlaying) {
-      toggleAudio(); // Start playing if not already playing
+    // Special case for Berlin culture
+    if (culture === 'berlin') {
+      console.log('Hero section handling Berlin audio toggle');
+      
+      try {
+        // Check if we already have a Berlin audio element
+        let berlinAudio = document.getElementById('berlin-audio') as HTMLAudioElement;
+        
+        // If not, create one
+        if (!berlinAudio) {
+          berlinAudio = document.createElement('audio');
+          berlinAudio.id = 'berlin-audio';
+          berlinAudio.src = '/audio/berlin-techno.mp3';
+          berlinAudio.volume = 0.3;
+          berlinAudio.loop = true;
+          document.body.appendChild(berlinAudio);
+        }
+        
+        // Toggle playback
+        if (berlinAudio.paused) {
+          berlinAudio.play()
+            .then(() => console.log('Berlin audio playing from hero'))
+            .catch(err => console.error('Berlin audio play error:', err));
+        } else {
+          berlinAudio.pause();
+        }
+      } catch (error) {
+        console.error('Error handling Berlin audio in hero:', error);
+        // Fallback to regular toggle
+        toggleAudio();
+      }
+    } else {
+      // Regular toggle for other cultures
+      toggleAudio();
     }
   };
   
   const handleToggleMute = () => {
-    toggleMute(); // Toggle between muted and unmuted
+    // Special case for Berlin audio
+    if (culture === 'berlin') {
+      const berlinAudio = document.getElementById('berlin-audio') as HTMLAudioElement;
+      if (berlinAudio) {
+        berlinAudio.muted = !berlinAudio.muted;
+      } else {
+        toggleMute();
+      }
+    } else {
+      toggleMute();
+    }
   };
 
   return (

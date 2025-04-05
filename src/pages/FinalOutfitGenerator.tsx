@@ -10,10 +10,26 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { useAuthStore } from '@/store/useAuthStore';
 import { useNavigate } from 'react-router-dom';
 
+// Define styles based on dark/light mode
+const getStyles = (isDarkMode: boolean) => ({
+  text: isDarkMode ? 'text-white' : 'text-gray-900',
+  secondaryText: isDarkMode ? 'text-gray-300' : 'text-gray-600',
+  card: isDarkMode ? 'bg-black text-white border-gray-800' : 'bg-white text-gray-900 border-gray-200',
+  input: isDarkMode ? 'bg-gray-900 border-gray-700 text-white' : 'bg-white border-gray-200 text-gray-900',
+  button: isDarkMode ? 'bg-pink-600 hover:bg-pink-500' : 'bg-indigo-600 hover:bg-indigo-500',
+  iconColor: isDarkMode ? 'text-pink-400' : 'text-indigo-400',
+  placeholder: isDarkMode ? 'bg-gray-900 border-gray-800' : 'bg-white border-gray-200',
+  highlight: isDarkMode ? 'text-pink-500' : 'text-indigo-500',
+  placeholderBg: isDarkMode ? 'bg-pink-500/20' : 'bg-indigo-100'
+});
+
 // Simple, reliable outfit generator
 export const FinalOutfitGenerator = () => {
   // Access theme store for culture theme - moving this to the top
   const { culture, setCulture, cultureInfo, darkMode } = useThemeStore();
+  
+  // Get styles based on current theme
+  const styles = getStyles(darkMode);
 
   // User auth state
   const { user, isAuthenticated } = useAuthStore();
@@ -326,33 +342,33 @@ export const FinalOutfitGenerator = () => {
   };
 
   return (
-    <div className="min-h-screen bg-black p-6 text-white">
+    <div className="min-h-screen w-full bg-transparent p-6" style={{ backgroundColor: 'transparent' }}>
       <div className="max-w-6xl mx-auto">
-        <h1 className="text-4xl font-bold mb-6 text-center">AI Outfit Generator</h1>
-        <p className="text-lg mb-10 text-center text-gray-300">
+        <h1 className={`text-4xl font-bold mb-6 text-center ${styles.text}`}>AI Outfit Generator</h1>
+        <p className={`text-lg mb-10 text-center ${styles.secondaryText}`}>
           Create a unique fashion identity based on your preferences
         </p>
         
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-10">
           {/* Inputs */}
-          <Card className="p-6 bg-gray-900 border-pink-500/20">
-            <h2 className="text-2xl font-bold mb-6 flex items-center">
-              <Sparkles className="w-5 h-5 mr-2 text-pink-500" />
+          <Card className={`p-6 shadow-sm ${styles.card}`}>
+            <h2 className={`text-2xl font-bold mb-6 flex items-center ${styles.text}`}>
+              <Sparkles className={`w-5 h-5 mr-2 ${styles.highlight}`} />
               Design Your Style
             </h2>
             
             <div className="space-y-6">
               {/* Music Genre */}
               <div className="space-y-2">
-                <label id="music-genre-label" className="text-gray-300 flex items-center text-sm font-medium">
-                  <Music className="w-4 h-4 mr-2 text-pink-400" />
+                <label id="music-genre-label" className={`flex items-center text-sm font-medium ${styles.secondaryText}`}>
+                  <Music className={`w-4 h-4 mr-2 ${styles.iconColor}`} />
                   Music Genre
                 </label>
                 <Select value={musicGenre} onValueChange={handleMusicGenreChange}>
-                  <SelectTrigger className="w-full bg-gray-800 border-gray-700 text-white">
+                  <SelectTrigger className={`w-full ${styles.input}`}>
                     <SelectValue placeholder="Select a music genre" />
                   </SelectTrigger>
-                  <SelectContent className="bg-gray-800 border-gray-700 text-white">
+                  <SelectContent className={styles.input}>
                     {musicGenres.map((genre) => (
                       <SelectItem key={genre.value} value={genre.value}>
                         {genre.label}
@@ -364,15 +380,15 @@ export const FinalOutfitGenerator = () => {
               
               {/* Emotional State */}
               <div className="space-y-2">
-                <label id="emotional-state-label" className="text-gray-300 flex items-center text-sm font-medium">
-                  <Heart className="w-4 h-4 mr-2 text-pink-400" />
+                <label id="emotional-state-label" className={`flex items-center text-sm font-medium ${styles.secondaryText}`}>
+                  <Heart className={`w-4 h-4 mr-2 ${styles.iconColor}`} />
                   Emotional State
                 </label>
                 <Select value={emotionalState} onValueChange={handleEmotionalStateChange}>
-                  <SelectTrigger className="w-full bg-gray-800 border-gray-700 text-white">
+                  <SelectTrigger className={`w-full ${styles.input}`}>
                     <SelectValue placeholder="Select an emotional state" />
                   </SelectTrigger>
-                  <SelectContent className="bg-gray-800 border-gray-700 text-white">
+                  <SelectContent className={styles.input}>
                     {emotionalStates.map((state) => (
                       <SelectItem key={state.value} value={state.value}>
                         {state.label}
@@ -384,15 +400,15 @@ export const FinalOutfitGenerator = () => {
               
               {/* City */}
               <div className="space-y-2">
-                <label id="city-label" className="text-gray-300 flex items-center text-sm font-medium">
-                  <Building2 className="w-4 h-4 mr-2 text-pink-400" />
+                <label id="city-label" className={`flex items-center text-sm font-medium ${styles.secondaryText}`}>
+                  <Building2 className={`w-4 h-4 mr-2 ${styles.iconColor}`} />
                   City Influence
                 </label>
                 <Select value={city} onValueChange={handleCityChange}>
-                  <SelectTrigger className="w-full bg-gray-800 border-gray-700 text-white">
+                  <SelectTrigger className={`w-full ${styles.input}`}>
                     <SelectValue placeholder="Select a city" />
                   </SelectTrigger>
-                  <SelectContent className="bg-gray-800 border-gray-700 text-white">
+                  <SelectContent className={styles.input}>
                     {getAvailableCities().map((city) => (
                       <SelectItem key={city.value} value={city.value}>
                         {city.label}
@@ -405,7 +421,7 @@ export const FinalOutfitGenerator = () => {
               {/* Generate Button */}
               <button
                 onClick={generateOutfit}
-                className="w-full py-3 rounded-md bg-pink-600 hover:bg-pink-500 text-white font-medium transition-all relative"
+                className={`w-full py-3 rounded-md text-white font-medium transition-all relative ${styles.button}`}
                 title="Change at least one selection to generate a new outfit"
               >
                 {generatedOutfit ? 'Generate New Outfit' : 'Generate Outfit'}
@@ -423,13 +439,13 @@ export const FinalOutfitGenerator = () => {
             {generatedOutfit ? (
               <OutfitCard outfit={generatedOutfit} />
             ) : (
-              <div className="flex items-center justify-center h-full bg-gray-900 rounded-lg p-8 border border-gray-800">
+              <div className={`flex items-center justify-center h-full rounded-lg p-8 shadow-sm ${styles.placeholder}`}>
                 <div className="text-center">
-                  <div className="w-20 h-20 mx-auto rounded-full bg-pink-500/20 flex items-center justify-center mb-4">
-                    <Sparkles className="w-8 h-8 text-pink-500" />
+                  <div className={`w-20 h-20 mx-auto rounded-full ${styles.placeholderBg} flex items-center justify-center mb-4`}>
+                    <Sparkles className={`w-8 h-8 ${styles.highlight}`} />
                   </div>
-                  <h3 className="text-xl font-medium mb-2">Your Fashion Identity</h3>
-                  <p className="text-gray-400">
+                  <h3 className={`text-xl font-medium mb-2 ${styles.text}`}>Your Fashion Identity</h3>
+                  <p className={styles.secondaryText}>
                     Generate your unique outfit to see your personalized fashion identity
                   </p>
                 </div>

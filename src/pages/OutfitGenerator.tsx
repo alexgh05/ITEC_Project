@@ -13,6 +13,20 @@ import { useAuthStore } from '@/store/useAuthStore';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 
+// Add custom styles to forcibly override any background color
+const pageStyles = {
+  lightMode: {
+    background: 'white !important',
+    backgroundColor: 'white !important',
+    color: '#333'
+  },
+  darkMode: {
+    background: '#171717 !important',
+    backgroundColor: '#171717 !important', 
+    color: 'white'
+  }
+};
+
 // Extend Window interface to include our custom property
 declare global {
   interface Window {
@@ -321,8 +335,20 @@ export const OutfitGenerator = () => {
   };
   
   return (
-    <div className="min-h-screen w-full">
-      <div className={`fixed inset-0 ${darkMode ? 'bg-black/30' : 'bg-white/70'} backdrop-blur-[2px] z-0`} />
+    <div 
+      className="min-h-screen w-full relative"
+      style={darkMode ? pageStyles.darkMode : pageStyles.lightMode}
+    >
+      {/* Grid pattern */}
+      <div 
+        className="fixed inset-0 z-0 pointer-events-none" 
+        style={{
+          backgroundImage: darkMode 
+            ? 'linear-gradient(rgba(255, 255, 255, 0.05) 1px, transparent 1px), linear-gradient(to right, rgba(255, 255, 255, 0.05) 1px, transparent 1px)'
+            : 'linear-gradient(rgba(0, 0, 0, 0.05) 1px, transparent 1px), linear-gradient(to right, rgba(0, 0, 0, 0.05) 1px, transparent 1px)',
+          backgroundSize: '20px 20px'
+        }}
+      ></div>
       
       {/* Fixed top emergency button */}
       <div className="fixed top-20 right-4 z-[9999] shadow-xl flex flex-col gap-3">
@@ -365,31 +391,6 @@ export const OutfitGenerator = () => {
         </button>
       </div>
       
-      {/* Dynamic background effect */}
-      <div 
-        className="fixed inset-0 bg-gradient-to-br from-transparent to-culture/30 z-0"
-        style={{
-          backgroundImage: `radial-gradient(circle at 50% 50%, 
-            rgba(var(--culture-rgb), 0.3) 0%, 
-            rgba(var(--culture-rgb), 0.1) 40%, 
-            transparent 70%)`,
-          backgroundColor: darkMode 
-            ? `rgba(0, 0, 0, 0.8)` 
-            : culture && cultureInfo && cultureInfo[culture]
-              ? `rgba(${cultureInfo[culture].rgbColor || '0, 0, 0'}, 0.2)`
-              : `rgba(${
-                city === 'tokyo' ? '20, 10, 40, 0.3' :
-                city === 'newyork' ? '35, 42, 50, 0.3' :
-                city === 'london' ? '44, 62, 80, 0.3' :
-                city === 'seoul' ? '89, 65, 169, 0.3' :
-                city === 'lagos' ? '255, 180, 0, 0.2' :
-                city === 'berlin' ? '50, 23, 77, 0.3' : '0, 0, 0, 0.2'
-              })`,
-          backgroundBlendMode: 'overlay',
-          transition: 'background-color 0.5s ease-in-out'
-        }}
-      />
-      
       {/* Content container */}
       <div className="container relative z-10 py-12 px-4 md:px-8 mx-auto">
         <motion.div
@@ -415,11 +416,14 @@ export const OutfitGenerator = () => {
         
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 z-10">
           <Card 
-            className={`p-6 ${
+            className={`p-6 backdrop-blur-sm rounded-xl shadow-lg ${
               darkMode 
-                ? 'border-white/5 bg-black/30' 
-                : 'border-gray-200 bg-white/95'
-            } backdrop-blur-lg overflow-hidden`}
+                ? 'shadow-black/20 border border-white/5' 
+                : 'shadow-gray-300/30 border border-gray-200/30'
+            }`}
+            style={{
+              backgroundColor: darkMode ? 'rgba(30, 30, 35, 0.15)' : 'rgba(250, 250, 255, 0.6)'
+            }}
           >
             <div className="space-y-6">
               <div className="flex items-center">
@@ -549,23 +553,23 @@ export const OutfitGenerator = () => {
               transition={{ duration: 0.6, delay: 0.3 }}
             >
               <AnimatePresence mode="wait">
-                {!generatedOutfit ? (
+                {isGenerating ? (
                   <motion.div
-                    key="placeholder"
+                    key="loading"
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     exit={{ opacity: 0 }}
-                    className="h-full flex items-center justify-center"
+                    className="rounded-xl p-6 backdrop-blur-sm flex flex-col items-center justify-center h-[450px]"
+                    style={{
+                      backgroundColor: darkMode ? 'rgba(30, 30, 35, 0.15)' : 'rgba(250, 250, 255, 0.6)',
+                      border: darkMode ? '1px solid rgba(255, 255, 255, 0.05)' : '1px solid rgba(0, 0, 0, 0.05)'
+                    }}
                   >
-                    <div className={`p-8 rounded-lg ${darkMode ? 'bg-black/30' : 'bg-white/95'} backdrop-blur-md border ${darkMode ? 'border-white/10' : 'border-gray-200'} text-center shadow-md`}>
-                      <div className={`w-24 h-24 rounded-full ${darkMode ? 'bg-culture/20' : 'bg-indigo-100'} mx-auto flex items-center justify-center mb-4`}>
-                        <Sparkles className={`w-10 h-10 ${darkMode ? 'text-culture' : 'text-indigo-600'}`} />
-                      </div>
-                      <h3 className={`text-xl font-medium ${darkMode ? 'text-white' : 'text-gray-900'} mb-2`}>Your Fashion Identity</h3>
-                      <p className={`${darkMode ? 'text-white/60' : 'text-gray-600'}`}>
-                        Generate your unique outfit to see your personalized fashion identity
-                      </p>
+                    <div className={`w-24 h-24 rounded-full ${darkMode ? 'bg-culture/20' : 'bg-indigo-100'} mx-auto flex items-center justify-center mb-4`}>
+                      <div className="h-4 w-4 border-4 border-culture border-t-transparent rounded-full animate-spin"></div>
                     </div>
+                    <div className={`${darkMode ? 'text-white' : 'text-gray-900'} text-xl font-medium`}>Generating your outfit...</div>
+                    <div className={`${darkMode ? 'text-white/60' : 'text-gray-600'} mt-2`}>This will take just a moment</div>
                   </motion.div>
                 ) : (
                   <motion.div
@@ -583,17 +587,6 @@ export const OutfitGenerator = () => {
           </div>
         </div>
       </div>
-      
-      {/* Loading Overlay */}
-      {isGenerating && (
-        <div className={`fixed inset-0 ${darkMode ? 'bg-black/50' : 'bg-white/60'} backdrop-blur-sm z-50 flex items-center justify-center`}>
-          <div className={`${darkMode ? 'bg-black/80' : 'bg-white/90'} p-8 rounded-xl border ${darkMode ? 'border-culture/30' : 'border-gray-300'} flex flex-col items-center`}>
-            <div className="w-20 h-20 border-4 border-culture border-t-transparent rounded-full animate-spin mb-4"></div>
-            <div className={`${darkMode ? 'text-white' : 'text-gray-900'} text-xl font-medium`}>Generating your outfit...</div>
-            <div className={`${darkMode ? 'text-white/60' : 'text-gray-600'} mt-2`}>This will take just a moment</div>
-          </div>
-        </div>
-      )}
       
       {/* Debug info */}
       {(debugMessage || clickAttempts > 0) && (

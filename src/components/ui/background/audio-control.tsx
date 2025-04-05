@@ -10,18 +10,38 @@ export const AudioControl: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   
+  // Debug logging for Berlin theme
+  useEffect(() => {
+    if (culture === 'berlin') {
+      console.log('Berlin culture selected:', {
+        isPlaying,
+        isMuted,
+        audioTrack: cultureInfo?.berlin?.sampleTrack,
+        currentSrc: audioRef.current?.src,
+      });
+    }
+  }, [culture, isPlaying, isMuted, cultureInfo, audioRef]);
+  
   // Handle loading and error states
   useEffect(() => {
     const audio = audioRef.current;
     if (!audio) return;
     
-    const handlePlay = () => setIsLoading(false);
+    const handlePlay = () => {
+      setIsLoading(false);
+      console.log('Audio playing now:', { 
+        src: audio.src,
+        currentCulture: culture,
+        currentTime: audio.currentTime
+      });
+    };
+    
     const handlePause = () => setIsLoading(false);
     const handleLoadStart = () => setIsLoading(true);
     const handleError = (e: ErrorEvent) => {
       console.error("Audio playback error:", e);
       setIsLoading(false);
-      setError("Couldn't play audio. Try again or check browser settings.");
+      setError(`Couldn't play audio for ${culture}. Error: ${e.message || 'Unknown error'}`);
     };
     
     // Add event listeners
@@ -39,7 +59,7 @@ export const AudioControl: React.FC = () => {
       audio.removeEventListener('loadstart', handleLoadStart);
       audio.removeEventListener('error', handleError as EventListener);
     };
-  }, [audioRef]);
+  }, [audioRef, culture]);
   
   // Keep these functions for potential use by other components
   const handleTogglePlayback = () => {
