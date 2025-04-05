@@ -720,8 +720,6 @@ const Admin = () => {
                             <option value="fashion">Fashion</option>
                             <option value="music">Music</option>
                             <option value="accessories">Accessories</option>
-                            <option value="books">Books</option>
-                            <option value="art">Art</option>
                             <option value="footwear">Footwear</option>
                             
                           </select>
@@ -735,6 +733,7 @@ const Admin = () => {
                           <option value="Lagos">Lagos</option>
                           <option value="Seoul">Seoul</option>
                           <option value="London">London</option>
+                          <option value="Berlin">Berlin</option>
                         </select>
                       </div>
                       <div className="space-y-2">
@@ -1741,8 +1740,6 @@ const Admin = () => {
                           <option value="fashion">Fashion</option>
                           <option value="music">Music</option>
                           <option value="accessories">Accessories</option>
-                          <option value="books">Books</option>
-                          <option value="art">Art</option>
                           <option value="footwear">Footwear</option>
                           
                         </select>

@@ -24,12 +24,12 @@ const productSchema = new mongoose.Schema({
   category: {
     type: String,
     required: [true, 'Please add a category'],
-    enum: ['fashion', 'music', 'accessories', 'books', 'art', 'footwear', 'clothing']
+    enum: ['fashion', 'music', 'accessories', 'footwear', 'clothing']
   },
   culture: {
     type: String,
     required: [true, 'Please add a culture'],
-    enum: ['Tokyo', 'New York', 'Lagos', 'Seoul', 'London']
+    enum: ['Tokyo', 'New York', 'Lagos', 'Seoul', 'London', 'Berlin']
   },
   images: {
     type: [String],

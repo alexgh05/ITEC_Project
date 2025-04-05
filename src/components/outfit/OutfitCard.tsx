@@ -342,7 +342,7 @@ export const OutfitCard = ({ outfit }: OutfitCardProps) => {
   if (!outfit || !outfit.colorPalette || !outfit.name) {
     return (
       <div className={`${darkMode ? 'bg-black/60' : 'bg-white/90'} p-8 rounded-lg text-center`}>
-        <div>Error: Incomplete outfit data</div>
+        <div className={`${darkMode ? 'text-white' : 'text-gray-900'}`}>Error: Incomplete outfit data</div>
       </div>
     );
   }
