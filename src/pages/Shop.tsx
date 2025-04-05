@@ -6,6 +6,7 @@ import { Filter, X, Music, ShoppingBag, Package } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useThemeStore } from '@/store/useThemeStore';
 import { fetchProducts } from '@/lib/api';
+import { useAudio } from '@/providers/ThemeProvider';
 
 const categories = ['All', 'Music', 'Accessories', 'Footwear', 'Fashion'];
 const cultures = ['All', 'Tokyo', 'New York', 'Lagos', 'Seoul', 'London', 'Berlin'];
@@ -52,6 +53,7 @@ const ShopPage = () => {
   const [filteredProducts, setFilteredProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const { setCulture } = useThemeStore();
+  const { audioRef, isPlaying } = useAudio();
   const [searchParams] = useSearchParams();
   
   // Fetch products from API
@@ -99,11 +101,62 @@ const ShopPage = () => {
     // Update the theme based on culture selection
     if (culture === 'All') {
       setCulture('default');
+      
+      // Stop Berlin audio if it's playing
+      const berlinAudio = document.getElementById('berlin-audio') as HTMLAudioElement;
+      if (berlinAudio && !berlinAudio.paused) {
+        berlinAudio.pause();
+      }
     } else if (culture === 'New York') {
       setCulture('newyork');
+      
+      // Stop Berlin audio if it's playing
+      const berlinAudio = document.getElementById('berlin-audio') as HTMLAudioElement;
+      if (berlinAudio && !berlinAudio.paused) {
+        berlinAudio.pause();
+      }
+    } else if (culture === 'Berlin') {
+      setCulture('berlin');
+      
+      // Special handling for Berlin audio
+      try {
+        // First, stop the default audio from ThemeProvider
+        if (audioRef?.current && !audioRef.current.paused) {
+          audioRef.current.pause();
+        }
+        
+        // Get or create Berlin audio element
+        let berlinAudio = document.getElementById('berlin-audio') as HTMLAudioElement;
+        if (!berlinAudio) {
+          berlinAudio = document.createElement('audio');
+          berlinAudio.id = 'berlin-audio';
+          berlinAudio.src = '/audio/berlin-techno.mp3';
+          berlinAudio.volume = 0.3;
+          berlinAudio.loop = true;
+          document.body.appendChild(berlinAudio);
+        }
+        
+        // Reset the audio to start from the beginning
+        berlinAudio.currentTime = 0;
+        
+        // Play Berlin audio if global audio is playing
+        if (isPlaying) {
+          berlinAudio.play()
+            .then(() => console.log('Berlin audio playing in shop filter'))
+            .catch(err => console.error('Berlin audio play error in shop filter:', err));
+        }
+      } catch (error) {
+        console.error('Error handling Berlin audio in shop:', error);
+      }
     } else {
-      // For Tokyo, Lagos, Seoul, London, Berlin - lowercase the culture name
+      // For Tokyo, Lagos, Seoul, London - lowercase the culture name
       setCulture(culture.toLowerCase() as any);
+      
+      // Stop Berlin audio if it's playing
+      const berlinAudio = document.getElementById('berlin-audio') as HTMLAudioElement;
+      if (berlinAudio && !berlinAudio.paused) {
+        berlinAudio.pause();
+      }
     }
   };
 
@@ -113,6 +166,15 @@ const ShopPage = () => {
     
     // Scroll to top when component mounts
     window.scrollTo(0, 0);
+    
+    // Cleanup when leaving the page
+    return () => {
+      // Stop Berlin audio if it's playing
+      const berlinAudio = document.getElementById('berlin-audio') as HTMLAudioElement;
+      if (berlinAudio && !berlinAudio.paused) {
+        berlinAudio.pause();
+      }
+    };
   }, []);
 
   return (

@@ -16,6 +16,8 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
+import { useThemeStore } from '@/store/useThemeStore';
+import { useAudio } from '@/providers/ThemeProvider';
 
 // Map category slugs to display names
 const categoryDisplayNames = {
@@ -29,7 +31,9 @@ const cultureMap = {
   'Tokyo': 'tokyo',
   'New York': 'newyork',
   'Lagos': 'lagos',
-  'Seoul': 'seoul'
+  'Seoul': 'seoul',
+  'London': 'london',
+  'Berlin': 'berlin'
 };
 
 // Gender options
@@ -49,11 +53,16 @@ interface Product {
   [key: string]: any;
 }
 
+// Available cultures for display (with proper capitalization)
+const cultures = ['Tokyo', 'New York', 'Lagos', 'Seoul', 'London', 'Berlin'];
+
 const ShopCategory = () => {
   const { category } = useParams<{ category: string }>();
   const [products, setProducts] = useState<Product[]>([]);
   const [filteredProducts, setFilteredProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
+  const { setCulture } = useThemeStore();
+  const { audioRef, isPlaying } = useAudio();
   
   // Filter states
   const [priceRange, setPriceRange] = useState<[number, number]>([0, 200]);
@@ -65,9 +74,6 @@ const ShopCategory = () => {
   
   // Sort state
   const [sortOption, setSortOption] = useState<string>('default');
-  
-  // Available cultures for display (with proper capitalization)
-  const cultures = ['Tokyo', 'New York', 'Lagos', 'Seoul'];
   
   // Get the display name for the category
   const categoryName = category ? categoryDisplayNames[category] || category : '';
@@ -106,6 +112,15 @@ const ShopCategory = () => {
     };
     
     getProducts();
+    
+    // Cleanup when unmounting
+    return () => {
+      // Stop Berlin audio if it's playing when leaving the page
+      const berlinAudio = document.getElementById('berlin-audio') as HTMLAudioElement;
+      if (berlinAudio && !berlinAudio.paused) {
+        berlinAudio.pause();
+      }
+    };
   }, [category, categoryName]);
   
   // Apply filters and sorting whenever filter options change
@@ -218,6 +233,77 @@ const ShopCategory = () => {
   const toggleCulture = (culture: string) => {
     console.log("Toggling culture:", culture);
     
+    // Handle culture theme changes
+    if (culture === 'Berlin') {
+      // Handle Berlin special case
+      const isBeingAdded = !selectedCultures.includes(culture);
+      
+      if (isBeingAdded) {
+        // Berlin is being added to filter
+        setCulture('berlin');
+        
+        // Special handling for Berlin audio
+        try {
+          // First, stop the default audio from ThemeProvider
+          if (audioRef?.current && !audioRef.current.paused) {
+            audioRef.current.pause();
+          }
+          
+          // Get or create Berlin audio element
+          let berlinAudio = document.getElementById('berlin-audio') as HTMLAudioElement;
+          if (!berlinAudio) {
+            berlinAudio = document.createElement('audio');
+            berlinAudio.id = 'berlin-audio';
+            berlinAudio.src = '/audio/berlin-techno.mp3';
+            berlinAudio.volume = 0.3;
+            berlinAudio.loop = true;
+            document.body.appendChild(berlinAudio);
+          }
+          
+          // Reset the audio to start from the beginning
+          berlinAudio.currentTime = 0;
+          
+          // Play Berlin audio if global audio is playing
+          if (isPlaying) {
+            berlinAudio.play()
+              .then(() => console.log('Berlin audio playing in shop category'))
+              .catch(err => console.error('Berlin audio play error in shop category:', err));
+          }
+        } catch (error) {
+          console.error('Error handling Berlin audio in shop category:', error);
+        }
+      } else {
+        // Berlin is being removed
+        setCulture('default');
+        
+        // Stop Berlin audio if it's playing
+        const berlinAudio = document.getElementById('berlin-audio') as HTMLAudioElement;
+        if (berlinAudio && !berlinAudio.paused) {
+          berlinAudio.pause();
+        }
+      }
+    } else {
+      // For other cultures
+      // If Berlin was previously selected, stop its audio
+      if (selectedCultures.includes('Berlin')) {
+        const berlinAudio = document.getElementById('berlin-audio') as HTMLAudioElement;
+        if (berlinAudio && !berlinAudio.paused) {
+          berlinAudio.pause();
+        }
+      }
+      
+      // Set appropriate culture theme based on selection
+      const cultureThemes = selectedCultures.filter(c => c !== 'Berlin');
+      if (cultureThemes.length === 0 && !selectedCultures.includes(culture)) {
+        // This culture is being added and no other cultures are selected
+        setCulture(cultureMap[culture].toLowerCase() as any);
+      } else if (cultureThemes.length === 1 && selectedCultures.includes(culture)) {
+        // This culture is being removed and it's the only one
+        setCulture('default');
+      }
+    }
+    
+    // Update selected cultures list
     setSelectedCultures(prev => {
       // Check if this culture is already selected
       if (prev.includes(culture)) {
