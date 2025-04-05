@@ -11,9 +11,11 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
+import NotifyMeButton from './NotifyMeButton';
 
 export interface Product {
   id: string;
+  _id?: string;
   name: string;
   price: number;
   category: string;
@@ -23,6 +25,7 @@ export interface Product {
   isFeatured?: boolean;
   sizes?: string[];
   selectedSize?: string;
+  countInStock?: number;
 }
 
 interface ProductCardProps {
@@ -69,6 +72,9 @@ const ProductCard = ({ product }: ProductCardProps) => {
       : `${product.name} added to wishlist!`
     );
   };
+
+  // Check if product is out of stock
+  const isOutOfStock = product.countInStock <= 0;
 
   return (
     <motion.div
@@ -130,6 +136,24 @@ const ProductCard = ({ product }: ProductCardProps) => {
           <p className="font-semibold">${product.price.toFixed(2)}</p>
         </div>
 
+        <div className="mt-1">
+          <p className={`text-xs ${
+            typeof product.countInStock === 'undefined' || product.countInStock === null ? 
+              'text-muted-foreground' : 
+              product.countInStock > 10 ? 
+                'text-green-600 dark:text-green-400' : 
+                product.countInStock > 0 ? 
+                  'text-amber-600 dark:text-amber-400' : 
+                  'text-red-600 dark:text-red-400'
+          }`}>
+            {typeof product.countInStock === 'undefined' || product.countInStock === null ? 
+              'Stock info unavailable' : 
+              product.countInStock > 0 ? 
+                `In stock: ${product.countInStock}` : 
+                'Out of stock'}
+          </p>
+        </div>
+
         <div className="mt-4 space-y-2">
           <Popover open={popoverOpen} onOpenChange={setPopoverOpen}>
             <PopoverTrigger asChild>
@@ -137,6 +161,7 @@ const ProductCard = ({ product }: ProductCardProps) => {
                 variant="outline" 
                 size="sm" 
                 className="w-full justify-between"
+                disabled={isOutOfStock}
               >
                 {selectedSize ? `Size: ${selectedSize}` : "Select Size"}
                 <ChevronDown size={16} />
@@ -158,16 +183,24 @@ const ProductCard = ({ product }: ProductCardProps) => {
             </PopoverContent>
           </Popover>
           
-          <Button 
-            variant="outline" 
-            size="sm" 
-            className="w-full bg-secondary hover:bg-secondary/80 flex items-center justify-center gap-2"
-            onClick={handleAddToCart}
-            disabled={!selectedSize}
-          >
-            <ShoppingCart size={16} />
-            Add to Cart
-          </Button>
+          {isOutOfStock ? (
+            <NotifyMeButton 
+              productId={product._id || product.id} 
+              productName={product.name}
+              className="w-full"
+            />
+          ) : (
+            <Button 
+              variant="outline" 
+              size="sm" 
+              className="w-full bg-secondary hover:bg-secondary/80 flex items-center justify-center gap-2"
+              onClick={handleAddToCart}
+              disabled={!selectedSize}
+            >
+              <ShoppingCart size={16} />
+              Add to Cart
+            </Button>
+          )}
         </div>
       </div>
     </motion.div>

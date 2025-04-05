@@ -208,6 +208,22 @@ const WishlistItem = ({ product, handleRemoveFromWishlist, handleAddToCart, hand
           <p className="font-semibold">${product.price.toFixed(2)}</p>
         </div>
         
+        <p className={`text-xs ${
+          typeof product.countInStock === 'undefined' || product.countInStock === null ? 
+            'text-muted-foreground' : 
+            product.countInStock > 10 ? 
+              'text-green-600 dark:text-green-400' : 
+              product.countInStock > 0 ? 
+                'text-amber-600 dark:text-amber-400' : 
+                'text-red-600 dark:text-red-400'
+        }`}>
+          {typeof product.countInStock === 'undefined' || product.countInStock === null ? 
+            'Stock info unavailable' : 
+            product.countInStock > 0 ? 
+              `In stock: ${product.countInStock}` : 
+              'Out of stock'}
+        </p>
+        
         <div className="mt-2 space-y-2" onClick={(e) => e.stopPropagation()}>
           <Popover open={popoverOpen} onOpenChange={setPopoverOpen}>
             <PopoverTrigger asChild>
@@ -302,6 +318,21 @@ const WishlistItemDraggable = ({ product, handleRemoveFromWishlist, handleAddToC
           </h3>
           <p className="text-sm text-muted-foreground">{product.culture}</p>
           <p className="text-sm font-semibold mt-1">${product.price.toFixed(2)}</p>
+          <p className={`text-xs ${
+            typeof product.countInStock === 'undefined' || product.countInStock === null ? 
+              'text-muted-foreground' : 
+              product.countInStock > 10 ? 
+                'text-green-600 dark:text-green-400' : 
+                product.countInStock > 0 ? 
+                  'text-amber-600 dark:text-amber-400' : 
+                  'text-red-600 dark:text-red-400'
+          }`}>
+            {typeof product.countInStock === 'undefined' || product.countInStock === null ? 
+              'Stock info unavailable' : 
+              product.countInStock > 0 ? 
+                `In stock: ${product.countInStock}` : 
+                'Out of stock'}
+          </p>
         </div>
         
         <div className="flex flex-col md:flex-row gap-2 mt-2 md:mt-0 w-full md:w-auto md:min-w-[240px]">

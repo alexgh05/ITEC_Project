@@ -8,7 +8,6 @@ const productSchema = new mongoose.Schema({
   },
   slug: {
     type: String,
-    unique: true,
     lowercase: true
   },
   price: {
@@ -19,7 +18,7 @@ const productSchema = new mongoose.Schema({
   category: {
     type: String,
     required: [true, 'Please add a category'],
-    enum: ['fashion', 'music', 'accessories']
+    enum: ['fashion', 'music', 'accessories', 'books', 'art', 'footwear', 'clothing']
   },
   culture: {
     type: String,
@@ -33,6 +32,11 @@ const productSchema = new mongoose.Schema({
   description: {
     type: String,
     required: [true, 'Please add a description']
+  },
+  countInStock: {
+    type: Number,
+    required: true,
+    default: 0
   },
   isFeatured: {
     type: Boolean,

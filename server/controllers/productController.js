@@ -1,4 +1,5 @@
 import Product from '../models/Product.js';
+import { processStockNotifications } from './stockNotificationController.js';
 
 // @desc    Get all products
 // @route   GET /api/products
@@ -100,17 +101,56 @@ export const updateProduct = async (req, res) => {
         error: 'Product not found'
       });
     }
+
+    // Check if stock is being updated from 0 to a positive number
+    const wasOutOfStock = product.countInStock <= 0;
+    const willBeInStock = req.body.countInStock > 0;
+    const stockNotificationsNeeded = wasOutOfStock && willBeInStock;
+    
+    console.log('Stock update check:', { 
+      productId: product._id,
+      productName: product.name,
+      previousStock: product.countInStock, 
+      newStock: req.body.countInStock,
+      wasOutOfStock,
+      willBeInStock,
+      stockNotificationsNeeded
+    });
     
     product = await Product.findByIdAndUpdate(req.params.id, req.body, {
       new: true,
       runValidators: true
     });
+
+    // If product was out of stock and is now in stock, process notifications
+    if (stockNotificationsNeeded) {
+      console.log(`Product ${product._id} (${product.name}) is back in stock. Processing notifications...`);
+      try {
+        const notificationResult = await processStockNotifications(product._id);
+        console.log('Stock notifications processed:', notificationResult);
+        
+        if (!notificationResult.success) {
+          console.error('Stock notification processing was not successful:', notificationResult.error);
+        } else {
+          console.log(`Sent ${notificationResult.userNotifications + notificationResult.guestNotifications} notifications`);
+          if (notificationResult.userEmails.length > 0) {
+            console.log('User emails notified:', notificationResult.userEmails);
+          }
+          if (notificationResult.guestEmails.length > 0) {
+            console.log('Guest emails notified:', notificationResult.guestEmails);
+          }
+        }
+      } catch (notificationError) {
+        console.error('Error processing stock notifications:', notificationError);
+      }
+    }
     
     res.status(200).json({
       success: true,
       data: product
     });
   } catch (error) {
+    console.error('Error updating product:', error);
     if (error.name === 'ValidationError') {
       const messages = Object.values(error.errors).map(err => err.message);
       

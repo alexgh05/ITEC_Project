@@ -1,9 +1,11 @@
-import dotenv from 'dotenv';
 import mongoose from 'mongoose';
-import { fileURLToPath } from 'url';
-import { dirname, join } from 'path';
 import Product from './models/Product.js';
 import User from './models/User.js';
+import Order from './models/Order.js';
+import dotenv from 'dotenv';
+import connectDB from './config/db.js';
+import { fileURLToPath } from 'url';
+import { dirname, join } from 'path';
 
 // __dirname workaround for ES modules
 const __filename = fileURLToPath(import.meta.url);
@@ -16,151 +18,248 @@ dotenv.config({ path: join(__dirname, '..', '.env') });
 const MONGO_URI = process.env.MONGO_URI || 'mongodb://localhost:27017/culture-drop-shop';
 
 // Connect to MongoDB
-const connectDB = async () => {
-  try {
-    const conn = await mongoose.connect(MONGO_URI);
-    
-    console.log(`MongoDB Connected: ${conn.connection.host}`);
-    return conn;
-  } catch (error) {
-    console.error(`Error: ${error.message}`);
-    process.exit(1);
-  }
-};
+connectDB();
 
-// Sample products data
-const productData = [
+// Sample data
+const users = [
+  {
+    name: 'Admin User',
+    email: 'admin@example.com',
+    password: 'adminpass',
+    role: 'admin'
+  },
+  {
+    name: 'John Doe',
+    email: 'john@example.com',
+    password: 'password123',
+    role: 'user'
+  },
+  {
+    name: 'Jane Smith',
+    email: 'jane@example.com',
+    password: 'password123',
+    role: 'user'
+  }
+];
+
+const products = [
   {
     name: 'Tokyo Neon Hoodie',
-    slug: 'tokyo-neon-hoodie',
     price: 89.99,
     category: 'fashion',
     culture: 'Tokyo',
-    images: ['/product-1a.jpg', '/product-1b.jpg'],
-    description: 'Inspired by the neon-lit streets of Shibuya',
+    images: ['/products/tokyo-neon-hoodie-1.svg', '/products/tokyo-neon-hoodie-2.svg'],
+    description: 'Inspired by the neon-lit streets of Shibuya, this hoodie features a unique blend of contemporary Japanese street fashion with cyberpunk aesthetics.',
+    countInStock: 25,
     isFeatured: true
   },
   {
     name: 'NYC Underground Vinyl',
-    slug: 'nyc-underground-vinyl',
     price: 29.99,
     category: 'music',
     culture: 'New York',
-    images: ['/product-2a.jpg', '/product-2b.jpg'],
-    description: 'Limited edition hip-hop vinyl straight from Brooklyn'
+    images: ['/products/nyc-underground-vinyl-1.svg', '/products/nyc-underground-vinyl-2.svg'],
+    description: 'Limited edition hip-hop vinyl straight from Brooklyn featuring the hottest underground artists.',
+    countInStock: 15
   },
   {
     name: 'Lagos Beats Headphones',
-    slug: 'lagos-beats-headphones',
     price: 129.99,
     category: 'accessories',
     culture: 'Lagos',
-    images: ['/product-3a.jpg', '/product-3b.jpg'],
-    description: 'Experience Afrobeats like never before'
-  },
-  {
-    name: 'Seoul Streetwear Jacket',
-    slug: 'seoul-streetwear-jacket',
-    price: 149.99,
-    category: 'fashion',
-    culture: 'Seoul',
-    images: ['/product-4a.jpg', '/product-4b.jpg'],
-    description: 'K-pop inspired fashion statement piece'
-  },
-  {
-    name: 'Tokyo Techno Vinyl',
-    slug: 'tokyo-techno-vinyl',
-    price: 34.99,
-    category: 'music',
-    culture: 'Tokyo',
-    images: ['/product-5a.jpg', '/product-5b.jpg'],
-    description: 'Cutting-edge electronic music from Tokyo\'s underground scene'
-  },
-  {
-    name: 'New York Cap',
-    slug: 'new-york-cap',
-    price: 39.99,
-    category: 'accessories',
-    culture: 'New York',
-    images: ['/product-6a.jpg', '/product-6b.jpg'],
-    description: 'Classic New York streetwear cap'
-  },
-  {
-    name: 'Lagos Pattern Tee',
-    slug: 'lagos-pattern-tee',
-    price: 49.99,
-    category: 'fashion',
-    culture: 'Lagos',
-    images: ['/product-7a.jpg', '/product-7b.jpg'],
-    description: 'Vibrant t-shirt with traditional Nigerian patterns'
-  },
-  {
-    name: 'Seoul K-Pop Album',
-    slug: 'seoul-k-pop-album',
-    price: 24.99,
-    category: 'music',
-    culture: 'Seoul',
-    images: ['/product-8a.jpg', '/product-8b.jpg'],
-    description: 'Limited edition K-Pop album with exclusive photobook'
-  },
-  {
-    name: 'London Club Jacket',
-    slug: 'london-club-jacket',
-    price: 129.99,
-    category: 'fashion',
-    culture: 'London',
-    images: ['/product-9a.jpg', '/product-9b.jpg'],
-    description: 'Stylish jacket inspired by London\'s electronic music scene',
+    images: ['/products/lagos-beats-headphones-1.svg', '/products/lagos-beats-headphones-2.svg'],
+    description: 'Experience Afrobeats like never before with these premium sound quality headphones inspired by Nigerian rhythms.',
+    countInStock: 8,
     isFeatured: true
   },
   {
-    name: 'London Underground Beanie',
-    slug: 'london-underground-beanie',
-    price: 29.99,
-    category: 'accessories',
-    culture: 'London',
-    images: ['/product-10a.jpg', '/product-10b.jpg'],
-    description: 'Keep warm with this London Underground inspired beanie'
+    name: 'Seoul Streetwear Jacket',
+    price: 149.99,
+    category: 'fashion',
+    culture: 'Seoul',
+    images: ['/products/seoul-streetwear-jacket-1.svg', '/products/seoul-streetwear-jacket-2.svg'],
+    description: 'K-pop inspired fashion statement piece with modern Korean design elements and premium materials.',
+    countInStock: 12
   },
   {
-    name: 'London Beats Vinyl',
-    slug: 'london-beats-vinyl',
+    name: 'NYC Graffiti Cap',
     price: 39.99,
-    category: 'music',
+    category: 'accessories',
+    culture: 'New York',
+    images: ['/products/nyc-graffiti-cap-1.svg', '/products/nyc-graffiti-cap-2.svg'],
+    description: 'Classic New York streetwear cap featuring authentic graffiti designs from local artists.',
+    countInStock: 0, // Out of stock
+    isFeatured: false
+  },
+  {
+    name: 'Rio Festival T-Shirt',
+    price: 45.99,
+    category: 'fashion',
+    culture: 'Lagos',
+    images: ['/products/rio-festival-tshirt-1.svg', '/products/rio-festival-tshirt-2.svg'],
+    description: 'Vibrant festival t-shirt inspired by the colors and energy of carnival celebrations.',
+    countInStock: 0, // Out of stock
+    isFeatured: false
+  },
+  {
+    name: 'London Fog Umbrella',
+    price: 49.99,
+    category: 'accessories',
     culture: 'London',
-    images: ['/product-11a.jpg', '/product-11b.jpg'],
-    description: 'Limited edition drum and bass vinyl from London\'s top producers'
+    images: ['/products/london-fog-umbrella-1.svg', '/products/london-fog-umbrella-2.svg'],
+    description: 'Stylish and durable umbrella inspired by London\'s iconic weather, perfect for rainy days with a touch of British elegance.',
+    countInStock: 0, // Out of stock
+    isFeatured: false
+  },
+  {
+    name: 'Tokyo Techno Limited Edition',
+    price: 79.99,
+    category: 'music',
+    culture: 'Tokyo',
+    images: ['/products/tokyo-neon-hoodie-1.svg', '/products/tokyo-neon-hoodie-2.svg'], // Reusing images as placeholder
+    description: 'Exclusive techno compilation featuring the most innovative sounds from Tokyo\'s underground electronic scene.',
+    countInStock: 3, // Low stock
+    isFeatured: true
+  },
+  {
+    name: 'Seoul Digital Art Print',
+    price: 59.99,
+    category: 'art',
+    culture: 'Seoul',
+    images: ['/products/seoul-streetwear-jacket-1.svg', '/products/seoul-streetwear-jacket-2.svg'], // Reusing images as placeholder
+    description: 'Limited edition digital art print showcasing the fusion of traditional Korean aesthetics with futuristic cyberpunk elements.',
+    countInStock: 5, // Low stock
+    isFeatured: false
+  },
+  {
+    name: 'Lagos Pattern Tote Bag',
+    price: 34.99,
+    category: 'accessories',
+    culture: 'Lagos',
+    images: ['/products/lagos-beats-headphones-1.svg', '/products/lagos-beats-headphones-2.svg'], // Reusing images as placeholder
+    description: 'Durable and stylish tote bag featuring authentic Nigerian patterns, perfect for shopping or everyday use.',
+    countInStock: 20,
+    isFeatured: false
   }
 ];
 
-// Sample user data
-const userData = {
-  name: 'Test User',
-  email: 'test@example.com',
-  password: 'password123' // In a real app, this would be hashed
-};
-
-// Function to import data
+// Import data to DB
 const importData = async () => {
   try {
-    const conn = await connectDB();
-    console.log('Connected to MongoDB, seeding data...');
-    
     // Clear existing data
-    await Product.deleteMany({});
-    await User.deleteMany({});
+    await Order.deleteMany();
+    await Product.deleteMany();
+    await User.deleteMany();
     
-    console.log('Existing data cleared');
-
-    // Import products
-    await Product.insertMany(productData);
-    console.log(`${productData.length} products inserted`);
+    // Insert users
+    const createdUsers = await User.insertMany(users);
+    const adminUser = createdUsers[0]._id;
+    const regularUser1 = createdUsers[1]._id;
+    const regularUser2 = createdUsers[2]._id;
     
-    // Create user
-    await User.create(userData);
-    console.log('Test user created');
-
-    console.log('Data imported successfully!');
+    // Add products with a reference to admin
+    const sampleProducts = products.map(product => {
+      return { ...product, user: adminUser };
+    });
+    
+    const createdProducts = await Product.insertMany(sampleProducts);
+    
+    // Create some orders
+    const orders = [
+      {
+        user: regularUser1,
+        orderItems: [
+          {
+            name: createdProducts[0].name,
+            quantity: 2,
+            image: createdProducts[0].images[0],
+            price: createdProducts[0].price,
+            product: createdProducts[0]._id
+          },
+          {
+            name: createdProducts[2].name,
+            quantity: 1,
+            image: createdProducts[2].images[0],
+            price: createdProducts[2].price,
+            product: createdProducts[2]._id
+          }
+        ],
+        shippingAddress: {
+          address: '123 Main St',
+          city: 'New York',
+          postalCode: '10001',
+          country: 'USA'
+        },
+        paymentMethod: 'PayPal',
+        taxPrice: 31.00,
+        shippingPrice: 10.00,
+        totalPrice: 351.97,
+        isPaid: true,
+        paidAt: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000), // 5 days ago
+        isDelivered: true,
+        deliveredAt: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000) // 3 days ago
+      },
+      {
+        user: regularUser2,
+        orderItems: [
+          {
+            name: createdProducts[3].name,
+            quantity: 1,
+            image: createdProducts[3].images[0],
+            price: createdProducts[3].price,
+            product: createdProducts[3]._id
+          }
+        ],
+        shippingAddress: {
+          address: '456 Oak St',
+          city: 'Chicago',
+          postalCode: '60007',
+          country: 'USA'
+        },
+        paymentMethod: 'Credit Card',
+        taxPrice: 15.00,
+        shippingPrice: 5.00,
+        totalPrice: 169.99,
+        isPaid: true,
+        paidAt: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000), // 2 days ago
+        isDelivered: false
+      },
+      {
+        user: regularUser1,
+        orderItems: [
+          {
+            name: createdProducts[1].name,
+            quantity: 1,
+            image: createdProducts[1].images[0],
+            price: createdProducts[1].price,
+            product: createdProducts[1]._id
+          },
+          {
+            name: createdProducts[4].name,
+            quantity: 1,
+            image: createdProducts[4].images[0],
+            price: createdProducts[4].price,
+            product: createdProducts[4]._id
+          }
+        ],
+        shippingAddress: {
+          address: '789 Pine St',
+          city: 'Los Angeles',
+          postalCode: '90001',
+          country: 'USA'
+        },
+        paymentMethod: 'PayPal',
+        taxPrice: 6.50,
+        shippingPrice: 5.00,
+        totalPrice: 76.48,
+        isPaid: false,
+        isDelivered: false
+      }
+    ];
+    
+    await Order.insertMany(orders);
+    
+    console.log('Data imported!');
     process.exit();
   } catch (error) {
     console.error(`Error: ${error.message}`);
@@ -168,17 +267,14 @@ const importData = async () => {
   }
 };
 
-// Function to destroy data
+// Delete all data from DB
 const destroyData = async () => {
   try {
-    await connectDB();
-    console.log('Connected to MongoDB, destroying data...');
+    await Order.deleteMany();
+    await Product.deleteMany();
+    await User.deleteMany();
     
-    // Clear all data
-    await Product.deleteMany({});
-    await User.deleteMany({});
-
-    console.log('Data destroyed successfully!');
+    console.log('Data destroyed!');
     process.exit();
   } catch (error) {
     console.error(`Error: ${error.message}`);
@@ -186,7 +282,7 @@ const destroyData = async () => {
   }
 };
 
-// Run the appropriate function based on command line args
+// Check command line arguments to determine action
 if (process.argv[2] === '-d') {
   destroyData();
 } else {
