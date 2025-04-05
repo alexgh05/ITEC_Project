@@ -115,6 +115,7 @@ const ThemeProvider = ({ children }: ThemeProviderProps) => {
     const audio = audioRef.current;
     if (!audio) return;
     
+    if (!cultureInfo[culture]?.sampleTrack) return;
     const trackSrc = cultureInfo[culture].sampleTrack;
     if (!trackSrc) return;
     
@@ -124,8 +125,8 @@ const ThemeProvider = ({ children }: ThemeProviderProps) => {
       const timestamp = new Date().getTime();
       audio.src = `${trackSrc}?t=${timestamp}`;
       
-      // Play audio if it should be playing
-      if (isPlaying || (audioEnabled && culture !== 'default')) {
+      // Only attempt to play if user has interacted with the page
+      if (hasUserInteracted && (isPlaying || (audioEnabled && culture !== 'default'))) {
         audio.play()
           .then(() => {
             setIsPlaying(true);
@@ -136,7 +137,7 @@ const ThemeProvider = ({ children }: ThemeProviderProps) => {
           });
       }
     }
-  }, [culture, cultureInfo, isPlaying, audioEnabled]);
+  }, [culture, cultureInfo, isPlaying, audioEnabled, hasUserInteracted]);
 
   // Toggle audio playback
   const toggleAudio = () => {
