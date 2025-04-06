@@ -98,7 +98,7 @@ export const translations: TranslationsType = {
     de: 'Kulturen'
   },
   outfitGenerator: {
-    en: 'AI Outfit Generator',
+    en: 'AI Style Augmenter',
     ro: 'Generator de Ținute AI',
     es: 'Generador de Outfits AI',
     de: 'KI-Outfit-Generator'

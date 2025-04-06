@@ -23,7 +23,7 @@ const getStyles = (isDarkMode: boolean) => ({
   placeholderBg: isDarkMode ? 'bg-pink-500/20' : 'bg-indigo-100'
 });
 
-// Simple, reliable outfit generator
+// Simple, reliable style augmenter
 export const FinalOutfitGenerator = () => {
   // Access theme store for culture theme - moving this to the top
   const { culture, setCulture, cultureInfo, darkMode } = useThemeStore();
@@ -344,7 +344,7 @@ export const FinalOutfitGenerator = () => {
   return (
     <div className="min-h-screen w-full bg-transparent p-6" style={{ backgroundColor: 'transparent' }}>
       <div className="max-w-6xl mx-auto">
-        <h1 className={`text-4xl font-bold mb-6 text-center ${styles.text}`}>AI Outfit Generator</h1>
+        <h1 className={`text-4xl font-bold mb-6 text-center ${styles.text}`}>AI Style Augmenter</h1>
         <p className={`text-lg mb-10 text-center ${styles.secondaryText}`}>
           Create a unique fashion identity based on your preferences
         </p>

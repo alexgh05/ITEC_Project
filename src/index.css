@@ -180,7 +180,7 @@
     transform: rotateY(180deg);
   }
   
-  /* Premium UI effects for outfit generator */
+  /* Premium UI effects for style augmenter */
   .text-gradient {
     @apply bg-clip-text text-transparent bg-gradient-to-r;
   }

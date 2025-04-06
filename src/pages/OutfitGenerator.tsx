@@ -400,7 +400,7 @@ export const OutfitGenerator = () => {
           className="text-center mb-12"
         >
           <h1 className={`text-4xl md:text-6xl font-bold ${darkMode ? 'text-white' : 'text-gray-900'} tracking-tight mb-4`}>
-            <span className={darkMode ? "text-culture" : "text-indigo-600"}>AI</span> Outfit Generator
+            <span className={darkMode ? "text-culture" : "text-indigo-600"}>AI</span> Style Augmenter
             <span className="inline-block ml-3">
               {darkMode ? (
                 <Moon className="inline-block w-8 h-8 text-blue-400 opacity-80" />
