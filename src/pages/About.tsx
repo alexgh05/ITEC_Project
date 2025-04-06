@@ -15,7 +15,7 @@ const AboutPage = () => {
       <section className="py-12 px-4 bg-secondary/50">
         <div className="container mx-auto">
           <div className="text-center">
-            <h1 className="text-4xl font-bold mb-4">About CultureDrop</h1>
+            <h1 className="text-4xl font-bold mb-4">About HypeHeritage</h1>
             <p className="text-muted-foreground max-w-2xl mx-auto">
               Where music and fashion unite to celebrate global urban cultures.
             </p>
@@ -34,12 +34,12 @@ const AboutPage = () => {
             >
               <h2 className="text-3xl font-bold mb-6">Our Story</h2>
               <p className="text-muted-foreground mb-4">
-                CultureDrop was born from a passion for the intersections between music, fashion, and cultural identity. 
+                HypeHeritage was born from a passion for the intersections between music, fashion, and cultural identity. 
                 We believe that urban cultures around the world create unique expressions that deserve to be celebrated and shared.
               </p>
               <p className="text-muted-foreground">
                 Founded in 2025 by a collective of Polytehnica Timisoara students,
-                CultureDrop aims to bring authentic products inspired by global urban cultures to people everywhere.
+                HypeHeritage aims to bring authentic products inspired by global urban cultures to people everywhere.
               </p>
             </motion.div>
             
@@ -195,7 +195,7 @@ const AboutPage = () => {
 
           <div className="mt-12 text-center max-w-3xl mx-auto">
             <p className="text-muted-foreground">
-              Together, we founded CultureDrop with a shared vision of creating a platform that celebrates the 
+              Together, we founded HypeHeritage with a shared vision of creating a platform that celebrates the 
               intersection of culture, fashion, and music from around the world.
             </p>
           </div>
