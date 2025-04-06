@@ -111,7 +111,7 @@ const ProductCard = ({ product }: ProductCardProps) => {
         <div className="flip-card-inner">
           {/* Front Side */}
           <div className="flip-card-front">
-            <Link to={`/shop/product/${product.id}`} className="block w-full h-full">
+            <Link to={`/product/${product.id}`} className="block w-full h-full">
               <img 
                 src={frontImage} 
                 alt={`${product.name} - Front view`} 
@@ -128,7 +128,7 @@ const ProductCard = ({ product }: ProductCardProps) => {
           
           {/* Back Side */}
           <div className="flip-card-back">
-            <Link to={`/shop/product/${product.id}`} className="block w-full h-full">
+            <Link to={`/product/${product.id}`} className="block w-full h-full">
               <img 
                 src={backImage} 
                 alt={`${product.name} - Back view`} 

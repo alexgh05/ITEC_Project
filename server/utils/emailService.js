@@ -260,13 +260,10 @@ export const sendStockNotificationEmail = async (product, customerEmail) => {
       to: customerEmail,
       subject: `${product.name} is Back in Stock! - CultureDrop`,
       text: `
-        Good news! The item you were waiting for is back in stock.
+        Good news! The ${product.name} is now back in stock. Hurry up before it sells out again!
         
-        Product: ${product.name}
-        Price: $${product.price.toFixed(2)}
-        
-        You can now purchase this item on our website:
-        http://localhost:8089/shop/product/${product._id}
+        You can view the product at: <br/>
+        http://localhost:8089/product/${product._id}
         
         Thank you for your patience.
         
@@ -290,7 +287,7 @@ export const sendStockNotificationEmail = async (product, customerEmail) => {
             <p><strong>Category:</strong> ${product.category}</p>
             
             <div style="margin-top: 20px; text-align: center;">
-              <a href="http://localhost:8089/shop/product/${product._id}" style="background-color: #4CAF50; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; display: inline-block;">
+              <a href="http://localhost:8089/product/${product._id}" style="background-color: #4CAF50; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; display: inline-block;">
                 View Product
               </a>
             </div>

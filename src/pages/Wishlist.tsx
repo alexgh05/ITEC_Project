@@ -73,8 +73,8 @@ const Wishlist = () => {
     }
   };
   
-  const handleViewProduct = (product: any) => {
-    navigate(`/shop/product/${product.id}`);
+  const handleViewProduct = (product) => {
+    navigate(`/product/${product.id}`);
   };
   
   const saveReorderedItems = () => {
